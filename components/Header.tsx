@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useSession, signIn, signOut } from 'next-auth/react';
 import { useAppStore } from '@/lib/store';
 import { markdownToDocx } from '@/lib/markdown-to-docx';
-import { FileDown, LogOut, LogIn, Loader2 } from 'lucide-react';
+import { Download, LogOut, LogIn } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export const Header: React.FC = () => {
@@ -63,12 +63,12 @@ export const Header: React.FC = () => {
           >
             {isExporting ? (
               <>
-                <Loader2 size={18} className="animate-spin" />
+                <div className="animate-spin"><Download size={18} /></div>
                 <span>Exportando...</span>
               </>
             ) : (
               <>
-                <FileDown size={18} />
+                <Download size={18} />
                 <span>Exportar DOCX</span>
               </>
             )}

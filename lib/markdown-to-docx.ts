@@ -1,4 +1,14 @@
-import { Document, Packer, Paragraph, TextRun, HeadingLevel, Table, BorderStyle } from 'docx';
+import {
+  Document,
+  Packer,
+  Paragraph,
+  TextRun,
+  HeadingLevel,
+  Table,
+  TableCell,
+  TableRow,
+  BorderStyle,
+} from 'docx';
 
 interface ParsedMarkdown {
   type: 'heading' | 'paragraph' | 'list' | 'code' | 'table' | 'hr' | 'mermaid';
@@ -6,6 +16,7 @@ interface ParsedMarkdown {
   content: string;
   items?: string[];
   ordered?: boolean;
+  linhas?: string[][];
 }
 
 function detectarBlocoArvore(
@@ -38,6 +49,49 @@ function detectarBlocoArvore(
   }
 
   return bloco.length > 0 ? { linhas: bloco, quantidade: i - indiceInicial } : null;
+}
+
+function validarSeparadorTabela(linha: string): boolean {
+  const conteudoLimpo = linha.trim();
+  const celulas = conteudoLimpo.split('|').filter((c) => c.trim());
+
+  if (celulas.length === 0) return false;
+
+  return celulas.every((celula) => /^[\s:-]+$/.test(celula));
+}
+
+function extrairLinhasTabela(linhas: string[], indiceInicial: number): string[][] | null {
+  if (indiceInicial + 1 >= linhas.length) return null;
+
+  const linhaUm = linhas[indiceInicial].trim();
+  const linhaAligment = linhas[indiceInicial + 1].trim();
+
+  if (!linhaUm.includes('|') || !validarSeparadorTabela(linhaAligment)) {
+    return null;
+  }
+
+  const tabelaLinhas: string[][] = [];
+
+  tabelaLinhas.push(
+    linhaUm
+      .split('|')
+      .map((c) => c.trim())
+      .filter((c) => c),
+  );
+
+  let i = indiceInicial + 2;
+  while (i < linhas.length && linhas[i].includes('|')) {
+    const linha = linhas[i].trim();
+    tabelaLinhas.push(
+      linha
+        .split('|')
+        .map((c) => c.trim())
+        .filter((c) => c),
+    );
+    i++;
+  }
+
+  return tabelaLinhas.length > 1 ? tabelaLinhas : null;
 }
 
 function parseMarkdown(markdown: string): ParsedMarkdown[] {
@@ -73,6 +127,11 @@ function parseMarkdown(markdown: string): ParsedMarkdown[] {
         result.push({ type: 'code', content: conteudoCodigo });
       }
       i++;
+    }
+    // Tables
+    else if ((tabelaLinhas = extrairLinhasTabela(lines, i))) {
+      result.push({ type: 'table', content: '', linhas: tabelaLinhas });
+      i += tabelaLinhas.length + 1;
     }
     // Estruturas de árvore e diagramas ASCII
     else if ((blocoArvore = detectarBlocoArvore(lines, i))) {
@@ -117,6 +176,7 @@ function parseMarkdown(markdown: string): ParsedMarkdown[] {
 }
 
 let blocoArvore: { linhas: string[]; quantidade: number } | null;
+let tabelaLinhas: string[][] | null;
 
 function formatText(text: string): TextRun[] {
   const runs: TextRun[] = [];
@@ -166,6 +226,38 @@ function getHeadingLevel(level: number): any {
     6: HeadingLevel.HEADING_6,
   };
   return levels[level] || HeadingLevel.HEADING_1;
+}
+
+function criarTabela(linhas: string[][]): Table {
+  if (linhas.length === 0) {
+    return new Table({ rows: [] });
+  }
+
+  const linhasTabela = linhas.map((celulasDaLinha, indiceLinhaAtual) => {
+    const celulasCriadas = celulasDaLinha.map((conteudoCelula) => {
+      const ehCabecalho = indiceLinhaAtual === 0;
+      return new TableCell({
+        children: [
+          new Paragraph({
+            children: formatText(conteudoCelula),
+            spacing: { line: 240 },
+          }),
+        ],
+        shading: {
+          fill: ehCabecalho ? 'D3D3D3' : 'FFFFFF',
+        },
+      });
+    });
+
+    return new TableRow({
+      children: celulasCriadas,
+    });
+  });
+
+  return new Table({
+    rows: linhasTabela,
+    width: { size: 100, type: 'pct' },
+  });
 }
 
 export async function markdownToDocx(markdown: string, fileName: string = 'documento') {
@@ -235,6 +327,9 @@ export async function markdownToDocx(markdown: string, fileName: string = 'docum
       });
 
       listaParagrafos.forEach((p) => sections.push(p));
+    } else if (item.type === 'table' && item.linhas) {
+      const tabela = criarTabela(item.linhas);
+      sections.push(tabela);
     } else if (item.type === 'mermaid') {
       // Renderizar diagrama Mermaid como bloco de código (representação textual)
       sections.push(

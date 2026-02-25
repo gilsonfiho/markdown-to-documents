@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useSession, signIn, signOut } from 'next-auth/react';
 import { useAppStore } from '@/lib/store';
 import { markdownToDocx } from '@/lib/markdown-to-docx';
+import { obterVersaoFormatada } from '@/lib/versao';
 import { Download, LogOut, LogIn } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -37,7 +38,12 @@ export const Header: React.FC = () => {
           </div>
           <div>
             <h1 className="text-xl font-bold text-neutral-900">Markdown Studio</h1>
-            <p className="text-xs text-neutral-500">Converta markdown para Word</p>
+            <div className="flex items-center gap-2">
+              <p className="text-xs text-neutral-500">Converta markdown para Word</p>
+              <span className="text-xs font-semibold text-neutral-400 bg-neutral-100 px-2 py-0.5 rounded">
+                {obterVersaoFormatada()}
+              </span>
+            </div>
           </div>
         </motion.div>
 

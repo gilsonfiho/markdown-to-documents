@@ -13,14 +13,9 @@ export function limparDiagramaMermaid(conteudoMermaid: string): string {
 
   let conteudoLimpo = conteudoMermaid;
 
-  // Remove <br/> (mais comum)
-  conteudoLimpo = conteudoLimpo.replace(/<br\s*\/>/gi, '\n    ');
+  conteudoLimpo = conteudoLimpo.replace(/<br\s*\/?>|<\/br>/gi, '\n    ');
 
-  // Remove <br> (sem barra de fechamento)
-  conteudoLimpo = conteudoLimpo.replace(/<br>/gi, '\n    ');
-
-  // Remove </br> (fechamento só)
-  conteudoLimpo = conteudoLimpo.replace(/<\/br>/gi, '\n    ');
+  conteudoLimpo = limparMermaidEmMarkdown(conteudoLimpo);
 
   return conteudoLimpo;
 }

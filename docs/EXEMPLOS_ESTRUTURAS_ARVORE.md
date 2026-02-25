@@ -144,7 +144,7 @@ Se preferir usar o formato tradicional de bloco de código:
 \`\`\`
 projeto/
 ├── src/
-│   └── index.ts
+│ └── index.ts
 └── package.json
 \`\`\`
 
@@ -157,23 +157,24 @@ projeto/
 
 ## Caracteres Suportados
 
-| Caractere | Nome | Uso |
-| :-------: | ---- | --- |
-| `├` | Ramificação | Itens intermediários |
-| `└` | Última ramificação | Último item de um nível |
-| `│` | Linha vertical | Continuação da estrutura |
-| `─` | Linha horizontal | Conexão horizontal |
-| `┌` | Canto superior esquerdo | Início de estrutura |
-| `┐` | Canto superior direito | Fim de primeira linha |
-| `┘` | Canto inferior direito | Fim de estrutura |
-| `┤` | Junção lateral | Conexão lateral |
-| `┬` | Junção superior | Divisão superior |
-| `┴` | Junção inferior | Divisão inferior |
-| `┼` | Junção central | Cruzamento de linhas |
+| Caractere | Nome                    | Uso                      |
+| :-------: | ----------------------- | ------------------------ |
+|    `├`    | Ramificação             | Itens intermediários     |
+|    `└`    | Última ramificação      | Último item de um nível  |
+|    `│`    | Linha vertical          | Continuação da estrutura |
+|    `─`    | Linha horizontal        | Conexão horizontal       |
+|    `┌`    | Canto superior esquerdo | Início de estrutura      |
+|    `┐`    | Canto superior direito  | Fim de primeira linha    |
+|    `┘`    | Canto inferior direito  | Fim de estrutura         |
+|    `┤`    | Junção lateral          | Conexão lateral          |
+|    `┬`    | Junção superior         | Divisão superior         |
+|    `┴`    | Junção inferior         | Divisão inferior         |
+|    `┼`    | Junção central          | Cruzamento de linhas     |
 
 ## Conversão para DOCX
 
 Quando você exporta para `.docx`, a estrutura é mantida com:
+
 - **Font**: Courier New (monoespace)
 - **Cor**: #333333 (cinza escuro)
 - **Fundo**: #F5F5F5 (cinza claro)
@@ -184,7 +185,7 @@ Isso garante que a visualização no Word seja fiel ao preview na tela.
 ## Referências
 
 Para mais informações, consulte:
+
 - Documentação: `/docs/SUPORTE_ESTRUTURAS_ARVORE.md`
 - Arquivo de configuração: `/lib/markdown-to-docx.ts`
 - Componente Preview: `/components/MarkdownPreview.tsx`
-

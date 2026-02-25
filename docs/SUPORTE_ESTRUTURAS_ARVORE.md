@@ -7,6 +7,7 @@ A aplicação **Markdown Studio** agora suporta a renderização correta de estr
 ## O Problema Original
 
 Anteriormente, markdown com estruturas de árvore era tratado como parágrafos normais, perdendo:
+
 - Espaçamento e indentação
 - Caracteres especiais Unicode como `├──`, `└──`, `│`
 - Formatação monoespace
@@ -23,6 +24,7 @@ const padraoArvore = /[├─└│┌┐┘┤┬┴┼]/;
 ```
 
 Suporta os seguintes caracteres Unicode:
+
 - `├──` — ramificação
 - `└──` — última ramificação
 - `│` — linha vertical
@@ -38,24 +40,29 @@ Suporta os seguintes caracteres Unicode:
 ### 2. **Renderização no Preview**
 
 O componente `MarkdownPreview` foi atualizado para:
+
 - Adicionar classe `whitespace-pre-wrap` ao elemento `<pre>`
 - Adicionar classe `break-words` para quebra de linha automática em telas pequenas
 - Preservar formatação monoespace via fonte `font-mono`
 
 **Classes Tailwind adicionadas:**
+
 ```tsx
-className="bg-neutral-900 text-neutral-50 p-4 rounded-lg overflow-x-auto my-4 border border-neutral-700 whitespace-pre-wrap break-words"
+className =
+  'bg-neutral-900 text-neutral-50 p-4 rounded-lg overflow-x-auto my-4 border border-neutral-700 whitespace-pre-wrap break-words';
 ```
 
 ### 3. **Exportação para DOCX**
 
 A função `markdownToDocx()` foi melhorada para:
+
 - Dividir blocos de código em múltiplos parágrafos (um por linha)
 - Aplicar bordas apenas na primeira e última linha
 - Preservar espaçamento e caracteres especiais
 - Usar fonte `Courier New` monoespace para mantê-lo visualmente correto
 
 **Resultado no DOCX:**
+
 - Primeira linha: borda superior + inferior + laterais
 - Linhas do meio: apenas bordas laterais
 - Última linha: borda inferior + laterais
@@ -121,6 +128,7 @@ Se desejar garantir formatação explícita, use blocos de código:
 ## Comportamento na Exportação DOCX
 
 Ambos os formatos (com e sem backticks) são exportados como:
+
 - Font: Courier New (monoespace)
 - Cor: #333333 (cinza escuro)
 - Fundo: #F5F5F5 (cinza muito claro)
@@ -134,16 +142,18 @@ Ambos os formatos (com e sem backticks) são exportados como:
 function detectarBlocoArvore(
   linhas: string[],
   indiceInicial: number,
-): { linhas: string[]; quantidade: number } | null
+): { linhas: string[]; quantidade: number } | null;
 ```
 
 Retorna:
+
 - `null` — se não for estrutura de árvore
 - `{ linhas: string[], quantidade: number }` — bloco detectado
 
 ### Parsing
 
 O parser agora reconhece no seguinte ordem:
+
 1. Headings (`#`, `##`, etc.)
 2. Code blocks (com backticks)
 3. **Estruturas de árvore** (novo)
@@ -176,4 +186,3 @@ O parser agora reconhece no seguinte ordem:
 - [Unicode Box Drawing Characters](https://en.wikipedia.org/wiki/Box_Drawing)
 - [React Markdown Documentation](https://github.com/remarkjs/react-markdown)
 - [DOCX Format Specification](https://www.ecma-international.org/publications-and-standards/standards/ecma-376-1/)
-

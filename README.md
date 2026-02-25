@@ -190,7 +190,6 @@ Input (inicial)
 [Nó 2] VerificacaoPreenchimento
 ├── Output: ano_exercicio, telefone
 └── contatos_indicador
-
 ```
 
 ## 📦 Estrutura do Projeto

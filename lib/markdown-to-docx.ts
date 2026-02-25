@@ -1,7 +1,7 @@
 import { Document, Packer, Paragraph, TextRun, HeadingLevel, Table, BorderStyle } from 'docx';
 
 interface ParsedMarkdown {
-  type: 'heading' | 'paragraph' | 'list' | 'code' | 'table' | 'hr';
+  type: 'heading' | 'paragraph' | 'list' | 'code' | 'table' | 'hr' | 'mermaid';
   level?: number;
   content: string;
   items?: string[];
@@ -57,15 +57,21 @@ function parseMarkdown(markdown: string): ParsedMarkdown[] {
     }
     // Code blocks
     else if (line.startsWith('```')) {
-      // remover informação de linguagem (não utilizada) para evitar aviso de variável não utilizada
-      line.replace(/```/, '').trim();
+      const linguagem = line.replace(/```/, '').trim();
       const codeLines = [];
       i++;
       while (i < lines.length && !lines[i].startsWith('```')) {
         codeLines.push(lines[i]);
         i++;
       }
-      result.push({ type: 'code', content: codeLines.join('\n') });
+      const conteudoCodigo = codeLines.join('\n');
+
+      // Verificar se é um bloco Mermaid
+      if (linguagem === 'mermaid') {
+        result.push({ type: 'mermaid', content: conteudoCodigo });
+      } else {
+        result.push({ type: 'code', content: conteudoCodigo });
+      }
       i++;
     }
     // Estruturas de árvore e diagramas ASCII
@@ -229,6 +235,58 @@ export async function markdownToDocx(markdown: string, fileName: string = 'docum
       });
 
       listaParagrafos.forEach((p) => sections.push(p));
+    } else if (item.type === 'mermaid') {
+      // Renderizar diagrama Mermaid como bloco de código (representação textual)
+      sections.push(
+        new Paragraph({
+          children: [
+            new TextRun({
+              text: '[Diagrama Mermaid]',
+              font: 'Courier New',
+              bold: true,
+              size: 20,
+              color: '0066CC',
+            }),
+          ],
+          spacing: { before: 200, after: 100 },
+        }),
+      );
+
+      const linhasMermaid = item.content.split('\n');
+      const paragrafosMermaid = linhasMermaid.map((linha) => {
+        return new Paragraph({
+          children: [
+            new TextRun({
+              text: linha || ' ',
+              font: 'Courier New',
+              size: 18,
+              color: '333333',
+            }),
+          ],
+          style: 'Normal',
+          spacing: { line: 240 },
+          border:
+            linha === linhasMermaid[0]
+              ? {
+                  top: { color: 'CCCCCC', space: 1, style: BorderStyle.SINGLE, size: 6 },
+                  bottom: { color: 'CCCCCC', space: 1, style: BorderStyle.SINGLE, size: 6 },
+                  left: { color: 'CCCCCC', space: 1, style: BorderStyle.SINGLE, size: 6 },
+                  right: { color: 'CCCCCC', space: 1, style: BorderStyle.SINGLE, size: 6 },
+                }
+              : linha === linhasMermaid[linhasMermaid.length - 1]
+                ? {
+                    bottom: { color: 'CCCCCC', space: 1, style: BorderStyle.SINGLE, size: 6 },
+                    left: { color: 'CCCCCC', space: 1, style: BorderStyle.SINGLE, size: 6 },
+                    right: { color: 'CCCCCC', space: 1, style: BorderStyle.SINGLE, size: 6 },
+                  }
+                : {
+                    left: { color: 'CCCCCC', space: 1, style: BorderStyle.SINGLE, size: 6 },
+                    right: { color: 'CCCCCC', space: 1, style: BorderStyle.SINGLE, size: 6 },
+                  },
+          shading: { fill: 'F0F8FF' },
+        });
+      });
+      paragrafosMermaid.forEach((p) => sections.push(p));
     } else if (item.type === 'hr') {
       sections.push(
         new Paragraph({

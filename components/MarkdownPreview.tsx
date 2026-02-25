@@ -33,8 +33,9 @@ export const MarkdownPreview: React.FC<MarkdownPreviewProps> = ({ content }) => 
             <strong className="font-semibold text-neutral-900" {...props} />
           ),
           em: ({ node, ...props }) => <em className="italic text-neutral-700" {...props} />,
-          code: ({ inline, ...props }: { inline?: boolean; [key: string]: unknown }) => {
-            const spreadProps = props as unknown as React.HTMLAttributes<HTMLElement>;
+          code: (props: any) => {
+            const { inline, ...rest } = props as any;
+            const spreadProps = rest as React.HTMLAttributes<HTMLElement>;
             return inline ? (
               <code
                 className="bg-neutral-100 text-neutral-900 px-2 py-1 rounded font-mono text-sm border border-neutral-200"

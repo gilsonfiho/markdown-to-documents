@@ -12,17 +12,20 @@ npm install
 ### 2️⃣ Configure Google OAuth
 
 **Passo 1: Acesse Google Cloud Console**
+
 - Vá para https://console.cloud.google.com/
 - Clique em "Selecionar um projeto" → "Novo projeto"
 - Nome: `Markdown Studio`
 
 **Passo 2: Ative Google+ API**
+
 - No menu esquerdo, clique em "APIs e Serviços"
 - Clique em "Ativar APIs e Serviços"
 - Pesquise por "Google+ API"
 - Clique em "Ativar"
 
 **Passo 3: Crie Credenciais OAuth**
+
 - No menu esquerdo, clique em "Credenciais"
 - Clique em "Criar Credenciais" → "ID do Cliente OAuth"
 - Selecione "Aplicação web"
@@ -44,11 +47,13 @@ GOOGLE_CLIENT_SECRET=seu-client-secret-aqui
 ```
 
 **Para gerar NEXTAUTH_SECRET:**
+
 ```bash
 openssl rand -base64 32
 ```
 
 Ou use esse valor (apenas para desenvolvimento):
+
 ```
 UltraSecretKeyForDevelopmentOnly123456789
 ```
@@ -80,7 +85,7 @@ Copie e cole isto no editor:
 
 ## Introdução
 
-Este é um **documento de exemplo** em *markdown*.
+Este é um **documento de exemplo** em _markdown_.
 
 ### Características
 
@@ -92,7 +97,7 @@ Este é um **documento de exemplo** em *markdown*.
 
 \`\`\`python
 def greet(name):
-    return f"Hello, {name}!"
+return f"Hello, {name}!"
 
 print(greet("World"))
 \`\`\`
@@ -115,19 +120,23 @@ print(greet("World"))
 ## 🐛 Solução de Problemas
 
 ### "Invalid Client"
+
 ❌ **Problema**: Credenciais do Google incorretas
 ✅ **Solução**: Verifique Client ID e Secret em .env.local
 
 ### "Erro ao exportar"
+
 ❌ **Problema**: Markdown malformado
 ✅ **Solução**: Tente um markdown simples primeiro
 
 ### "Não consigo fazer login"
+
 ❌ **Problema**: Callback URI incorreta
 ✅ **Solução**: Verifique em Google Cloud Console se está exatamente:
-   `http://localhost:3000/api/auth/callback/google`
+`http://localhost:3000/api/auth/callback/google`
 
 ### "Porta 3000 em uso"
+
 ```bash
 npm run dev -- -p 3001
 ```
@@ -206,6 +215,7 @@ Siga as instruções na CLI.
 ### Modificar Estilos
 
 Os estilos estão em:
+
 - `app/globals.css` - Estilos globais
 - `tailwind.config.ts` - Configuração Tailwind
 - `components/*.tsx` - Tailwind classes
@@ -223,7 +233,7 @@ Em `lib/store.ts`, modifique o markdown padrão.
 - Markdown completo com:
   - Headings (# ## ###)
   - Bold (**text**)
-  - Italic (*text*)
+  - Italic (_text_)
   - Código (```python)
   - Listas
   - Citações (>)

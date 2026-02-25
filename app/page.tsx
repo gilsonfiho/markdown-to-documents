@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Header } from '@/components/Header';
@@ -23,7 +23,7 @@ export default function Home() {
   if (status === 'loading') {
     return (
       <div className="w-full h-screen flex items-center justify-center bg-white">
-        <motion.div 
+        <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
           className="w-12 h-12 border-3 border-neutral-900 border-t-transparent rounded-full"
@@ -39,15 +39,15 @@ export default function Home() {
   return (
     <div className="w-screen h-screen flex flex-col bg-white overflow-hidden">
       <Header />
-      
-      <motion.div 
+
+      <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
         className="flex flex-1 overflow-hidden gap-px"
       >
         {/* Editor Panel */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.2, duration: 0.5 }}
@@ -62,7 +62,7 @@ export default function Home() {
         </motion.div>
 
         {/* Preview Panel */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.2, duration: 0.5 }}

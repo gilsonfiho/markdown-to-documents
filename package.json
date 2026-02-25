@@ -7,7 +7,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,html,md,mdx,json,css,scss}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,html,md,mdx,json,css,scss}\"",
+    "lint": "eslint -c .eslintrc.cjs --ext .js,.jsx,.ts,.tsx . --max-warnings=0",
+    "lint:fix": "eslint -c .eslintrc.cjs --ext .js,.jsx,.ts,.tsx . --fix"
   },
   "dependencies": {
     "@next-auth/prisma-adapter": "^1.0.0",
@@ -26,9 +29,18 @@
     "@types/node": "^20.10.0",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
+    "@tailwindcss/typography": "^0.5.19",
     "autoprefixer": "^10.4.0",
     "postcss": "^8.4.0",
     "tailwindcss": "^3.3.0",
-    "typescript": "^5.3.0"
+    "typescript": "^5.3.0",
+    "prettier": "^3.8.1",
+    "eslint": "^8.57.1",
+    "@typescript-eslint/parser": "^6.8.0",
+    "@typescript-eslint/eslint-plugin": "^6.8.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.5.5",
+    "eslint-plugin-react": "^7.32.2",
+    "eslint-plugin-react-hooks": "^4.6.0"
   }
 }

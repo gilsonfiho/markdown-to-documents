@@ -22,6 +22,7 @@ Este arquivo contém todas as variáveis sensíveis e **NUNCA deve ser commitado
 **O que é**: Chave privada para criptografia de sessões do NextAuth
 
 **Como gerar**:
+
 ```bash
 # Opção 1: OpenSSL (recomendado)
 openssl rand -base64 32
@@ -37,16 +38,19 @@ python -c "import secrets; print(secrets.token_urlsafe(32))"
 ```
 
 **Exemplo**:
+
 ```
 NEXTAUTH_SECRET=K4kZpL9mN2vQ5xY7aB3cD6eF8gH1jK4l+M7nO9pQ2rS5t=
 ```
 
 **Importância**: 🔴 CRÍTICA
+
 - Se vazar, todas as sessões são comprometidas
 - Mude em produção regularmente
 - Nunca compartilhe
 
 **Para Produção**:
+
 ```bash
 # Gere um novo valor
 openssl rand -base64 64  # Mais longo para produção
@@ -59,26 +63,31 @@ openssl rand -base64 64  # Mais longo para produção
 **O que é**: URL base da sua aplicação
 
 **Desenvolvimento**:
+
 ```
 NEXTAUTH_URL=http://localhost:3000
 ```
 
 **Staging**:
+
 ```
 NEXTAUTH_URL=https://staging.markdown-studio.app
 ```
 
 **Produção**:
+
 ```
 NEXTAUTH_URL=https://markdown-studio.app
 ```
 
 **Importância**: 🟡 IMPORTANTE
+
 - Deve ser exato (protocolo://dominio:porta)
 - Sem barra final
 - Usado para callbacks OAuth
 
 **Valores Inválidos**:
+
 ```
 ❌ http://localhost:3000/     # Tem barra
 ❌ localhost:3000             # Sem protocolo
@@ -102,11 +111,13 @@ NEXTAUTH_URL=https://markdown-studio.app
 7. Copie o "Client ID"
 
 **Formato**:
+
 ```
 GOOGLE_CLIENT_ID=123456789-abcdefghijklmnopqrstuvwxyz.apps.googleusercontent.com
 ```
 
 **Importância**: 🟡 IMPORTANTE
+
 - Pode ser revelado (é um ID público)
 - Usado para identificar seu app no Google
 - Diferente para cada ambiente (dev/staging/prod)
@@ -118,21 +129,25 @@ GOOGLE_CLIENT_ID=123456789-abcdefghijklmnopqrstuvwxyz.apps.googleusercontent.com
 **O que é**: Senha do seu app no Google (SENSÍVEL)
 
 **Como obter**:
+
 - Mesmo processo que CLIENT_ID
 - Na página de credenciais, clique em seu app
 - Copie o "Client Secret"
 
 **Formato**:
+
 ```
 GOOGLE_CLIENT_SECRET=GOCSPX-abcdefghijklmnopqrst1234567890
 ```
 
 **Importância**: 🔴 CRÍTICA
+
 - **NUNCA** compartilhe ou commit
 - Revogue imediatamente se vazar
 - Use diferentes secrets para cada ambiente
 
 **Se vazar**:
+
 ```bash
 # 1. Google Cloud Console
 # 2. Delete o secret comprometido
@@ -251,12 +266,12 @@ Dashboard → Seu Projeto → Settings → Environment Variables
 
 ### Passo 2: Adicione Variables
 
-| Variable | Value | Preview | Production |
-|----------|-------|---------|------------|
-| NEXTAUTH_SECRET | (valor) | ✅ | ✅ |
-| NEXTAUTH_URL | (url) | ✅ | ✅ |
-| GOOGLE_CLIENT_ID | (id) | ✅ | ✅ |
-| GOOGLE_CLIENT_SECRET | (secret) | ✅ | ✅ |
+| Variable             | Value    | Preview | Production |
+| -------------------- | -------- | ------- | ---------- |
+| NEXTAUTH_SECRET      | (valor)  | ✅      | ✅         |
+| NEXTAUTH_URL         | (url)    | ✅      | ✅         |
+| GOOGLE_CLIENT_ID     | (id)     | ✅      | ✅         |
+| GOOGLE_CLIENT_SECRET | (secret) | ✅      | ✅         |
 
 ### Passo 3: Redeploy
 
@@ -328,6 +343,7 @@ openssl rand -base64 64
 **Causa**: Variável não setada ou vazia
 
 **Solução**:
+
 ```bash
 # 1. Gere secret
 openssl rand -base64 32
@@ -344,6 +360,7 @@ npm run dev
 **Causa**: CLIENT_ID incorreto ou não encontrado
 
 **Solução**:
+
 1. Google Cloud Console
 2. Credenciais
 3. Verifique Client ID está correto
@@ -355,6 +372,7 @@ npm run dev
 **Causa**: NEXTAUTH_URL não corresponde ao registrado no Google
 
 **Solução**:
+
 1. Google Cloud Console → Credenciais
 2. Edite app OAuth
 3. Em "URIs autorizados de redirecionamento", adicione:
@@ -369,6 +387,7 @@ npm run dev
 **Causa**: NEXTAUTH_SECRET diferente entre deploys
 
 **Solução**:
+
 1. Use o MESMO secret em todos os servers
 2. Verifique em Vercel → Settings
 3. Redeploy
@@ -423,6 +442,7 @@ git push origin main
 ## Best Practices
 
 ✅ **DO**
+
 - Use secrets gerados aleatoriamente
 - Diferentes secrets por ambiente
 - Armazene em password manager corporativo
@@ -432,6 +452,7 @@ git push origin main
 - Monitore logs de acesso
 
 ❌ **DON'T**
+
 - Nunca commit .env.local
 - Nunca coloque secrets em código
 - Nunca compartilhe via Slack/Email

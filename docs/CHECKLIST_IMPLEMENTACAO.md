@@ -3,18 +3,21 @@
 ## 🚀 Phase 1: Setup Inicial (Tempo: 15 minutos)
 
 ### Preparação
+
 - [ ] Clonar/baixar projeto
 - [ ] Node.js 22+ instalado? (`node --version`)
 - [ ] npm/yarn instalado? (`npm --version`)
 - [ ] Editor de código pronto (VS Code, etc)
 
 ### Instalação
+
 - [ ] Abrir terminal na pasta do projeto
 - [ ] Executar `npm install`
 - [ ] Aguardar conclusão (2-3 minutos)
 - [ ] Verificar se não houve erros
 
 ### Git (Opcional)
+
 - [ ] Inicializar git: `git init`
 - [ ] Criar `.gitignore` (já incluído ✅)
 - [ ] Fazer commit inicial: `git add . && git commit -m "init: project setup"`
@@ -49,7 +52,7 @@
 - [ ] Preencher:
   - **Name**: `Markdown Studio Web`
   - **Authorized JavaScript origins**: `http://localhost:3000`
-  - **Authorized redirect URIs**: 
+  - **Authorized redirect URIs**:
     - `http://localhost:3000/api/auth/callback/google`
 - [ ] Clicar "Create"
 - [ ] Uma modal aparecerá com Client ID e Secret
@@ -152,20 +155,21 @@ npm run dev
 
 Cole isto no editor:
 
-```markdown
+````markdown
 # Teste
 
-**Bold** e *italic*
+**Bold** e _italic_
 
 - Lista 1
 - Lista 2
 
 ## Sub-heading
 
-```code```
-```
+`code`
+````
 
 Verifique no preview:
+
 - [ ] Heading renderizado
 - [ ] Bold e italic funcionam
 - [ ] Lista renderizada
@@ -225,6 +229,7 @@ Verifique no preview:
 ### Diferentes Markdowns
 
 Teste com:
+
 - [ ] Tabelas
 - [ ] Citações
 - [ ] Links
@@ -374,21 +379,25 @@ De volta ao Google Cloud Console:
 ## 🎯 Phase 14: Próximos Passos (Opcional)
 
 ### Imediato (Semana 1)
+
 - [ ] Customizar design/cores
 - [ ] Adicionar seu logo
 - [ ] Testar com mais exemplos
 
 ### Curto Prazo (Mês 1)
+
 - [ ] Implementar backend (Node.js + DB)
 - [ ] Adicionar salvamento de documentos
 - [ ] Adicionar histórico de versões
 
 ### Médio Prazo (Mês 2-3)
+
 - [ ] Autenticação com outros provedores
 - [ ] Features de colaboração
 - [ ] Temas customizáveis
 
 ### Longo Prazo (Mês 3+)
+
 - [ ] Mobile app
 - [ ] Browser extensions
 - [ ] API pública
@@ -399,16 +408,19 @@ De volta ao Google Cloud Console:
 ## 🐛 Troubleshooting Rápido
 
 ### "Port 3000 já em uso"
+
 ```bash
 npm run dev -- -p 3001
 ```
 
 ### "Module not found"
+
 ```bash
 rm -rf node_modules && npm install
 ```
 
 ### "Erro TypeScript"
+
 ```bash
 # Limpar cache
 rm -rf .next
@@ -416,12 +428,14 @@ npm run dev
 ```
 
 ### "Google login não funciona"
+
 - Verify: NEXTAUTH_SECRET em .env.local
 - Verify: NEXTAUTH_URL correto
 - Verify: Google OAuth credentials corretos
 - Verify: Callback URI registrado no Google Cloud
 
 ### "DOCX export falha"
+
 - Tente markdown simples primeiro
 - Limpar cache do navegador (Ctrl+Shift+Del)
 - Abrir DevTools → Console para ver erro

@@ -3,6 +3,7 @@
 ## 1. Documento Profissional
 
 ### Input Markdown:
+
 ```markdown
 # Relatório Mensal - Janeiro 2025
 
@@ -18,15 +19,15 @@ Este relatório apresenta os resultados de **janeiro de 2025**, com foco em:
 
 ### KPIs Atingidos
 
-| Métrica | Meta | Realizado | Status |
-|---------|------|-----------|--------|
-| Receita | R$ 100k | R$ 125k | ✅ |
-| Usuários | 5k | 7.2k | ✅ |
-| Conversão | 5% | 6.2% | ✅ |
+| Métrica   | Meta    | Realizado | Status |
+| --------- | ------- | --------- | ------ |
+| Receita   | R$ 100k | R$ 125k   | ✅     |
+| Usuários  | 5k      | 7.2k      | ✅     |
+| Conversão | 5%      | 6.2%      | ✅     |
 
 ### Detalhes
 
-A performance foi **excepcional** este mês. Conseguimos ultrapassar as metas em *todas as métricas*.
+A performance foi **excepcional** este mês. Conseguimos ultrapassar as metas em _todas as métricas_.
 
 #### Pontos Positivos
 
@@ -46,8 +47,8 @@ Implementamos a seguinte solução:
 \`\`\`typescript
 // Função de cálculo de ROI
 function calculateROI(investment: number, revenue: number): number {
-  const profit = revenue - investment;
-  return (profit / investment) * 100;
+const profit = revenue - investment;
+return (profit / investment) \* 100;
 }
 
 // Exemplo de uso
@@ -64,10 +65,11 @@ Continuaremos com essa estratégia em **fevereiro**.
 
 ---
 
-*Relatório preparado em 31 de janeiro de 2025*
+_Relatório preparado em 31 de janeiro de 2025_
 ```
 
 ### Output DOCX:
+
 - Documento formatado com headings hierárquicos
 - Tabela renderizada corretamente
 - Código com destaque
@@ -80,6 +82,7 @@ Continuaremos com essa estratégia em **fevereiro**.
 ## 2. Guia de Procedimentos
 
 ### Input Markdown:
+
 ```markdown
 # Guia de Onboarding - Novos Desenvolvedores
 
@@ -90,6 +93,7 @@ Este guia ajudará você a se integrar à equipe em **5 dias**.
 ## Dia 1: Setup
 
 ### Passo 1: Acesso aos Sistemas
+
 - Solicit credenciais ao RH
 - Configure autenticação 2FA
 - Teste acesso ao GitHub
@@ -97,15 +101,19 @@ Este guia ajudará você a se integrar à equipe em **5 dias**.
 ### Passo 2: Ambiente Local
 
 \`\`\`bash
+
 # Clone os repositórios
+
 git clone https://github.com/company/backend.git
 git clone https://github.com/company/frontend.git
 
 # Instale dependências
+
 cd backend && npm install
 cd ../frontend && npm install
 
 # Inicie servidores
+
 npm run dev
 \`\`\`
 
@@ -118,7 +126,7 @@ npm run dev
 
 ## Dia 2-5: Treinamento
 
-**Importante**: Faça *muitas* perguntas!
+**Importante**: Faça _muitas_ perguntas!
 
 ---
 
@@ -126,6 +134,7 @@ Dúvidas? Procure seu **mentor designado** ou abra uma issue.
 ```
 
 ### Output DOCX:
+
 - Documento de procedimentos bem estruturado
 - Instruções passo-a-passo
 - Comandos destacados
@@ -136,6 +145,7 @@ Dúvidas? Procure seu **mentor designado** ou abra uma issue.
 ## 3. Relatório Técnico
 
 ### Input Markdown:
+
 ```markdown
 # Migração de Banco de Dados: MongoDB → PostgreSQL
 
@@ -149,24 +159,27 @@ A empresa está migrando de **MongoDB** para **PostgreSQL** devido a:
 
 ## Timeline
 
-| Fase | Data | Responsável |
-|------|------|-------------|
-| Planejamento | 01-15 jan | TechLead |
+| Fase            | Data            | Responsável  |
+| --------------- | --------------- | ------------ |
+| Planejamento    | 01-15 jan       | TechLead     |
 | Desenvolvimento | 15 jan - 15 fev | Backend Team |
-| Testes | 15-28 fev | QA + Backend |
-| Migração | 01 mar | DevOps |
+| Testes          | 15-28 fev       | QA + Backend |
+| Migração        | 01 mar          | DevOps       |
 
 ## Riscos
 
 ### Alto Risco 🔴
+
 - Downtime durante migração
 - Perda de dados (mitigado com backup)
 
 ### Médio Risco 🟡
+
 - Incompatibilidade de schemas
 - Performance em queries complexas
 
 ### Baixo Risco 🟢
+
 - Capacitação do time
 - Documentação
 
@@ -175,10 +188,10 @@ A empresa está migrando de **MongoDB** para **PostgreSQL** devido a:
 \`\`\`sql
 -- Criar nova tabela em PostgreSQL
 CREATE TABLE users (
-  id SERIAL PRIMARY KEY,
-  email VARCHAR(255) NOT NULL UNIQUE,
-  name VARCHAR(255) NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+id SERIAL PRIMARY KEY,
+email VARCHAR(255) NOT NULL UNIQUE,
+name VARCHAR(255) NOT NULL,
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Criar índices
@@ -194,6 +207,7 @@ Data: 15 de janeiro de 2025
 ```
 
 ### Output DOCX:
+
 - Relatório executivo formatado
 - Tabela de timeline
 - Code blocks SQL
@@ -204,6 +218,7 @@ Data: 15 de janeiro de 2025
 ## 4. Apresentação de Produto
 
 ### Input Markdown:
+
 ```markdown
 # Markdown Studio - Apresentação
 
@@ -215,7 +230,7 @@ Profissionais e escritores precisam:
 - **Visualizar** em tempo real
 - **Exportar** para Word (.docx)
 
-Atualmente, precisam usar *múltiplas ferramentas*.
+Atualmente, precisam usar _múltiplas ferramentas_.
 
 ## A Solução
 
@@ -230,41 +245,47 @@ Atualmente, precisam usar *múltiplas ferramentas*.
 ## Features
 
 ### 1. Editor Inteligente
+
 - Suporte a markdown completo
 - Syntax highlighting visual
 - Tab support para indentação
 
 ### 2. Preview em Tempo Real
+
 - Atualização instantânea
 - Suporte a tabelas
 - Syntax highlight para código
 
 ### 3. Exportação Smart
+
 - Converte markdown para DOCX
 - Preserva formatação
 - Suporta imagens (future)
 
 ## Pricing
 
-| Plano | Preço | Features |
-|-------|-------|----------|
-| Grátis | $0/mês | 5 exports/mês |
-| Pro | $9/mês | Exportações ilimitadas |
-| Team | $29/mês | Colaboração + API |
+| Plano  | Preço   | Features               |
+| ------ | ------- | ---------------------- |
+| Grátis | $0/mês  | 5 exports/mês          |
+| Pro    | $9/mês  | Exportações ilimitadas |
+| Team   | $29/mês | Colaboração + API      |
 
 ## Roadmap
 
 ### Q1 2025 ✅
+
 - [ ] MVP com autenticação
 - [ ] Exportação DOCX
 - [ ] Preview split-view
 
 ### Q2 2025
+
 - [ ] Colaboração em tempo real
 - [ ] Upload de imagens
 - [ ] Histórico de versões
 
 ### Q3 2025
+
 - [ ] API pública
 - [ ] Integrações (Slack, Notion)
 - [ ] Mobile app
@@ -277,6 +298,7 @@ Pronto para começar? [Clique aqui](https://markdown-studio.app)
 ```
 
 ### Output DOCX:
+
 - Apresentação bem estruturada
 - Tabela de pricing
 - Roadmap visual
@@ -287,38 +309,50 @@ Pronto para começar? [Clique aqui](https://markdown-studio.app)
 ## 5. Artigo / Blog Post
 
 ### Input Markdown:
+
 ```markdown
 # As 5 Melhores Práticas de Markdown em 2025
 
 ## Introdução
 
-O markdown se tornou a *linguagem de documentação* padrão. Vamos explorar as melhores práticas atuais.
+O markdown se tornou a _linguagem de documentação_ padrão. Vamos explorar as melhores práticas atuais.
 
 ## 1. Use Headings Hierarquicamente
 
 ❌ **Errado**:
 \`\`\`markdown
+
 # Seção 1
+
 ## Subseção
-# Seção 2  # Pulou nível!
+
+# Seção 2 # Pulou nível!
+
 \`\`\`
 
 ✅ **Correto**:
 \`\`\`markdown
+
 # Seção 1
+
 ## Subseção 1.1
+
 ### Subseção 1.1.1
+
 ## Subseção 1.2
+
 \`\`\`
 
 ## 2. Use Listas Apropriadamente
 
 ### Listas não-ordenadas
+
 - Use quando ordem não importa
 - Mais **fluidas** visualmente
 - Melhor para bullets
 
 ### Listas ordenadas
+
 1. Use quando ordem **importa**
 2. Procedimentos passo-a-passo
 3. Mais estruturado
@@ -328,25 +362,29 @@ O markdown se tornou a *linguagem de documentação* padrão. Vamos explorar as 
 Sempre use code blocks com linguagem:
 
 \`\`\`python
+
 # ✅ Com linguagem
+
 def hello():
-    return "Hello, World!"
+return "Hello, World!"
 \`\`\`
 
 \`\`\`
+
 # ❌ Sem linguagem
+
 def hello():
-    return "Hello, World!"
+return "Hello, World!"
 \`\`\`
 
 ## 4. Tabelas para Dados
 
-| Prática | Benefício | Dificuldade |
-|---------|-----------|-------------|
-| Headings | Estrutura | Baixa |
-| Listas | Legibilidade | Baixa |
-| Tabelas | Dados tabulares | Média |
-| Código | Exemplos | Alta |
+| Prática  | Benefício       | Dificuldade |
+| -------- | --------------- | ----------- |
+| Headings | Estrutura       | Baixa       |
+| Listas   | Legibilidade    | Baixa       |
+| Tabelas  | Dados tabulares | Média       |
+| Código   | Exemplos        | Alta        |
 
 ## 5. Quebras Visuais
 
@@ -364,11 +402,12 @@ Comece hoje mesmo com **Markdown Studio**! 🚀
 
 ---
 
-*Artigo por: Dev Senior*
-*Data: 15 de janeiro de 2025*
+_Artigo por: Dev Senior_
+_Data: 15 de janeiro de 2025_
 ```
 
 ### Output DOCX:
+
 - Artigo bem formatado
 - Exemplos de código lado a lado
 - Emojis destacados
@@ -380,6 +419,7 @@ Comece hoje mesmo com **Markdown Studio**! 🚀
 ## 6. Template: Spec Técnico
 
 ### Input Markdown:
+
 ```markdown
 # Technical Specification: Auth v2
 
@@ -406,30 +446,30 @@ Upgrade do sistema de autenticação para suportar **OAuth2**, **MFA** e **SAML*
 
 \`\`\`
 ┌─────────────┐
-│   Frontend  │
+│ Frontend │
 └──────┬──────┘
-       │ /api/auth
-       ▼
+│ /api/auth
+▼
 ┌─────────────────┐
-│  Auth Service   │
-│  (Node.js)      │
+│ Auth Service │
+│ (Node.js) │
 └──────┬──────────┘
-       │
-       ├─► OAuth Provider
-       ├─► Database
-       └─► Cache (Redis)
+│
+├─► OAuth Provider
+├─► Database
+└─► Cache (Redis)
 \`\`\`
 
 ## Data Model
 
 \`\`\`sql
 CREATE TABLE auth_sessions (
-  id UUID PRIMARY KEY,
-  user_id INT NOT NULL,
-  provider VARCHAR(50),
-  token VARCHAR(500),
-  expires_at TIMESTAMP,
-  created_at TIMESTAMP
+id UUID PRIMARY KEY,
+user_id INT NOT NULL,
+provider VARCHAR(50),
+token VARCHAR(500),
+expires_at TIMESTAMP,
+created_at TIMESTAMP
 );
 \`\`\`
 
@@ -441,12 +481,12 @@ CREATE TABLE auth_sessions (
 
 ## Timeline
 
-| Milestone | Data |
-|-----------|------|
-| Design review | 20 jan |
-| Implementation | 20-30 jan |
-| Testing | 30 jan - 5 fev |
-| Deployment | 6 fev |
+| Milestone      | Data           |
+| -------------- | -------------- |
+| Design review  | 20 jan         |
+| Implementation | 20-30 jan      |
+| Testing        | 30 jan - 5 fev |
+| Deployment     | 6 fev          |
 
 ## Sign-off
 
@@ -456,6 +496,7 @@ CREATE TABLE auth_sessions (
 ```
 
 ### Output DOCX:
+
 - Documento técnico profissional
 - Diagramas ASCII renderizados
 - SQL code blocks
@@ -467,6 +508,7 @@ CREATE TABLE auth_sessions (
 ## 7. Tutoriais e How-To
 
 ### Input Markdown:
+
 ```markdown
 # Como Criar um Blog com Next.js
 
@@ -483,10 +525,13 @@ Criar um blog estático com **Next.js**, **MDX** e deploy no **Vercel**.
 ## Passo 1: Setup Inicial
 
 \`\`\`bash
+
 # Crie novo projeto
+
 npx create-next-app@latest blog --typescript
 
 # Instale MDX
+
 npm install @mdx-js/loader @mdx-js/react
 \`\`\`
 
@@ -495,28 +540,28 @@ npm install @mdx-js/loader @mdx-js/react
 \`\`\`
 blog/
 ├── posts/
-│   ├── primeiro-post.mdx
-│   ├── segundo-post.mdx
-│   └── index.ts
+│ ├── primeiro-post.mdx
+│ ├── segundo-post.mdx
+│ └── index.ts
 ├── pages/
-│   ├── blog/
-│   │   └── [slug].tsx
-│   └── index.tsx
+│ ├── blog/
+│ │ └── [slug].tsx
+│ └── index.tsx
 └── lib/
-    └── posts.ts
+└── posts.ts
 \`\`\`
 
 ## Passo 3: Componente Post
 
 \`\`\`typescript
 export default function Post({ post }) {
-  return (
-    <article>
-      <h1>{post.title}</h1>
-      <p>{post.date}</p>
-      {post.content}
-    </article>
-  )
+return (
+<article>
+<h1>{post.title}</h1>
+<p>{post.date}</p>
+{post.content}
+</article>
+)
 }
 \`\`\`
 
@@ -535,6 +580,7 @@ Parabéns! Seu blog está pronto. 🎉
 ```
 
 ### Output DOCX:
+
 - Tutorial completo e seguível
 - Código bem organizado
 - Estrutura clara
@@ -545,6 +591,7 @@ Parabéns! Seu blog está pronto. 🎉
 ## 8. Notas de Meeting
 
 ### Input Markdown:
+
 ```markdown
 # Meeting Notes - Planejamento Q2
 
@@ -570,22 +617,24 @@ Parabéns! Seu blog está pronto. 🎉
 ### Prioridades Q2
 
 **Alta Prioridade**
+
 1. Migração MongoDB → PostgreSQL
 2. Implementar caching com Redis
 3. Otimizar queries N+1
 
 **Média Prioridade**
+
 - Melhorar UI do dashboard
 - Documentação técnica
 - Automated testing
 
 ### Blockers
 
-| Blocker | Severidade | Owner | ETA |
-|---------|-----------|-------|-----|
-| Acesso ao prod | Alta | DevOps | Semana 1 |
-| Licença Datadog | Média | Finance | Semana 2 |
-| Design specs | Baixa | Design | Semana 3 |
+| Blocker         | Severidade | Owner   | ETA      |
+| --------------- | ---------- | ------- | -------- |
+| Acesso ao prod  | Alta       | DevOps  | Semana 1 |
+| Licença Datadog | Média      | Finance | Semana 2 |
+| Design specs    | Baixa      | Design  | Semana 3 |
 
 ### Action Items
 
@@ -601,11 +650,12 @@ Parabéns! Seu blog está pronto. 🎉
 
 ---
 
-*Prepared by: Dev Senior*
-*Distribuir para: @equipe-tech*
+_Prepared by: Dev Senior_
+_Distribuir para: @equipe-tech_
 ```
 
 ### Output DOCX:
+
 - Notas bem estruturadas
 - Action items claros
 - Tabela de blockers
@@ -616,6 +666,7 @@ Parabéns! Seu blog está pronto. 🎉
 ## 9. Documentation API (Readme)
 
 ### Input Markdown:
+
 ```markdown
 # API Documentation
 
@@ -642,19 +693,19 @@ Lista todos os documentos do usuário.
 **Request**:
 \`\`\`bash
 curl -H "Authorization: Bearer token" \
-  https://api.markdown-studio.app/v1/documents
+ https://api.markdown-studio.app/v1/documents
 \`\`\`
 
 **Response** (200):
 \`\`\`json
 {
-  "data": [
-    {
-      "id": "doc_123",
-      "title": "Meu Documento",
-      "created_at": "2025-01-15T10:30:00Z"
-    }
-  ]
+"data": [
+{
+"id": "doc_123",
+"title": "Meu Documento",
+"created_at": "2025-01-15T10:30:00Z"
+}
+]
 }
 \`\`\`
 
@@ -671,8 +722,8 @@ Exporta documento para DOCX.
 **cURL Example**:
 \`\`\`bash
 curl -X POST \
-  -H "Authorization: Bearer token" \
-  https://api.markdown-studio.app/v1/documents/doc_123/export
+ -H "Authorization: Bearer token" \
+ https://api.markdown-studio.app/v1/documents/doc_123/export
 \`\`\`
 
 ## Error Handling
@@ -680,14 +731,14 @@ curl -X POST \
 **401 Unauthorized**:
 \`\`\`json
 {
-  "error": "Invalid or expired token"
+"error": "Invalid or expired token"
 }
 \`\`\`
 
 **404 Not Found**:
 \`\`\`json
 {
-  "error": "Document not found"
+"error": "Document not found"
 }
 \`\`\`
 
@@ -697,6 +748,7 @@ Para mais informações, visite [docs.markdown-studio.app](https://docs.markdown
 ```
 
 ### Output DOCX:
+
 - Documentação API bem estruturada
 - Exemplos práticos
 - Tabelas de parâmetros
@@ -713,7 +765,7 @@ Para mais informações, visite [docs.markdown-studio.app](https://docs.markdown
 3. **Use listas não-ordenadas** para items aleatórios
 4. **Adicione quebras horizontais** entre seções
 5. **Use `>` para citações** importantes
-6. **Code blocks com linguagem** (```python, ```bash)
+6. **Code blocks com linguagem** (`python, `bash)
 7. **Tabelas** para dados estruturados
 8. **Negrito/Itálico** para ênfase
 

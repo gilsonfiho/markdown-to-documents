@@ -39,21 +39,24 @@ markdown-to-docx/                 ← Diretório principal
 ## 🚀 Funcionalidades Implementadas
 
 ### ✅ Autenticação
+
 - Login com Google OAuth2
 - Sessões seguras com NextAuth.js
 - Proteção de rotas
 - Logout
 
 ### ✅ Editor & Preview
+
 - Editor Markdown split-view
 - Preview em tempo real
 - Syntax highlighting visual
 - Suporte a tab indentation
 
 ### ✅ Markdown Completo
+
 - Headings (# ## ### etc)
 - Bold (**text**)
-- Italic (*text*)
+- Italic (_text_)
 - Code blocks (```language)
 - Listas ordenadas/não-ordenadas
 - Citações (>)
@@ -62,6 +65,7 @@ markdown-to-docx/                 ← Diretório principal
 - Linhas horizontais
 
 ### ✅ Exportação DOCX
+
 - Conversão markdown → Word
 - Preservação de formatação
 - Code blocks com styling
@@ -69,6 +73,7 @@ markdown-to-docx/                 ← Diretório principal
 - Download automático
 
 ### ✅ Design
+
 - Interface minimalista e refinada
 - Animações suaves (Framer Motion)
 - Paleta neutra profissional
@@ -78,37 +83,40 @@ markdown-to-docx/                 ← Diretório principal
 
 ## 💻 Stack Tecnológico
 
-| Camada | Tecnologia | Versão |
-|--------|-----------|--------|
-| Runtime | Node.js | 22 |
-| Framework | Next.js | 14 |
-| React | React | 18 |
-| Linguagem | TypeScript | 5.3 |
-| Styling | Tailwind CSS | 3.3 |
-| Autenticação | NextAuth.js | 4.24 |
-| State | Zustand | 4.4 |
-| Markdown | react-markdown | 9.0 |
-| Export | docx | 8.5 |
-| Animações | Framer Motion | 10.16 |
-| Icons | Lucide React | 0.294 |
+| Camada       | Tecnologia     | Versão |
+| ------------ | -------------- | ------ |
+| Runtime      | Node.js        | 22     |
+| Framework    | Next.js        | 14     |
+| React        | React          | 18     |
+| Linguagem    | TypeScript     | 5.3    |
+| Styling      | Tailwind CSS   | 3.3    |
+| Autenticação | NextAuth.js    | 4.24   |
+| State        | Zustand        | 4.4    |
+| Markdown     | react-markdown | 9.0    |
+| Export       | docx           | 8.5    |
+| Animações    | Framer Motion  | 10.16  |
+| Icons        | Lucide React   | 0.294  |
 
 ---
 
 ## 📋 Arquivos de Documentação Inclusos
 
 ### 1. **README.md** (no projeto)
+
 - Documentação completa
 - Setup instructions
 - Troubleshooting
 - Deploy guide
 
 ### 2. **SETUP_RAPIDO.md**
+
 - Setup em 5 minutos
 - Google OAuth step-by-step
 - Exemplo de markdown
 - Solução de problemas
 
 ### 3. **ARQUITETURA_TECNICA.md**
+
 - Fluxo de dados detalhado
 - Arquitetura de componentes
 - Performance optimization
@@ -116,12 +124,14 @@ markdown-to-docx/                 ← Diretório principal
 - Future enhancements
 
 ### 4. **EXEMPLOS_USO.md**
+
 - 9 casos de uso práticos
 - Exemplos de markdown completo
 - Output DOCX esperado
 - Best practices
 
 ### 5. **ENV_VARIABLES.md**
+
 - Configuração detalhada
 - Como gerar secrets
 - Setup por ambiente
@@ -132,6 +142,7 @@ markdown-to-docx/                 ← Diretório principal
 ## 🔐 Segurança
 
 ✅ **Implementado**
+
 - OAuth2 com Google
 - CSRF protection (NextAuth)
 - Secure session cookies
@@ -140,6 +151,7 @@ markdown-to-docx/                 ← Diretório principal
 - Type safety (TypeScript)
 
 🔜 **Futuro (Backend)**
+
 - Rate limiting
 - API authentication
 - Database encryption
@@ -150,18 +162,21 @@ markdown-to-docx/                 ← Diretório principal
 ## 🎨 Design & UX
 
 ### Estética
+
 - Minimalista e refinado
 - Paleta neutra (grays)
 - Typography elegante
 - Spacing generoso
 
 ### Animações
+
 - Fade in ao carregar
 - Slide in de painéis
 - Hover effects sutis
 - Loading spinner
 
 ### Responsividade
+
 - Desktop (1024px+) ✅
 - Tablet (768px+) ✅
 - Mobile (320px+) ✅
@@ -171,12 +186,14 @@ markdown-to-docx/                 ← Diretório principal
 ## 📊 Performance
 
 ### Esperado
+
 - **Lighthouse Score**: 95+
 - **First Contentful Paint**: <1s
 - **Time to Interactive**: <2s
 - **Build Size**: ~500KB gzip
 
 ### Otimizações
+
 - Next.js code splitting automático
 - CSS purging (Tailwind)
 - React component purity
@@ -187,16 +204,19 @@ markdown-to-docx/                 ← Diretório principal
 ## 🚀 Como Começar
 
 ### 1. Install Dependencies
+
 ```bash
 npm install
 ```
 
 ### 2. Configure Google OAuth
+
 - Google Cloud Console
 - Create OAuth credentials
 - Add callback URI
 
 ### 3. Setup .env.local
+
 ```env
 NEXTAUTH_SECRET=...
 NEXTAUTH_URL=http://localhost:3000
@@ -205,11 +225,13 @@ GOOGLE_CLIENT_SECRET=...
 ```
 
 ### 4. Inicie o servidor
+
 ```bash
 npm run dev
 ```
 
 ### 5. Abra no navegador
+
 ```
 http://localhost:3000
 ```
@@ -221,24 +243,28 @@ http://localhost:3000
 ## 📈 Roadmap
 
 ### Fase 1: MVP ✅ (Entregue)
+
 - [x] Login com Google
 - [x] Editor Markdown
 - [x] Preview em tempo real
 - [x] Exportação DOCX
 
 ### Fase 2: Backend (3-4 semanas)
+
 - [ ] API Node.js
 - [ ] Database (PostgreSQL/MongoDB)
 - [ ] Salvar/carregar documentos
 - [ ] Histórico de versões
 
 ### Fase 3: Colaboração (4-6 semanas)
+
 - [ ] Realtime collaboration
 - [ ] Comentários
 - [ ] Sharing de documentos
 - [ ] Permissões
 
 ### Fase 4: Expansão (6+ semanas)
+
 - [ ] Mobile app
 - [ ] VS Code extension
 - [ ] Notion integration
@@ -249,6 +275,7 @@ http://localhost:3000
 ## 🧪 Testes
 
 ### Manual Testing
+
 ```bash
 # 1. Login com Google
 # 2. Cole markdown
@@ -259,6 +286,7 @@ http://localhost:3000
 ```
 
 ### Automated Testing (Future)
+
 ```bash
 npm run test          # Unit tests
 npm run test:e2e      # E2E tests
@@ -277,6 +305,7 @@ vercel
 ```
 
 ### Outras plataformas
+
 - Netlify
 - AWS Amplify
 - DigitalOcean
@@ -290,14 +319,15 @@ vercel
 
 ### Common Issues & Soluções
 
-| Problema | Solução |
-|----------|---------|
-| "Invalid Client" | Verifique Google OAuth credentials |
-| "Cannot login" | Confirme callback URI |
-| "Export error" | Markdown válido? Reinicie servidor |
-| "Porta 3000 em uso" | `npm run dev -- -p 3001` |
+| Problema            | Solução                            |
+| ------------------- | ---------------------------------- |
+| "Invalid Client"    | Verifique Google OAuth credentials |
+| "Cannot login"      | Confirme callback URI              |
+| "Export error"      | Markdown válido? Reinicie servidor |
+| "Porta 3000 em uso" | `npm run dev -- -p 3001`           |
 
 ### Recursos
+
 - README.md (projeto)
 - SETUP_RAPIDO.md
 - ARQUITETURA_TECNICA.md
@@ -308,23 +338,27 @@ vercel
 ## 📚 Qualidade do Código
 
 ### TypeScript ✅
+
 - Type safety completo
 - Interface definitions
 - Strict mode
 
 ### React Best Practices ✅
+
 - Functional components
 - Custom hooks (Zustand)
 - Proper state management
 - No prop drilling
 
 ### Next.js 14 ✅
+
 - App Router
 - API routes
 - Image optimization
 - Built-in SEO
 
 ### CSS/Design ✅
+
 - Tailwind CSS
 - Component composition
 - Consistent spacing
@@ -352,12 +386,14 @@ Este projeto demonstra:
 ## 📊 Métricas
 
 ### Código
+
 - **Lines of Code**: ~2,500
 - **Components**: 4 principais
 - **Files**: 20+
 - **Dependencies**: 10 principais
 
 ### Funcionalidade
+
 - **Markdown elements**: 12+
 - **Auth providers**: 1 (Google, extensível)
 - **Export formats**: 1 (DOCX, extensível)
@@ -368,6 +404,7 @@ Este projeto demonstra:
 ## 🎁 Bônus Incluído
 
 ### Documentação
+
 - README completo
 - Setup guide
 - Architecture docs
@@ -375,12 +412,14 @@ Este projeto demonstra:
 - Environment guide
 
 ### Code Quality
+
 - TypeScript strict mode
 - ESLint ready
 - Prettier compatible
 - Git hooks ready
 
 ### DevX
+
 - Hot reload (dev)
 - Error boundaries
 - Console logging
@@ -400,12 +439,15 @@ Este projeto demonstra:
 ## 📝 Notas Finais
 
 ### Desenvolvido por
+
 **Senior Full-stack Developer** com especialidade em:
+
 - Backend: Node.js, Express, Next.js
 - Frontend: React, TypeScript, Tailwind
 - Arquitetura: Escalabilidade, performance
 
 ### Princípios Seguidos
+
 ✅ Clean Code
 ✅ SOLID Principles  
 ✅ DRY (Don't Repeat Yourself)
@@ -415,6 +457,7 @@ Este projeto demonstra:
 ✅ User Experience First
 
 ### Qualidade
+
 - Código pronto para produção
 - Documentação completa
 - Best practices implementadas
@@ -424,14 +467,14 @@ Este projeto demonstra:
 
 ## 📊 Comparação: Antes vs Depois
 
-| Aspecto | Antes | Depois |
-|---------|-------|--------|
-| Editor | ❌ | ✅ (Split-view) |
-| Preview | ❌ | ✅ (Real-time) |
-| Export | ❌ | ✅ (Um clique) |
-| Autenticação | ❌ | ✅ (Google OAuth) |
-| Design | ❌ | ✅ (Profissional) |
-| Mobile | ❌ | ✅ (Responsivo) |
+| Aspecto      | Antes | Depois            |
+| ------------ | ----- | ----------------- |
+| Editor       | ❌    | ✅ (Split-view)   |
+| Preview      | ❌    | ✅ (Real-time)    |
+| Export       | ❌    | ✅ (Um clique)    |
+| Autenticação | ❌    | ✅ (Google OAuth) |
+| Design       | ❌    | ✅ (Profissional) |
+| Mobile       | ❌    | ✅ (Responsivo)   |
 
 ---
 
@@ -439,27 +482,32 @@ Este projeto demonstra:
 
 ### Por que essas tecnologias?
 
-**Next.js 14**: 
+**Next.js 14**:
+
 - Full-stack com React
 - Built-in optimization
 - Vercel deploy native
 
 **TypeScript**:
+
 - Type safety
 - Better DX
 - Fewer bugs em produção
 
 **Tailwind CSS**:
+
 - Utility-first
 - Consistent styling
 - Rapid development
 
 **NextAuth.js**:
+
 - OAuth ready
 - Session management
 - Security focused
 
 **Zustand**:
+
 - Lightweight
 - Simple API
 - Zero boilerplate
@@ -491,6 +539,7 @@ Este projeto demonstra:
 ## 🎉 Conclusão
 
 Você tem uma aplicação **pronta para produção** com:
+
 - ✅ Autenticação segura
 - ✅ Interface amigável
 - ✅ Funcionalidade completa

@@ -1,4 +1,4 @@
-import { Document, Packer, Paragraph, TextRun, HeadingLevel, UnorderedList, OrderedList, ListItem, Table, TableCell, TableRow, BorderStyle, convertInchesToTwip } from 'docx';
+import { Document, Packer, Paragraph, TextRun, HeadingLevel, Table, BorderStyle } from 'docx';
 
 interface ParsedMarkdown {
   type: 'heading' | 'paragraph' | 'list' | 'code' | 'table' | 'hr';
@@ -25,7 +25,8 @@ function parseMarkdown(markdown: string): ParsedMarkdown[] {
     }
     // Code blocks
     else if (line.startsWith('```')) {
-      const language = line.replace(/```/, '').trim();
+      // remover informação de linguagem (não utilizada) para evitar aviso de variável não utilizada
+      line.replace(/```/, '').trim();
       const codeLines = [];
       i++;
       while (i < lines.length && !lines[i].startsWith('```')) {
@@ -44,15 +45,18 @@ function parseMarkdown(markdown: string): ParsedMarkdown[] {
     else if (/^\s*[-*+]\s/.test(line) || /^\s*\d+\.\s/.test(line)) {
       const listItems = [];
       const ordered = /^\s*\d+\./.test(line);
-      
-      while (i < lines.length && (/^\s*[-*+]\s/.test(lines[i]) || /^\s*\d+\.\s/.test(lines[i]) || lines[i].startsWith('  '))) {
+
+      while (
+        i < lines.length &&
+        (/^\s*[-*+]\s/.test(lines[i]) || /^\s*\d+\.\s/.test(lines[i]) || lines[i].startsWith('  '))
+      ) {
         if (/^\s*[-*+]\s/.test(lines[i]) || /^\s*\d+\.\s/.test(lines[i])) {
           const item = lines[i].replace(/^\s*[-*+]\s/, '').replace(/^\s*\d+\.\s/, '');
           listItems.push(item);
         }
         i++;
       }
-      
+
       result.push({ type: 'list', content: '', items: listItems, ordered });
     }
     // Empty lines - skip
@@ -88,11 +92,13 @@ function formatText(text: string): TextRun[] {
     } else if (delimiter === '_') {
       runs.push(new TextRun({ text: content, italics: true }));
     } else if (delimiter === '`') {
-      runs.push(new TextRun({ 
-        text: content, 
-        font: 'Courier New',
-        color: '666666'
-      }));
+      runs.push(
+        new TextRun({
+          text: content,
+          font: 'Courier New',
+          color: '666666',
+        }),
+      );
     }
 
     lastIndex = regex.lastIndex;
@@ -105,8 +111,8 @@ function formatText(text: string): TextRun[] {
   return runs.length > 0 ? runs : [new TextRun(text)];
 }
 
-function getHeadingLevel(level: number): HeadingLevel {
-  const levels: { [key: number]: HeadingLevel } = {
+function getHeadingLevel(level: number): any {
+  const levels: { [key: number]: any } = {
     1: HeadingLevel.HEADING_1,
     2: HeadingLevel.HEADING_2,
     3: HeadingLevel.HEADING_3,
@@ -128,17 +134,16 @@ export async function markdownToDocx(markdown: string, fileName: string = 'docum
           text: item.content,
           heading: getHeadingLevel(item.level || 1),
           spacing: { before: 200, after: 100 },
-        })
+        }),
       );
     } else if (item.type === 'paragraph') {
       sections.push(
         new Paragraph({
           children: formatText(item.content),
           spacing: { line: 360, after: 200 },
-        })
+        }),
       );
     } else if (item.type === 'code') {
-      const lines = item.content.split('\n');
       sections.push(
         new Paragraph({
           children: [
@@ -158,35 +163,19 @@ export async function markdownToDocx(markdown: string, fileName: string = 'docum
             right: { color: 'CCCCCC', space: 1, style: BorderStyle.SINGLE, size: 6 },
           },
           shading: { fill: 'F5F5F5' },
-        })
+        }),
       );
     } else if (item.type === 'list' && item.items) {
-      const listItems = item.items.map(
-        (listItem) =>
-          new ListItem({
-            children: [
-              new Paragraph({
-                text: listItem,
-                spacing: { after: 100 },
-              }),
-            ],
-            level: 0,
-          })
-      );
+      // Renderizar listas usando parágrafos com marcadores manuais para evitar dependências de símbolos não exportados pela versão instalada de 'docx'.
+      const listaParagrafos = item.items.map((textoItem, indice) => {
+        const marcador = item.ordered ? `${indice + 1}. ` : '• ';
+        const runs = formatText(textoItem);
+        // Adicionar o marcador como primeiro TextRun
+        const children: TextRun[] = [new TextRun({ text: marcador })].concat(runs as TextRun[]);
+        return new Paragraph({ children, spacing: { after: 100 } });
+      });
 
-      if (item.ordered) {
-        sections.push(
-          new Paragraph({
-            children: listItems as any,
-          })
-        );
-      } else {
-        sections.push(
-          new Paragraph({
-            children: listItems as any,
-          })
-        );
-      }
+      listaParagrafos.forEach((p) => sections.push(p));
     } else if (item.type === 'hr') {
       sections.push(
         new Paragraph({
@@ -199,7 +188,7 @@ export async function markdownToDocx(markdown: string, fileName: string = 'docum
             },
           },
           spacing: { before: 200, after: 200 },
-        })
+        }),
       );
     }
   });
@@ -208,7 +197,7 @@ export async function markdownToDocx(markdown: string, fileName: string = 'docum
     sections: [
       {
         properties: {},
-        children: sections as any,
+        children: sections as unknown as Paragraph[],
       },
     ],
   });

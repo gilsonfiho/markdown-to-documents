@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useEffect } from 'react';
-import { useSession, signIn } from 'next-auth/react';
+import { useEffect } from 'react';
+import { signIn, useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { FileText, Zap } from 'lucide-react';
@@ -20,12 +20,12 @@ export default function SignIn() {
     <div className="w-screen h-screen bg-gradient-to-br from-neutral-900 via-neutral-800 to-neutral-900 flex items-center justify-center overflow-hidden">
       {/* Background decorative elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <motion.div 
+        <motion.div
           animate={{ opacity: [0.3, 0.5, 0.3] }}
           transition={{ duration: 4, repeat: Infinity }}
           className="absolute top-20 -right-40 w-80 h-80 bg-neutral-700 rounded-full blur-3xl"
         />
-        <motion.div 
+        <motion.div
           animate={{ opacity: [0.3, 0.5, 0.3] }}
           transition={{ duration: 5, repeat: Infinity, delay: 1 }}
           className="absolute -bottom-40 -left-40 w-80 h-80 bg-neutral-700 rounded-full blur-3xl"
@@ -40,13 +40,13 @@ export default function SignIn() {
           transition={{ duration: 0.8 }}
           className="text-center mb-12"
         >
-          <motion.div 
+          <motion.div
             whileHover={{ scale: 1.1, rotate: 5 }}
             className="w-16 h-16 bg-white rounded-xl flex items-center justify-center mx-auto mb-6 shadow-lg"
           >
             <FileText className="w-8 h-8 text-neutral-900" />
           </motion.div>
-          
+
           <h1 className="text-4xl font-bold text-white mb-2">Markdown Studio</h1>
           <p className="text-neutral-400 flex items-center justify-center gap-2">
             <Zap size={16} className="text-yellow-400" />
@@ -63,9 +63,7 @@ export default function SignIn() {
         >
           <div className="mb-6 text-center">
             <h2 className="text-2xl font-bold text-white mb-2">Bem-vindo</h2>
-            <p className="text-neutral-400 text-sm">
-              Faça login com sua conta Google para começar
-            </p>
+            <p className="text-neutral-400 text-sm">Faça login com sua conta Google para começar</p>
           </div>
 
           <motion.button

@@ -95,11 +95,13 @@ Acesse [http://localhost:3000](http://localhost:3000)
 
 ```markdown
 # Heading 1
+
 ## Heading 2
+
 ### Heading 3
 
 **Bold text**
-*Italic text*
+_Italic text_
 `inline code`
 
 - Lista não ordenada
@@ -109,9 +111,11 @@ Acesse [http://localhost:3000](http://localhost:3000)
 2. Item 2
 
 \`\`\`python
+
 # Bloco de código
+
 def hello():
-    print("Hello World")
+print("Hello World")
 \`\`\`
 
 > Citação
@@ -121,7 +125,7 @@ def hello():
 [Link](https://example.com)
 
 | Coluna 1 | Coluna 2 |
-|----------|----------|
+| -------- | -------- |
 | Cell 1   | Cell 2   |
 ```
 

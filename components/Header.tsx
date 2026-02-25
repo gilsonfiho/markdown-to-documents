@@ -26,7 +26,7 @@ export const Header: React.FC = () => {
   return (
     <header className="border-b border-neutral-200 bg-white">
       <div className="flex items-center justify-between px-8 py-4">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, x: -10 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}
@@ -43,7 +43,7 @@ export const Header: React.FC = () => {
 
         <div className="flex items-center gap-4">
           {session?.user && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.1 }}

@@ -6,13 +6,13 @@
 
 ### Stack Tecnológico Principal
 
-- **Next.js 16.1.6** (App Router, TypeScript)
-- **NextAuth.js 4.24** (autenticação Google OAuth)
-- **React 18.2** com React Markdown + remark-gfm
-- **Tailwind CSS 3** + **Framer Motion** (animações)
-- **Zustand** (estado global)
-- **docx 8.5** (exportação DOCX)
-- **ESLint 8.57 + Prettier 3.8** (formatação e linting)
+- **Next.js 16.1.6** (App Router, Turbopack)
+- **React 19.2.4** com React Markdown 9.1.0 + remark-gfm 4.0.0
+- **NextAuth.js 4.24.13** (autenticação Google OAuth)
+- **Tailwind CSS 3.3** + **Framer Motion 11.18.2** (animações)
+- **Zustand 4.4.0** (estado global)
+- **docx 8.5.0** (exportação DOCX)
+- **TypeScript 5.3** + **ESLint 8.57 + Prettier 3.8** (linting e formatação)
 
 ---
 
@@ -74,22 +74,43 @@ Consumido em: `MarkdownEditor`, `MarkdownPreview`, `Header`.
 
 ### 2. **Conversão Markdown → DOCX** (`lib/markdown-to-docx.ts`)
 
-- **Parsing**: função `parseMarkdown()` tokeniza markdown em tipo `ParsedMarkdown[]`
-- **Tipos suportados**: heading, paragraph, list, code, table, hr
-- **Listas**: renderizadas como `Paragraph` com marcadores manuais (`•` ou `1.`) pois `ListItem` não é exportado pela `docx@8.5.0`
-- **Formatação inline**: `**bold**`, `_italic_`, `` `code` `` processadas por `formatText()`
-- **Export**: `markdownToDocx()` → `Document` → `Packer.toBlob()` → download via `createObjectURL`
+- **Parsing**: Tokenização linha-por-linha em tipo `ParsedMarkdown[]` com tipos: `heading|paragraph|list|code|table|hr`
+- **Headings**: Detecta `#` e ajusta `HeadingLevel` 1-6 automaticamente
+- **Listas**: Renderizadas como `Paragraph` com marcadores manuais (`•` para unordered, `1.` para ordered)
+  - ⚠️ `docx@8.5.0` **não exporta** `ListItem` — usar `Paragraph` com marcadores inline
+- **Formatação inline**: Processa `**bold**`, `_italic_`, `` `código` `` via `formatText()` com `TextRun`
+- **Code blocks**: Suporta ` ```typescript ` com `language` tag (ignorado)
+- **Export**: `markdownToDocx()` → `Document` → `Packer.toBlob()` → trigger download com `createObjectURL()`
+
+**Padrão de lista** (evitar `ListItem`):
+```typescript
+// ✅ Correto: usar Paragraph com prefix
+new Paragraph({
+  text: '• Item da lista',
+  style: 'ListParagraph',
+})
+```
 
 ### 3. **Tipagem e ESLint**
 
 - TypeScript strict: `tsconfig.json` ativa `strict: true`
 - ESLint com Prettier: `.eslintrc.cjs` integra `eslint-plugin-prettier`
-- Regras relaxadas: `@typescript-eslint/no-explicit-any: 'warn'` (necessário em alguns handlers react-markdown)
+- Regras: `@typescript-eslint/no-explicit-any: 'off'` (necessário em handlers `react-markdown`)
+- **Regra crítica**: `@typescript-eslint/no-require-imports` — Usar imports ES6, não `require()`
 - **Scripts**:
   - `npm run lint` — ESLint com `--max-warnings=0` (falha se houver warnings)
   - `npm run lint:fix` — ESLint com `--fix`
   - `npm run format` — Prettier `--write`
   - `npm run format:check` — Prettier `--check`
+
+**Padrão ES6 obrigatório** — Evite `require()`:
+```typescript
+// ❌ Não fazer
+const typography = require('@tailwindcss/typography');
+
+// ✅ Fazer
+import typography from '@tailwindcss/typography';
+```
 
 ### 4. **Autenticação NextAuth**
 
@@ -120,16 +141,21 @@ npm run format                # Formatar código com Prettier
 - **"Markdown não renderiza preview"**: Verificar `MarkdownPreview.tsx` se `ReactMarkdown` está recebendo prop `content`
 - **"DOCX não baixa"**: Verificar console — `Packer.toBlob()` em `markdown-to-docx.ts` pode falhar se markdown é inválido
 - **"Type errors"**: Rodar `npx tsc --noEmit` para verificar tipos antes de submeter PR
+- **"NEXTAUTH_SECRET missing"**: Em produção, adicionar variável de ambiente aleatória (mínimo 32 bytes)
+- **"Zustand state not updating"**: Verificar que componente está marcado com `'use client'`
+- **"Packer.toBlob() timeout"**: Se markdown é muito grande, considerar quebrar em múltiplos documentos
 
 ---
 
 ## ⚠️ Armadilhas e Considerações
 
 1. **ListItem Não Exportado**: `docx@8.5.0` não exporta `ListItem`. Listas são renderizadas como `Paragraph` com marcadores inline.
-2. **React Markdown Props**: Components customizados (em `MarkdownPreview.tsx`) usam `any` para `props` pois `react-markdown@9` tem tipos complexos. Manter regra ESLint como `warn`.
+2. **React Markdown Props**: Components customizados (em `MarkdownPreview.tsx`) usam `any` para `props` pois `react-markdown@9` tem tipos complexos. Manter regra ESLint como `off`.
 3. **NEXTAUTH_SECRET Obrigatório**: Produção exige `NEXTAUTH_SECRET` em `.env` (aleatório longo).
 4. **Zustand Sem Persistência**: Estado atual não persiste entre reloads. Se precisar, adicionar middleware `persist`.
-5. **Tailwind CSS Classes**: Usar espacingem `py-`, `px-`, `mb-`, etc. Tema de cores: `neutral-{50..900}` (sem cores primárias).
+5. **Tailwind CSS Classes**: Usar spacing em `py-`, `px-`, `mb-`, etc. Tema de cores: `neutral-{50..900}` (sem cores primárias).
+6. **React 19 - Sem import React**: Em React 19, não é necessário importar React em arquivos JSX. Se vir `import React from 'react'`, remova (otimização de bundle).
+7. **lucide-react peer warning**: Pacote declara suporte React 16-18, mas funciona com React 19. Aviso é seguro ignorar.
 
 ---
 
@@ -167,27 +193,21 @@ code: (props: any) => <code {...(props as any)} />
 - **Config ESLint**: `.eslintrc.cjs` (integrado com Prettier)
 - **Config Prettier**: `.prettierrc.cjs` (overrides para TSX e HTML)
 - **TypeScript**: `tsconfig.json` com `strict: true`
-
----
-
-## 💡 Boas Práticas para Agentes
-
-1. **Rodar linting antes de submeter**: `npm run lint` (deve retornar 0 warnings/errors)
-2. **Formatar código**: `npm run format` depois de mudanças
-3. **Testar localmente**: `npm run dev` e validar manualmente no navegador
-4. **Manter types tipificados**: Evitar `any` exceto em componentes `react-markdown` já conhecidos
-5. **Respeitar padrões de pasta**: Componentes em `components/`, lógica em `lib/`, páginas em `app/`
-6. **Usar Context7** para consultar versões de dependências ao sugerir atualizações
+- **Atualização React 19**: Veja `ATUALIZACAO_REACT_19.md` para detalhes da migração recente
 
 ---
 
 ## 📌 Versões Críticas
 
-Validar compatibilidade ao atualizar:
+Versões instaladas (atualizado em fevereiro 2026):
 
 - `next@16.1.6` — App Router com Turbopack
-- `react@18.2` — Hooks e JSX Transform
-- `next-auth@4.24` — OAuth 2.0 Google
-- `docx@8.5` — Sem `ListItem` export (usar marcadores inline)
-- `eslint@8.57` — Suporta `.eslintrc.cjs` (não ESLint v9 flat config)
-- `typescript@5.3` — Suporta TypeScript 5.9.3 (com warning)
+- `react@19.2.4` — Hooks e JSX Transform (sem import React necessário)
+- `react-dom@19.2.4` — Sincronizar com React
+- `next-auth@4.24.13` — OAuth 2.0 Google (compatível com React 19)
+- `framer-motion@11.18.2` — Atualizado para React 19
+- `docx@8.5.0` — Sem `ListItem` export (usar marcadores inline)
+- `eslint@8.57.1` — Suporta `.eslintrc.cjs` (não ESLint v9 flat config)
+- `@typescript-eslint/parser@8.0.0` e `@typescript-eslint/eslint-plugin@8.0.0` — Compatível com React 19
+- `typescript@5.3.3` — Modo strict ativado
+- `lucide-react@0.294.0` — Ícones SVG (declarado para React 16-18, funciona com React 19)

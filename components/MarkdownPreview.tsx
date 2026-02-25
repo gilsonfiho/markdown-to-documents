@@ -4,6 +4,7 @@ import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { MermaidDiagram } from './MermaidDiagram';
+import { limparDiagramaMermaid } from '@/lib/mermaid-cleaner';
 
 interface MarkdownPreviewProps {
   content: string;
@@ -37,7 +38,9 @@ export const MarkdownPreview: React.FC<MarkdownPreviewProps> = ({ content }) => 
             // Verificar se é um bloco de código Mermaid
             const linguagem = className?.replace(/language-/, '') || '';
             if (!inline && linguagem === 'mermaid' && typeof children === 'string') {
-              return <MermaidDiagram content={children} />;
+              // Limpar automaticamente <br/> do diagrama
+              const diagramaLimpo = limparDiagramaMermaid(children);
+              return <MermaidDiagram content={diagramaLimpo} />;
             }
 
             return inline ? (

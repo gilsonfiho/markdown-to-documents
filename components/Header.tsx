@@ -63,7 +63,9 @@ export const Header: React.FC = () => {
           >
             {isExporting ? (
               <>
-                <div className="animate-spin"><Download size={18} /></div>
+                <div className="animate-spin">
+                  <Download size={18} />
+                </div>
                 <span>Exportando...</span>
               </>
             ) : (

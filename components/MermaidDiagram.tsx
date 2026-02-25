@@ -15,24 +15,29 @@ export const MermaidDiagram: React.FC<MermaidDiagramProps> = ({ content }) => {
 
     const renderDiagram = async () => {
       try {
-        mermaid.initialize({ startOnLoad: true, theme: 'default' });
-        mermaid.contentLoaded();
+        mermaid.initialize({ startOnLoad: false, theme: 'default' });
 
         const element = document.createElement('div');
         element.className = 'mermaid';
         element.textContent = content;
 
-        containerRef.current?.appendChild(element);
+        if (containerRef.current) {
+          containerRef.current.innerHTML = '';
+          containerRef.current.appendChild(element);
+        }
 
         await mermaid.run();
-      } catch {
+      } catch (erro) {
         if (containerRef.current) {
-          containerRef.current.innerHTML = `<p className="text-red-600 text-sm">Erro ao renderizar diagrama Mermaid</p>`;
+          containerRef.current.innerHTML = '';
+          const errorElement = document.createElement('p');
+          errorElement.className = 'text-red-600 text-sm';
+          errorElement.textContent = `Erro ao renderizar diagrama Mermaid: ${erro instanceof Error ? erro.message : 'Erro desconhecido'}`;
+          containerRef.current.appendChild(errorElement);
         }
       }
     };
 
-    containerRef.current.innerHTML = '';
     renderDiagram();
   }, [content]);
 

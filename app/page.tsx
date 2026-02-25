@@ -12,7 +12,11 @@ import { motion } from 'framer-motion';
 export default function Home() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const { markdown, setMarkdown } = useAppStore();
+  const { markdown, setMarkdown, carregarDoStorage } = useAppStore();
+
+  useEffect(() => {
+    carregarDoStorage();
+  }, [carregarDoStorage]);
 
   useEffect(() => {
     if (status === 'unauthenticated') {

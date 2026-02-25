@@ -5,12 +5,12 @@ import { useSession, signIn, signOut } from 'next-auth/react';
 import { useAppStore } from '@/lib/store';
 import { markdownToDocx } from '@/lib/markdown-to-docx';
 import { obterVersaoFormatada } from '@/lib/versao';
-import { Download, LogOut, LogIn } from 'lucide-react';
+import { Download, LogOut, LogIn, Save, CheckCircle2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export const Header: React.FC = () => {
   const { data: session } = useSession();
-  const { markdown, fileName } = useAppStore();
+  const { markdown, fileName, salvarNoStorage, salvoAoMemento } = useAppStore();
   const [isExporting, setIsExporting] = useState(false);
 
   const handleExport = async () => {
@@ -22,6 +22,10 @@ export const Header: React.FC = () => {
     } finally {
       setIsExporting(false);
     }
+  };
+
+  const handleSalvar = () => {
+    salvarNoStorage();
   };
 
   return (
@@ -59,6 +63,31 @@ export const Header: React.FC = () => {
               <p className="text-xs text-neutral-500">{session.user.email}</p>
             </motion.div>
           )}
+
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={handleSalvar}
+            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-neutral-400 disabled:cursor-not-allowed transition-colors relative"
+          >
+            {salvoAoMemento ? (
+              <>
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <CheckCircle2 size={18} />
+                </motion.div>
+                <span>Salvo às {salvoAoMemento}</span>
+              </>
+            ) : (
+              <>
+                <Save size={18} />
+                <span>Salvar</span>
+              </>
+            )}
+          </motion.button>
 
           <motion.button
             whileHover={{ scale: 1.05 }}

@@ -490,11 +490,34 @@ Para agentes de IA (GitHub Copilot, Claude, etc.), consulte [`.github/copilot-in
 - **Armadilhas e considerações** importantes
 - **Versões críticas** de todas as dependências
 
+### Arquivos Principais
+
+| Arquivo | Propósito |
+| --- | --- |
+| `app/page.tsx` | Página principal (split-view editor) |
+| `app/layout.tsx` | Root layout com providers |
+| `app/auth/signin/page.tsx` | Página de login |
+| `components/Header.tsx` | Navbar com botões Export/Auth |
+| `components/MarkdownEditor.tsx` | Textarea do editor |
+| `components/MarkdownPreview.tsx` | Preview com React Markdown |
+| `components/MermaidDiagram.tsx` | Renderizador de diagramas Mermaid |
+| `lib/store.ts` | Zustand store (estado global) |
+| `lib/markdown-to-docx.ts` | Lógica de conversão markdown → DOCX |
+| `lib/mermaid-cleaner.ts` | Utilitários para limpeza de diagramas Mermaid |
+| `.env.local.example` | Variáveis de ambiente necessárias |
+| `.eslintrc.cjs` | Configuração ESLint + Prettier |
+| `.prettierrc.cjs` | Configuração Prettier |
+| `tsconfig.json` | Configuração TypeScript (strict mode) |
+
 ---
 
-## 📚 Documentação
+## 📄 Licença
 
-MIT License
+MIT License - Veja arquivo LICENSE para detalhes
+
+Copyright (c) 2026 Markdown Studio Contributors
+
+---
 
 ## 🤝 Contribuindo
 

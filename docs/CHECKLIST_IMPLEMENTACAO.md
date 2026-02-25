@@ -155,7 +155,7 @@ npm run dev
 
 Cole isto no editor:
 
-````markdown
+```markdown
 # Teste
 
 **Bold** e _italic_
@@ -166,7 +166,7 @@ Cole isto no editor:
 ## Sub-heading
 
 `code`
-````
+```
 
 Verifique no preview:
 

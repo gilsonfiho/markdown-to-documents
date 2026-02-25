@@ -556,6 +556,7 @@ blog/
 \`\`\`typescript
 export default function Post({ post }) {
 return (
+
 <article>
 <h1>{post.title}</h1>
 <p>{post.date}</p>

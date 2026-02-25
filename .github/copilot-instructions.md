@@ -83,12 +83,13 @@ Consumido em: `MarkdownEditor`, `MarkdownPreview`, `Header`.
 - **Export**: `markdownToDocx()` → `Document` → `Packer.toBlob()` → trigger download com `createObjectURL()`
 
 **Padrão de lista** (evitar `ListItem`):
+
 ```typescript
 // ✅ Correto: usar Paragraph com prefix
 new Paragraph({
   text: '• Item da lista',
   style: 'ListParagraph',
-})
+});
 ```
 
 ### 3. **Tipagem e ESLint**
@@ -104,6 +105,7 @@ new Paragraph({
   - `npm run format:check` — Prettier `--check`
 
 **Padrão ES6 obrigatório** — Evite `require()`:
+
 ```typescript
 // ❌ Não fazer
 const typography = require('@tailwindcss/typography');

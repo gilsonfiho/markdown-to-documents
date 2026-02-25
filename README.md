@@ -10,6 +10,7 @@ Uma aplicação web moderna e minimalista que permite converter markdown para do
 - ✅ **Autenticação Google**: Login seguro com NextAuth.js
 - ✅ **Exportação DOCX**: Converta markdown para Word com um clique
 - ✅ **Suporte Markdown Completo**: Headings (H1-H6), listas ordenadas/desordenadas, código com syntax highlight, blocos de citação, links, tabelas, linhas horizontais
+- ✅ **Estruturas de Árvore e Diagramas ASCII**: Detecta e renderiza automaticamente diagramas com caracteres `├──`, `└──`, `│`, etc.
 - ✅ **Interface Minimalista**: Design refinado e profissional
 - ✅ **Responsivo**: Funciona em desktop, tablets e mobile
 - ✅ **Formatação Inline**: Suporte a **negrito**, _itálico_ e `` `código inline` ``
@@ -172,6 +173,24 @@ print("Hello World")
 | Coluna 1 | Coluna 2 |
 | -------- | -------- |
 | Cell 1   | Cell 2   |
+
+# Estruturas de Árvore (novo!)
+
+A aplicação agora detecta automaticamente diagramas ASCII com caracteres especiais:
+
+Input (inicial)
+├── token, app_origem, client_app_header
+├── num_processo, analise
+└── errors: [], pecas: []
+
+[Nó 1] BuscarPecasProcesso
+├── Output: pecas[], nome_beneficiario
+└── is_pecas_processo
+
+[Nó 2] VerificacaoPreenchimento
+├── Output: ano_exercicio, telefone
+└── contatos_indicador
+
 ```
 
 ## 📦 Estrutura do Projeto

@@ -10,21 +10,21 @@ O projeto Markdown Studio foi atualizado com sucesso de **React 18.2** para **Re
 
 ### 1. Dependências Principais Atualizadas
 
-| Pacote | Versão Anterior | Versão Atual |
-|--------|-----------------|-------------|
-| `react` | 18.2.0 | 19.2.4 |
-| `react-dom` | 18.2.0 | 19.2.4 |
-| `@types/react` | 18.2.0 | 19.2.14 |
-| `@types/react-dom` | 18.2.0 | 19.2.3 |
-| `framer-motion` | 10.16.0 | 11.18.2 |
+| Pacote             | Versão Anterior | Versão Atual |
+| ------------------ | --------------- | ------------ |
+| `react`            | 18.2.0          | 19.2.4       |
+| `react-dom`        | 18.2.0          | 19.2.4       |
+| `@types/react`     | 18.2.0          | 19.2.14      |
+| `@types/react-dom` | 18.2.0          | 19.2.3       |
+| `framer-motion`    | 10.16.0         | 11.18.2      |
 
 ### 2. Ferramentas de Desenvolvimento Atualizadas
 
-| Pacote | Versão Anterior | Versão Atual |
-|--------|-----------------|-------------|
-| `@typescript-eslint/parser` | 6.8.0 | 8.0.0 |
-| `@typescript-eslint/eslint-plugin` | 6.8.0 | 8.0.0 |
-| `eslint-plugin-react-hooks` | 4.6.0 | 5.0.0 |
+| Pacote                             | Versão Anterior | Versão Atual |
+| ---------------------------------- | --------------- | ------------ |
+| `@typescript-eslint/parser`        | 6.8.0           | 8.0.0        |
+| `@typescript-eslint/eslint-plugin` | 6.8.0           | 8.0.0        |
+| `eslint-plugin-react-hooks`        | 4.6.0           | 5.0.0        |
 
 ### 3. Correções de Código
 
@@ -106,4 +106,3 @@ npm run dev
 ---
 
 **Status:** ✅ Atualização concluída com sucesso
-

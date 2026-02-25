@@ -43,14 +43,14 @@ export const MarkdownPreview: React.FC<MarkdownPreviewProps> = ({ content }) => 
               />
             ) : (
               <code
-                className="bg-neutral-900 text-neutral-50 px-4 py-3 rounded-lg font-mono text-sm block my-4 overflow-x-auto"
+                className="bg-neutral-900 text-neutral-50 px-4 py-3 rounded-lg font-mono text-sm block my-4 overflow-x-auto whitespace-pre-wrap break-words"
                 {...spreadProps}
               />
             );
           },
           pre: ({ node, ...props }) => (
             <pre
-              className="bg-neutral-900 text-neutral-50 p-4 rounded-lg overflow-x-auto my-4 border border-neutral-700"
+              className="bg-neutral-900 text-neutral-50 p-4 rounded-lg overflow-x-auto my-4 border border-neutral-700 whitespace-pre-wrap break-words"
               {...props}
             />
           ),

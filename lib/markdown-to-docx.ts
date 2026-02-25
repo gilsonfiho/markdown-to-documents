@@ -8,6 +8,38 @@ interface ParsedMarkdown {
   ordered?: boolean;
 }
 
+function detectarBlocoArvore(
+  linhas: string[],
+  indiceInicial: number,
+): { linhas: string[]; quantidade: number } | null {
+  const padraoArvore = /[├─└│┌┐┘┤┬┴┼]/;
+
+  if (!padraoArvore.test(linhas[indiceInicial])) {
+    return null;
+  }
+
+  const bloco = [];
+  let i = indiceInicial;
+
+  while (i < linhas.length) {
+    const linha = linhas[i];
+    if (linha.trim() === '') {
+      if (bloco.length > 0) break;
+      i++;
+      continue;
+    }
+
+    if (padraoArvore.test(linha) || (bloco.length > 0 && /^\s/.test(linha))) {
+      bloco.push(linha);
+      i++;
+    } else {
+      break;
+    }
+  }
+
+  return bloco.length > 0 ? { linhas: bloco, quantidade: i - indiceInicial } : null;
+}
+
 function parseMarkdown(markdown: string): ParsedMarkdown[] {
   const lines = markdown.split('\n');
   const result: ParsedMarkdown[] = [];
@@ -35,6 +67,11 @@ function parseMarkdown(markdown: string): ParsedMarkdown[] {
       }
       result.push({ type: 'code', content: codeLines.join('\n') });
       i++;
+    }
+    // Estruturas de árvore e diagramas ASCII
+    else if ((blocoArvore = detectarBlocoArvore(lines, i))) {
+      result.push({ type: 'code', content: blocoArvore.linhas.join('\n') });
+      i += blocoArvore.quantidade;
     }
     // Horizontal rule
     else if (/^(---|\*\*\*|___)/.test(line.trim())) {
@@ -72,6 +109,8 @@ function parseMarkdown(markdown: string): ParsedMarkdown[] {
 
   return result;
 }
+
+let blocoArvore: { linhas: string[]; quantidade: number } | null;
 
 function formatText(text: string): TextRun[] {
   const runs: TextRun[] = [];
@@ -144,27 +183,41 @@ export async function markdownToDocx(markdown: string, fileName: string = 'docum
         }),
       );
     } else if (item.type === 'code') {
-      sections.push(
-        new Paragraph({
+      const linhasCodeigo = item.content.split('\n');
+      const paragrafosCodeigo = linhasCodeigo.map((linha) => {
+        return new Paragraph({
           children: [
             new TextRun({
-              text: item.content,
+              text: linha || ' ',
               font: 'Courier New',
               size: 18,
               color: '333333',
             }),
           ],
           style: 'Normal',
-          spacing: { before: 100, after: 200, line: 360 },
-          border: {
-            top: { color: 'CCCCCC', space: 1, style: BorderStyle.SINGLE, size: 6 },
-            bottom: { color: 'CCCCCC', space: 1, style: BorderStyle.SINGLE, size: 6 },
-            left: { color: 'CCCCCC', space: 1, style: BorderStyle.SINGLE, size: 6 },
-            right: { color: 'CCCCCC', space: 1, style: BorderStyle.SINGLE, size: 6 },
-          },
+          spacing: { line: 240 },
+          border:
+            linha === linhasCodeigo[0]
+              ? {
+                  top: { color: 'CCCCCC', space: 1, style: BorderStyle.SINGLE, size: 6 },
+                  bottom: { color: 'CCCCCC', space: 1, style: BorderStyle.SINGLE, size: 6 },
+                  left: { color: 'CCCCCC', space: 1, style: BorderStyle.SINGLE, size: 6 },
+                  right: { color: 'CCCCCC', space: 1, style: BorderStyle.SINGLE, size: 6 },
+                }
+              : linha === linhasCodeigo[linhasCodeigo.length - 1]
+                ? {
+                    bottom: { color: 'CCCCCC', space: 1, style: BorderStyle.SINGLE, size: 6 },
+                    left: { color: 'CCCCCC', space: 1, style: BorderStyle.SINGLE, size: 6 },
+                    right: { color: 'CCCCCC', space: 1, style: BorderStyle.SINGLE, size: 6 },
+                  }
+                : {
+                    left: { color: 'CCCCCC', space: 1, style: BorderStyle.SINGLE, size: 6 },
+                    right: { color: 'CCCCCC', space: 1, style: BorderStyle.SINGLE, size: 6 },
+                  },
           shading: { fill: 'F5F5F5' },
-        }),
-      );
+        });
+      });
+      paragrafosCodeigo.forEach((p) => sections.push(p));
     } else if (item.type === 'list' && item.items) {
       // Renderizar listas usando parágrafos com marcadores manuais para evitar dependências de símbolos não exportados pela versão instalada de 'docx'.
       const listaParagrafos = item.items.map((textoItem, indice) => {

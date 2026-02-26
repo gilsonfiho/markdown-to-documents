@@ -1,5 +1,5 @@
 module.exports = {
-  printWidth: 100,
+  printWidth: 250,
   tabWidth: 2,
   useTabs: false,
   semi: true,
@@ -17,24 +17,24 @@ module.exports = {
         singleQuote: true,
         semi: true,
         tabWidth: 2,
-        jsxSingleQuote: false
-      }
+        jsxSingleQuote: false,
+      },
     },
     {
       files: ['*.html', '**/*.html'],
       options: {
         parser: 'html',
         tabWidth: 2,
+        printWidth: 450,
         singleQuote: false,
-        htmlWhitespaceSensitivity: 'css'
-      }
+        htmlWhitespaceSensitivity: 'css',
+      },
     },
     {
       files: ['*.md', '*.mdx'],
       options: {
-        parser: 'markdown'
-      }
-    }
-  ]
+        parser: 'markdown',
+      },
+    },
+  ],
 };
-

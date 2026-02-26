@@ -3,30 +3,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { type AbaData, useAppStore } from '@/lib/store';
-import {
-  CheckCircle2,
-  ChevronDown,
-  ChevronLeft,
-  ChevronRight,
-  Clipboard,
-  Download,
-  FileJson,
-  FileText,
-  Plus,
-  Save,
-  X,
-} from 'lucide-react';
+import { CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, Clipboard, Download, FileJson, FileText, Plus, Save, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
-import {
-  baixarHtmlDocumento,
-  copiarParaAreaTransferencia,
-  exportarParaPdf,
-  markdownToDocx,
-} from '@/lib/markdown-to-docx';
+import { baixarHtmlDocumento, copiarParaAreaTransferencia, exportarParaPdf, markdownToDocx } from '@/lib/markdown-to-docx';
 
 export const TabsBar: React.FC = () => {
-  const { abas, abaAtiva, setAbaAtiva, adicionarAba, removerAba, atualizarAba, salvarNoStorage } =
-    useAppStore();
+  const { abas, abaAtiva, setAbaAtiva, adicionarAba, removerAba, atualizarAba, salvarNoStorage } = useAppStore();
   const [editandoId, setEditandoId] = useState<string | null>(null);
   const [novoNome, setNovoNome] = useState('');
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -195,9 +177,7 @@ export const TabsBar: React.FC = () => {
               exit={{ opacity: 0, x: 10 }}
               transition={{ duration: 0.2 }}
               className={`flex items-center gap-2 px-2 py-1 rounded-lg text-xs font-bold cursor-pointer whitespace-nowrap transition-all flex-shrink-0 ${
-                abaAtiva === aba.id
-                  ? 'bg-white border border-neutral-300 shadow-sm'
-                  : 'hover:bg-neutral-100 border border-transparent'
+                abaAtiva === aba.id ? 'bg-white border border-neutral-300 shadow-sm' : 'hover:bg-neutral-100 border border-transparent'
               }`}
               onClick={() => setAbaAtiva(aba.id)}
             >
@@ -220,20 +200,11 @@ export const TabsBar: React.FC = () => {
                 />
               ) : (
                 <>
-                  <span
-                    className="text-sm font-medium text-neutral-700 max-w-[150px] truncate"
-                    onDoubleClick={() => handleRenomear(aba)}
-                    title={aba.nome}
-                  >
+                  <span className="text-sm font-medium text-neutral-700 max-w-[150px] truncate" onDoubleClick={() => handleRenomear(aba)} title={aba.nome}>
                     {aba.nome}
                   </span>
                   {aba.salvoAoMemento && (
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      exit={{ scale: 0 }}
-                      transition={{ duration: 0.2 }}
-                    >
+                    <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} transition={{ duration: 0.2 }}>
                       <CheckCircle2 size={13} className="text-green-600" />
                     </motion.div>
                   )}
@@ -260,17 +231,12 @@ export const TabsBar: React.FC = () => {
                         const rect = e.currentTarget.getBoundingClientRect();
                         const larguraMenu = 192;
                         const margem = 8;
-                        const esquerda = Math.min(
-                          Math.max(rect.right - larguraMenu, margem),
-                          window.innerWidth - larguraMenu - margem,
-                        );
+                        const esquerda = Math.min(Math.max(rect.right - larguraMenu, margem), window.innerWidth - larguraMenu - margem);
                         const topo = rect.bottom + 6;
                         setPosicaoMenuExportar({ top: topo, left: esquerda });
                         setMenuExportarId(aba.id);
                       }}
-                      className={`flex items-center gap-0.5 text-neutral-400 hover:text-purple-600 p-1 rounded hover:bg-purple-100 transition-colors ${
-                        menuExportarId === aba.id ? 'bg-purple-100 text-purple-600' : ''
-                      }`}
+                      className={`flex items-center gap-0.5 text-neutral-400 hover:text-purple-600 p-1 rounded hover:bg-purple-100 transition-colors ${menuExportarId === aba.id ? 'bg-purple-100 text-purple-600' : ''}`}
                       title="Exportar aba"
                     >
                       {abaExportando === aba.id ? (
@@ -340,10 +306,7 @@ export const TabsBar: React.FC = () => {
                 style={{ top: posicaoMenuExportar.top, left: posicaoMenuExportar.left }}
                 onClick={(e) => e.stopPropagation()}
               >
-                <button
-                  onClick={(e) => handleExportarAba(e, abaMenuAtivo)}
-                  className="w-full flex items-center gap-2 px-4 py-3 text-xs text-neutral-700 hover:bg-neutral-100 transition-colors text-left font-medium whitespace-nowrap"
-                >
+                <button onClick={(e) => handleExportarAba(e, abaMenuAtivo)} className="w-full flex items-center gap-2 px-4 py-3 text-xs text-neutral-700 hover:bg-neutral-100 transition-colors text-left font-medium whitespace-nowrap">
                   <Download size={12} className="text-purple-500 flex-shrink-0" />
                   Baixar Documento (.docx)
                 </button>
@@ -351,11 +314,7 @@ export const TabsBar: React.FC = () => {
                   onClick={(e) => handleCopiarAba(e, abaMenuAtivo)}
                   className="w-full flex items-center gap-2 px-4 py-3 text-xs text-neutral-700 hover:bg-neutral-100 transition-colors text-left font-medium border-t border-neutral-100 whitespace-nowrap"
                 >
-                  {abaCopiadaId === abaMenuAtivo.id ? (
-                    <CheckCircle2 size={12} className="text-green-500 flex-shrink-0" />
-                  ) : (
-                    <Clipboard size={12} className="text-purple-500 flex-shrink-0" />
-                  )}
+                  {abaCopiadaId === abaMenuAtivo.id ? <CheckCircle2 size={12} className="text-green-500 flex-shrink-0" /> : <Clipboard size={12} className="text-purple-500 flex-shrink-0" />}
                   Copiar para Área de Transferência
                 </button>
                 <button

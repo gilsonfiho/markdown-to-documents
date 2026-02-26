@@ -1,14 +1,4 @@
-import {
-  BorderStyle,
-  Document,
-  HeadingLevel,
-  Packer,
-  Paragraph,
-  Table,
-  TableCell,
-  TableRow,
-  TextRun,
-} from 'docx';
+import { BorderStyle, Document, HeadingLevel, Packer, Paragraph, Table, TableCell, TableRow, TextRun } from 'docx';
 
 interface ParsedMarkdown {
   type: 'heading' | 'paragraph' | 'list' | 'code' | 'table' | 'hr' | 'mermaid';
@@ -19,10 +9,7 @@ interface ParsedMarkdown {
   linhas?: string[][];
 }
 
-function detectarBlocoArvore(
-  linhas: string[],
-  indiceInicial: number,
-): { linhas: string[]; quantidade: number } | null {
+function detectarBlocoArvore(linhas: string[], indiceInicial: number): { linhas: string[]; quantidade: number } | null {
   const padraoArvore = /[├─└│┌┐┘┤┬┴┼]/;
 
   if (!padraoArvore.test(linhas[indiceInicial])) {
@@ -148,10 +135,7 @@ function parseMarkdown(markdown: string): ParsedMarkdown[] {
       const listItems = [];
       const ordered = /^\s*\d+\./.test(line);
 
-      while (
-        i < lines.length &&
-        (/^\s*[-*+]\s/.test(lines[i]) || /^\s*\d+\.\s/.test(lines[i]) || lines[i].startsWith('  '))
-      ) {
+      while (i < lines.length && (/^\s*[-*+]\s/.test(lines[i]) || /^\s*\d+\.\s/.test(lines[i]) || lines[i].startsWith('  '))) {
         if (/^\s*[-*+]\s/.test(lines[i]) || /^\s*\d+\.\s/.test(lines[i])) {
           const item = lines[i].replace(/^\s*[-*+]\s/, '').replace(/^\s*\d+\.\s/, '');
           listItems.push(item);
@@ -248,8 +232,7 @@ function gerarHtmlDocumento(markdown: string): string {
     } else if (item.type === 'code') {
       html += `<pre><code>${escapeHtml(item.content)}</code></pre>`;
     } else if (item.type === 'table' && item.linhas) {
-      html +=
-        '<table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse;">';
+      html += '<table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse;">';
       item.linhas.forEach((linhaData) => {
         html += '<tr>';
         linhaData.forEach((celula) => {
@@ -378,14 +361,8 @@ export async function gerarBlobDocx(markdown: string): Promise<Blob> {
             style: 'Normal',
             spacing: { line: 240 },
             border: {
-              top:
-                linha === linhasCode[0]
-                  ? { color: 'CCCCCC', space: 1, style: BorderStyle.SINGLE, size: 6 }
-                  : undefined,
-              bottom:
-                linha === linhasCode[linhasCode.length - 1]
-                  ? { color: 'CCCCCC', space: 1, style: BorderStyle.SINGLE, size: 6 }
-                  : undefined,
+              top: linha === linhasCode[0] ? { color: 'CCCCCC', space: 1, style: BorderStyle.SINGLE, size: 6 } : undefined,
+              bottom: linha === linhasCode[linhasCode.length - 1] ? { color: 'CCCCCC', space: 1, style: BorderStyle.SINGLE, size: 6 } : undefined,
               left: { color: 'CCCCCC', space: 1, style: BorderStyle.SINGLE, size: 6 },
               right: { color: 'CCCCCC', space: 1, style: BorderStyle.SINGLE, size: 6 },
             },

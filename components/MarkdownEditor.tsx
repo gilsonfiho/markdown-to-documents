@@ -29,8 +29,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({ value, onChange 
 
         setTimeout(() => {
           if (textareaRef.current) {
-            textareaRef.current.selectionStart = textareaRef.current.selectionEnd =
-              start + texto.length;
+            textareaRef.current.selectionStart = textareaRef.current.selectionEnd = start + texto.length;
             textareaRef.current.focus();
           }
         }, 0);
@@ -100,12 +99,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({ value, onChange 
           title="Colar opções"
         >
           {colado ? (
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0 }}
-              transition={{ duration: 0.2 }}
-            >
+            <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} transition={{ duration: 0.2 }}>
               <CheckCircle2 size={18} className="text-green-600" />
             </motion.div>
           ) : (
@@ -124,11 +118,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({ value, onChange 
             transition={{ duration: 0.15 }}
             className="absolute top-full right-0 mt-2 bg-white border border-neutral-200 rounded-lg shadow-lg z-50 min-w-[180px]"
           >
-            <motion.button
-              whileHover={{ backgroundColor: '#f3f4f6' }}
-              onClick={handleColar}
-              className="w-full flex items-center gap-3 px-4 py-3 text-xs text-neutral-700 hover:bg-neutral-50 transition-colors text-left font-medium whitespace-nowrap"
-            >
+            <motion.button whileHover={{ backgroundColor: '#f3f4f6' }} onClick={handleColar} className="w-full flex items-center gap-3 px-4 py-3 text-xs text-neutral-700 hover:bg-neutral-50 transition-colors text-left font-medium whitespace-nowrap">
               <Clipboard size={14} />
               <span>Colar</span>
             </motion.button>

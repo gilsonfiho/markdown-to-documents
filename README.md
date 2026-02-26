@@ -1,8 +1,8 @@
 # Markdown Studio
 
-Uma aplicação web moderna e minimalista que permite converter markdown para documentos Word (.docx) em tempo real, com autenticação segura via Google. Desenvolvida com Next.js 16, React 19 e Tailwind CSS, oferece uma interface split-view profissional com suporte a múltiplas abas para máxima produtividade.
+Uma aplicação web moderna e minimalista que permite converter markdown para documentos Word (.docx) em tempo real, com autenticação segura via Google. Desenvolvida com Next.js 16.1.6, React 19.0.0 e Tailwind CSS 3.3.0, oferece uma interface split-view profissional com suporte a múltiplas abas renomeáveis para máxima produtividade.
 
-**Status**: ✅ Completo e funcional
+**Versão**: 1.0.18 | **Status**: ✅ Completo e funcional
 
 ## 🎯 Funcionalidades
 
@@ -23,22 +23,23 @@ Uma aplicação web moderna e minimalista que permite converter markdown para do
 
 ## 🛠️ Stack Tecnológico
 
-- **Frontend**: React 19.0.0 + Next.js 16.1.6
-- **Autenticação**: NextAuth.js 4.24.0
-- **Markdown**: react-markdown 9.0.0 + remark-gfm 4.0.0
-- **Diagramas**: Mermaid 11.12.3
-- **Export**: docx 8.5.0
-- **Styling**: Tailwind CSS 3.3.0
-- **Animações**: Framer Motion 11.0.0
-- **State Management**: Zustand 4.4.0
-- **Icons**: Lucide React 0.575.0
+### Frontend e Bibliotecas Principais
+
+- **Next.js 16.1.6** (App Router, Turbopack)
+- **React 19.0.0** com React Markdown 9.0.0 + remark-gfm 4.0.0
+- **NextAuth.js 4.24.0** (autenticação Google OAuth)
+- **Tailwind CSS 3.3.0** + **Framer Motion 11.0.0** (animações suaves)
+- **Zustand 4.4.0** (gerenciamento de estado global com persistência localStorage)
+- **docx 8.5.0** (exportação DOCX)
+- **Mermaid 11.12.3** (renderização de diagramas em preview)
+- **Lucide React 0.575.0** (ícones SVG)
 
 ### Ferramentas de Desenvolvimento
 
-- **ESLint 8.57 + @typescript-eslint 8.0.0**: Linting com regras TypeScript
-- **Prettier 3.8.1**: Code formatting com overrides para TSX e HTML
-- **TypeScript 5.3.0**: Tipagem estrita (strict mode ativado)
-- **Tailwind CSS 3.3.0 + @tailwindcss/typography**: Utility-first CSS com suporte a prose
+- **TypeScript 5.3.0** (tipagem estrita com strict mode)
+- **ESLint 8.57.1** + **@typescript-eslint 8.0.0** (linting com regras TypeScript)
+- **Prettier 3.8.1** (formatação de código com overrides para TSX/HTML)
+- **@tailwindcss/typography 0.5.19** (prose styling para markdown)
 
 ## 🏗️ Arquitetura
 
@@ -46,24 +47,27 @@ Uma aplicação web moderna e minimalista que permite converter markdown para do
 
 ```
 App/
-├── Header (Navbar + Export/Auth)
-├── Editor (Split-view)
-│   ├── MarkdownEditor (esquerda)
-│   └── MarkdownPreview (direita)
-└── Auth (Sign in com Google)
+├── Header.tsx (Navbar + Exportar/Salvar/Auth)
+├── TabsBar.tsx (Gerenciamento de abas com scroll)
+├── Editor (Split-view editor + preview)
+│   ├── MarkdownEditor.tsx (Textarea esquerda + clipboard inteligente)
+│   └── MarkdownPreview.tsx (Preview direita com react-markdown)
+│       └── MermaidDiagram.tsx (Renderizador de diagramas Mermaid)
+└── Auth (Sign in com Google OAuth)
 
-State: Zustand (markdown, fileName)
-Export: markdown-to-docx.ts (parse → DOCX via docx library)
+State Management: Zustand (store.ts com persistência localStorage)
+Export: markdown-to-docx.ts (parse markdown → DOCX via docx library)
 ```
 
 ### Fluxo de Dados
 
-1. User edita markdown em `MarkdownEditor` (painel esquerdo)
-2. Estado atualiza em Zustand `useAppStore.atualizarAba()`
-3. `MarkdownPreview` renderiza em tempo real com `ReactMarkdown` (painel direito)
-4. User gerencia abas em `TabsBar` (adicionar, renomear, remover, exportar individual)
-5. User clica "Exportar Todas" em `Header` → lote de exportações DOCX com delay entre elas
-6. Persistência: `salvarNoStorage()` → localStorage com todas as abas
+1. **Autenticação**: User → `/auth/signin` → Google OAuth → `app/page.tsx`
+2. **Carregar Estado**: `useEffect([carregarDoStorage])` → restaura abas do localStorage
+3. **Edição**: User edita markdown → `onChange()` → `atualizarAba(abaAtiva, conteudo)`
+4. **Preview Tempo Real**: `abaAtual.conteudo` → `MarkdownPreview` → renderização instantânea
+5. **Gerenciamento de Abas**: Adicionar (+) | Renomear (duplo clique) | Remover (x) | Exportar individual
+6. **Exportar Todas**: Loop `markdownToDocx()` com 500ms delay entre downloads
+7. **Persistência**: `salvarNoStorage()` → localStorage `markdown-studio-abas` e `markdown-studio-aba-ativa`
 
 ## 📋 Pré-requisitos
 
@@ -257,103 +261,48 @@ markdown-to-docx/
 └── next.config.ts
 ```
 
-## 🔑 Padrões Importantes
+## 🔑 Padrões Importantes do Projeto
 
-### Persistência Local (localStorage) com Sistema de Abas
+### Sistema de Gerenciamento de Abas
 
-O estado de **todas as abas** é automaticamente salvo no localStorage:
+Cada aba possui:
 
 ```typescript
-// Salvar no localStorage
-salvarNoStorage();         // Salva aba ativa + mostra timestamp
-salvarTodasAsAbas();       // Salva todas as abas + mostra timestamp em todas
-fecharTodasAsAbas();       // Limpa localStorage + reinicia com 1 aba vazia
-
-// Carregar do localStorage ao iniciar
-carregarDoStorage();       // Chamado em app/page.tsx no useEffect
-```
-
-**Chaves utilizadas**:
-
-- `markdown-studio-abas` — Array serializado de todas as abas (AbaData[])
-- `markdown-studio-aba-ativa` — ID da aba ativa
-
-**Exemplo de estrutura salva**:
-```json
-{
-  "abas": [
-    {
-      "id": "aba-1708234567890-abc123def",
-      "nome": "Documento 1",
-      "conteudo": "# Bem-vindo\n\n...",
-      "salvoAoMemento": null
-    },
-    {
-      "id": "aba-1708234568901-xyz789uvw",
-      "nome": "Documento 2",
-      "conteudo": "# Segundo documento\n\n...",
-      "salvoAoMemento": "14:32:45"
-    }
-  ],
-  "abaAtiva": "aba-1708234567890-abc123def"
+interface AbaData {
+  id: string; // ID único gerado automaticamente
+  nome: string; // Nome renomeável da aba
+  conteudo: string; // Markdown editável
+  salvoAoMemento: string | null; // Timestamp "Salvo às HH:MM:SS" (limpa após 3s)
 }
 ```
 
-### Gerenciamento de Abas (`components/TabsBar.tsx`)
+**Funcionalidades**:
 
-**Funcionalidades principais**:
+- ✅ **Adicionar**: Botão "+" → nova aba com markdown padrão
+- ✅ **Renomear**: Duplo clique no nome → input inline → Enter para confirmar
+- ✅ **Remover**: Botão "x" → remove (sempre mínimo 1 aba)
+- ✅ **Salvar Individual**: Save icon → `salvarNoStorage(abaId)` → mostra timestamp
+- ✅ **Exportar Individual**: Download icon → `markdownToDocx(conteudo, nome)`
 
-1. **Adicionar Aba**: Clique em "+" → nova aba com nome "Documento N" e markdown padrão
-2. **Renomear Aba**: Duplo clique no nome da aba → input inline → Enter para confirmar
-3. **Remover Aba**: Clique em "x" por aba → remove (sempre mantém mínimo 1 aba)
-4. **Salvar Individual**: Clique no ícone Save → `salvarNoStorage(abaId)` → mostra "Salvo às HH:MM:SS"
-5. **Exportar Individual**: Clique no ícone Download → `markdownToDocx(conteudo, nome)` → faz download do DOCX
-6. **Scroll Horizontal**: Botões ◀ ▶ aparecem em viewports pequenas para navegar entre abas
+**localStorage Keys**:
+
+- `markdown-studio-abas` — Array serializado de todas as abas
+- `markdown-studio-aba-ativa` — ID da aba ativa atual
 
 ### Client vs Server Components
 
-- ✅ Components com hooks (`useState`, `useSession`, `useAppStore`) — marcados com `'use client'`
-- ✅ `app/layout.tsx` — Server Component (wraps `<Providers>`)
-- ✅ `components/Providers.tsx` — Client Component (`SessionProvider`)
+- ✅ Components com hooks (`useState`, `useSession`, `useAppStore`) → `'use client'`
+- ✅ `app/layout.tsx` → Server Component (wraps `<SessionProvider>`)
+- ✅ Todos components em `components/` → `'use client'` (usam hooks)
 
-### Conversão Markdown → DOCX
+### Conversão Markdown → DOCX (`lib/markdown-to-docx.ts`)
 
-O arquivo `lib/markdown-to-docx.ts` implementa parsing linha-por-linha:
-
-- **Headings**: `#`, `##`, etc. → `HeadingLevel` 1-6
-- **Listas**: `- item` e `1. item` → `Paragraph` com marcadores (⚠️ `docx@8.5.0` não exporta `ListItem`)
-- **Code blocks**: ` ```typescript ` → bloco de código com fonte monospace
-- **Diagramas Mermaid**: ` ```mermaid ` → renderizados como bloco de código em DOCX
+- **Headings**: Detecta `#` e mapeia `HeadingLevel` 1-6
+- **Listas**: Usa `Paragraph` com marcadores (⚠️ `docx@8.5.0` não exporta `ListItem`)
+- **Code Blocks**: ` ```typescript ` → bloco com fonte monospace
+- **Diagramas Mermaid**: ` ```mermaid ` → renderizados como texto em DOCX
 - **Estruturas ASCII**: Blocos com `├──`, `└──` → mantidos como código formatado
-
----
-
-## 📦 Estrutura do Projeto
-
-```
-markdown-to-docx/
-├── app/
-│   ├── api/
-│   │   └── auth/[...nextauth]/
-│   ├── auth/signin/
-│   ├── globals.css
-│   ├── layout.tsx
-│   └── page.tsx
-├── components/
-│   ├── Header.tsx
-│   ├── MarkdownEditor.tsx
-│   ├── MarkdownPreview.tsx
-│   └── Providers.tsx
-├── lib/
-│   ├── markdown-to-docx.ts
-│   └── store.ts
-├── public/
-├── .env.local.example
-├── package.json
-├── tailwind.config.ts
-├── tsconfig.json
-└── next.config.ts
-```
+- **Inline**: Bold, italic, inline code via `TextRun` com formatação
 
 ## 🔐 Configuração de Segurança
 
@@ -398,52 +347,101 @@ A aplicação é **100% responsiva**:
 
 ## 🐛 Troubleshooting
 
-### Erro de autenticação Google
+### Autenticação e Variáveis de Ambiente
 
-- Verifique as credenciais em `.env.local`
-- Confirme as URIs autorizadas no Google Cloud Console: `http://localhost:3000/api/auth/callback/google`
-- Certifique-se de que `NEXTAUTH_SECRET` está definido (mínimo 32 caracteres)
-- Limpe cookies/cache do navegador e tente novamente
-
-### Erro ao exportar DOCX
-
-- ✅ Verifique console do navegador (`F12 > Console`) para detalhes do erro
-- ✅ Teste com markdown simples (ex: `# Título\nParágrafo`)
-- ✅ Valide que não há caracteres especiais problemáticos
-- ✅ Se markdown é muito grande, pode ter timeout — tente quebrar em seções menores
-- ✅ Verifique se o botão "Exportar" não está desabilitado (usuário deve estar autenticado)
-
-### Diagramas Mermaid não renderizam
-
-- Verifique sintaxe do diagrama (use validador em [mermaid.live](https://mermaid.live))
-- Remova tags `<br/>` dentro do diagrama — não são suportadas
-- Verifique console do navegador para mensagens de erro específicas
-- Reinicie o servidor de desenvolvimento
-
-### ESLint/Prettier errors
+**"Session is null" ou "Not authenticated"**
 
 ```bash
-npm run lint:fix     # Corrige a maioria dos erros automaticamente
-npm run format       # Formata código com Prettier
-npm run lint         # Verifica (--max-warnings=0 — falha se houver warnings)
+# Verificar .env.local:
+- NEXTAUTH_SECRET= (mínimo 32 caracteres, gerar com: openssl rand -base64 32)
+- NEXTAUTH_URL=http://localhost:3000 (desenvolvimento)
+- GOOGLE_CLIENT_ID=... (de Google Cloud Console)
+- GOOGLE_CLIENT_SECRET=... (de Google Cloud Console)
+
+# Solução:
+1. Regenerar NEXTAUTH_SECRET com: openssl rand -base64 32
+2. Verificar Google Cloud Console → credenciais OAuth 2.0
+3. Adicionar URI: http://localhost:3000/api/auth/callback/google
+4. Limpar cookies/cache: Cmd+Shift+Del (Safari) ou Ctrl+Shift+Del (Chrome)
+5. Reiniciar servidor: npm run dev
 ```
 
-### "Session is null" ou "Not authenticated"
+**Erro de autenticação Google**
 
-- ✅ Verificar `NEXTAUTH_SECRET` em `.env.local` (não pode ser vazio)
-- ✅ Verificar `NEXTAUTH_URL=http://localhost:3000` (desenvolvimento)
-- ✅ Verificar `GOOGLE_CLIENT_ID` e `GOOGLE_CLIENT_SECRET` válidos
-- ✅ Limpar cache/cookies do navegador: `Ctrl+Shift+Del` (Chrome) ou `Cmd+Shift+Del` (Safari)
-- ✅ Reiniciar dev server: `npm run dev`
+- ✅ Verifique Client ID e Client Secret em `.env.local`
+- ✅ Confirme URIs autorizadas no Google Cloud: `http://localhost:3000/api/auth/callback/google`
+- ✅ API "Google+ API" está ativada no projeto Google Cloud
+- ✅ Limpe cookies e tente novamente
 
-### Markdown não renderiza preview
+### Markdown e Renderização
 
-- Verifique se o component `MarkdownPreview.tsx` está recebendo a prop `content`
-- Verifique console do navegador para erros no `ReactMarkdown`
-- Tente com markdown simples para descartar problema de sintaxe
-- Verifique se `remark-gfm` está instalado corretamente
+**Markdown não renderiza preview**
 
-### Porta 3000 já em uso
+- Verificar se `abaAtiva` está definida corretamente em `page.tsx`
+- Testar com markdown simples: `# Título\nParágrafo`
+- Verificar console do navegador para erros do `ReactMarkdown`
+- Validar que `remark-gfm` está instalado
+
+**Diagramas Mermaid não renderizam**
+
+- Validar sintaxe em https://mermaid.live
+- Remover tags `<br/>` dentro do diagrama (não suportadas)
+- Verificar console para mensagens de erro específicas
+- Reiniciar servidor: `npm run dev`
+
+### Exportação DOCX
+
+**Erro ao exportar DOCX**
+
+- ✅ Testar com markdown simples (ex: `# Título\nParágrafo`)
+- ✅ Verificar console do navegador (F12 > Console) para detalhes
+- ✅ Validar caracteres especiais no markdown
+- ✅ Se muito grande, quebrar em seções menores
+- ✅ Usuário deve estar autenticado
+
+**Múltiplas exportações travadas**
+
+- Verificar timeout em `Header.tsx` (500ms delay padrão)
+- Aumentar delay se houver muitas abas (ex: 800ms)
+- Verificar se navegador permite múltiplos downloads simultâneos
+
+### Linting e Build
+
+**ESLint/Prettier errors**
+
+```bash
+npm run lint:fix     # Corrige automaticamente
+npm run format       # Formata com Prettier
+npm run lint         # Verifica (falha se houver warnings)
+```
+
+**Type errors ao fazer build**
+
+```bash
+npx tsc --noEmit     # Verificar tipos sem build
+npm run build         # Build completo com otimizações
+```
+
+Se persistirem, verificar que `tsconfig.json` tem `"strict": true` e todos os tipos estão corretos.
+
+### Estado e Persistência
+
+**Abas não salvam**
+
+- Verificar localStorage em DevTools: F12 > Application > Storage
+- Confirmar que `salvarNoStorage()` é chamado
+- Verificar keys: `markdown-studio-abas` e `markdown-studio-aba-ativa`
+- Limpar localStorage manualmente e recarregar: `localStorage.clear()`
+
+**Zustand state não atualiza**
+
+- Certificar que componente tem `'use client'` no topo
+- Verificar que `carregarDoStorage()` é chamado em `useEffect` ao montar
+- Verificar console do navegador para erros
+
+### Desenvolvidor
+
+**Porta 3000 já em uso**
 
 ```bash
 # macOS/Linux
@@ -456,48 +454,71 @@ Get-Process -Id (Get-NetTCPConnection -LocalPort 3000).OwningProcess | Stop-Proc
 PORT=3001 npm run dev
 ```
 
-### "Type errors" ao fazer build
+**Dependências com conflito**
 
 ```bash
-npx tsc --noEmit     # Verificar tipos sem fazer build
-npm run build         # Build completo
+rm -rf node_modules package-lock.json
+npm install
+npm run dev
 ```
 
-Se persistirem erros, verifique que `tsconfig.json` tem `strict: true` e todos os tipos estão corretos.
+## 📦 Estrutura do Projeto
 
-### Zustand state não atualiza
-
-- Certifique-se que o componente está marcado com `'use client'` (se usar `useAppStore`)
-- Verifique que está chamando `carregarDoStorage()` em `useEffect` ao montar
-- Verifique console do navegador para erros
-
-### Logout não funciona
-
-- Verificar que botão chama `signOut()` de `next-auth/react`
-- Verificar se `NextAuth.js` está configurado corretamente em `app/api/auth/[...nextauth].ts`
-- Limpar cookies manualmente e tentar novamente
-
----
+```
+markdown-to-docx/
+├── app/                               # Next.js App Router
+│   ├── api/
+│   │   └── auth/[...nextauth]/
+│   │       └── route.ts               # NextAuth endpoints
+│   ├── auth/signin/
+│   │   └── page.tsx                   # Página de login
+│   ├── globals.css                    # Estilos globais
+│   ├── layout.tsx                     # Root layout + SessionProvider
+│   └── page.tsx                       # Home (split-view + tabs)
+├── components/                        # React components (todos 'use client')
+│   ├── Header.tsx                     # Navbar + Export/Save/Auth
+│   ├── MarkdownEditor.tsx             # Textarea editor
+│   ├── MarkdownPreview.tsx            # Preview com react-markdown
+│   ├── MermaidDiagram.tsx             # Renderizador Mermaid
+│   ├── TabsBar.tsx                    # Gerenciador de abas
+│   └── Providers.tsx                  # SessionProvider wrapper
+├── lib/                               # Utilitários e lógica
+│   ├── store.ts                       # Zustand store com persistência
+│   ├── markdown-to-docx.ts            # Parser markdown → DOCX
+│   ├── mermaid-cleaner.ts             # Limpeza diagramas Mermaid
+│   └── versao.ts                      # Versionamento (1.0.18)
+├── docs/                              # Documentação adicional
+├── public/                            # Assets estáticos
+├── .env.local.example                 # Template de variáveis
+├── .eslintrc.cjs                      # Configuração ESLint
+├── .prettierrc.cjs                    # Configuração Prettier
+├── package.json                       # Dependências
+├── tailwind.config.ts                 # Configuração Tailwind
+├── tsconfig.json                      # Configuração TypeScript
+├── next.config.ts                     # Configuração Next.js
+└── README.md                          # Este arquivo
+```
 
 ## 📦 Dependências Principais
 
-| Pacote                  | Versão   | Propósito                        |
-| ----------------------- | -------- | -------------------------------- |
-| next                    | ^16.1.6  | Framework web com App Router     |
-| react                   | ^19.0.0  | UI library (JSX Transform)       |
-| next-auth               | ^4.24.0  | Autenticação OAuth 2.0           |
-| docx                    | ^8.5.0   | Export DOCX                      |
-| react-markdown          | ^9.0.0   | Parse e renderização markdown    |
-| remark-gfm              | ^4.0.0   | GitHub Flavored Markdown support |
-| mermaid                 | ^11.12.3 | Renderização de diagramas        |
-| zustand                 | ^4.4.0   | State management minimalista     |
-| framer-motion           | ^11.0.0  | Animações e transições           |
-| tailwindcss             | ^3.3.0   | CSS utilitário                   |
-| lucide-react            | ^0.575.0 | Ícones SVG                       |
-| @tailwindcss/typography | ^0.5.19  | Prose styling para markdown      |
-| eslint                  | ^8.57.1  | Linting JavaScript/TypeScript    |
-| prettier                | ^3.8.1   | Code formatting                  |
-| typescript              | ^5.3.0   | Tipagem estática (strict mode)   |
+| Pacote                  | Versão  | Propósito                                |
+| ----------------------- | ------- | ---------------------------------------- |
+| next                    | 16.1.6  | Framework web com App Router + Turbopack |
+| react                   | 19.0.0  | UI library (JSX Transform automático)    |
+| react-dom               | 19.0.0  | React DOM rendering                      |
+| next-auth               | 4.24.0  | Autenticação OAuth 2.0 Google            |
+| docx                    | 8.5.0   | Export DOCX                              |
+| react-markdown          | 9.0.0   | Parse e renderização markdown            |
+| remark-gfm              | 4.0.0   | GitHub Flavored Markdown support         |
+| mermaid                 | 11.12.3 | Renderização de diagramas                |
+| zustand                 | 4.4.0   | State management minimalista             |
+| framer-motion           | 11.0.0  | Animações e transições suaves            |
+| tailwindcss             | 3.3.0   | CSS utilitário                           |
+| lucide-react            | 0.575.0 | Ícones SVG de qualidade                  |
+| @tailwindcss/typography | 0.5.19  | Prose styling para markdown              |
+| eslint                  | 8.57.1  | Linting JavaScript/TypeScript            |
+| prettier                | 3.8.1   | Code formatting                          |
+| typescript              | 5.3.0   | Tipagem estática (strict mode)           |
 
 ## 🚀 Deploy
 
@@ -521,34 +542,16 @@ GOOGLE_CLIENT_SECRET=...
 
 Para agentes de IA (GitHub Copilot, Claude, etc.), consulte [`.github/copilot-instructions.md`](.github/copilot-instructions.md) que contém:
 
-- **Arquitetura detalhada** do projeto
-- **Padrões de componentes** React e Next.js
-- **Conversão Markdown → DOCX** (parsing e exportação)
-- **Gerenciamento de estado** com Zustand
-- **Renderização de Mermaid** e diagramas ASCII
-- **Configurações ESLint/Prettier** específicas
-- **Workflows essenciais** (dev, build, lint, format)
-- **Armadilhas e considerações** importantes
-- **Versões críticas** de todas as dependências
-
-### Arquivos Principais
-
-| Arquivo                          | Propósito                                     |
-| -------------------------------- | --------------------------------------------- |
-| `app/page.tsx`                   | Página principal (split-view editor)          |
-| `app/layout.tsx`                 | Root layout com providers                     |
-| `app/auth/signin/page.tsx`       | Página de login                               |
-| `components/Header.tsx`          | Navbar com botões Export/Auth                 |
-| `components/MarkdownEditor.tsx`  | Textarea do editor                            |
-| `components/MarkdownPreview.tsx` | Preview com React Markdown                    |
-| `components/MermaidDiagram.tsx`  | Renderizador de diagramas Mermaid             |
-| `lib/store.ts`                   | Zustand store (estado global)                 |
-| `lib/markdown-to-docx.ts`        | Lógica de conversão markdown → DOCX           |
-| `lib/mermaid-cleaner.ts`         | Utilitários para limpeza de diagramas Mermaid |
-| `.env.local.example`             | Variáveis de ambiente necessárias             |
-| `.eslintrc.cjs`                  | Configuração ESLint + Prettier                |
-| `.prettierrc.cjs`                | Configuração Prettier                         |
-| `tsconfig.json`                  | Configuração TypeScript (strict mode)         |
+- **Arquitetura detalhada** do projeto com fluxo de dados completo
+- **Padrões de componentes** React e Next.js específicos do projeto
+- **Gerenciamento de estado** com Zustand (interface AppStore completa)
+- **Sistema de abas** com interface AbaData e persistência localStorage
+- **Conversão Markdown → DOCX** (parsing linha-por-linha e tipos suportados)
+- **Renderização de Mermaid** e detecção de diagramas ASCII
+- **Configurações ESLint/Prettier** precisas (typescript-eslint, prettier-plugin-tailwind)
+- **Workflows essenciais** (dev, build, lint, format com regras específicas)
+- **Armadilhas e considerações** importantes (ListItem não exportado, NEXTAUTH_SECRET obrigatório, etc.)
+- **Versões críticas** de todas as dependências sincronizadas com package.json
 
 ---
 

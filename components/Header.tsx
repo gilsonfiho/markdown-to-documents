@@ -3,25 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import { useSession, signIn, signOut } from 'next-auth/react';
 import { useAppStore } from '@/lib/store';
-import {
-  markdownToDocx,
-  copiarParaAreaTransferencia,
-  baixarHtmlDocumento,
-  exportarParaPdf,
-} from '@/lib/markdown-to-docx';
+import { markdownToDocx, copiarParaAreaTransferencia, baixarHtmlDocumento, exportarParaPdf } from '@/lib/markdown-to-docx';
 import { obterVersaoFormatada } from '@/lib/versao';
-import {
-  LogOut,
-  LogIn,
-  Save,
-  Package,
-  X,
-  Clipboard,
-  ChevronDown,
-  CheckCircle2,
-  FileText,
-  FileJson,
-} from 'lucide-react';
+import { LogOut, LogIn, Save, Package, X, Clipboard, ChevronDown, CheckCircle2, FileText, FileJson } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const Header: React.FC = () => {
@@ -95,12 +79,7 @@ export const Header: React.FC = () => {
   return (
     <header className="border-b border-neutral-200 bg-white">
       <div className="flex items-center justify-between px-8 py-4">
-        <motion.div
-          initial={{ opacity: 0, x: -10 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5 }}
-          className="flex items-center gap-3"
-        >
+        <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }} className="flex items-center gap-3">
           <div className="w-10 h-10 bg-gradient-to-br from-neutral-900 to-neutral-700 rounded-lg flex items-center justify-center">
             <span className="text-white font-bold text-lg">M</span>
           </div>
@@ -108,21 +87,14 @@ export const Header: React.FC = () => {
             <h1 className="text-xl font-bold text-neutral-900">Markdown Studio</h1>
             <div className="flex items-center gap-2">
               <p className="text-xs text-neutral-500">Converta markdown para Word</p>
-              <span className="text-xs font-semibold text-neutral-400 bg-neutral-100 px-2 py-0.5 rounded">
-                {obterVersaoFormatada()}
-              </span>
+              <span className="text-xs font-semibold text-neutral-400 bg-neutral-100 px-2 py-0.5 rounded">{obterVersaoFormatada()}</span>
             </div>
           </div>
         </motion.div>
 
         <div className="flex items-center gap-4">
           {session?.user && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.1 }}
-              className="text-right"
-            >
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }} className="text-right">
               <p className="text-sm font-medium text-neutral-900">{session.user.name}</p>
               <p className="text-xs text-neutral-500">{session.user.email}</p>
             </motion.div>
@@ -175,17 +147,11 @@ export const Header: React.FC = () => {
                   className="absolute right-0 mt-2 w-72 bg-white border border-neutral-200 rounded-lg shadow-xl z-50 overflow-hidden"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <button
-                    onClick={handleExportarTodas}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-xs text-neutral-700 hover:bg-neutral-50 transition-colors text-left font-medium whitespace-nowrap"
-                  >
+                  <button onClick={handleExportarTodas} className="w-full flex items-center gap-3 px-4 py-3 text-xs text-neutral-700 hover:bg-neutral-50 transition-colors text-left font-medium whitespace-nowrap">
                     <Package size={18} className="text-purple-600" />
                     Baixar Todas (.docx)
                   </button>
-                  <button
-                    onClick={handleCopiarTodas}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-xs text-neutral-700 hover:bg-neutral-50 transition-colors text-left font-medium border-t border-neutral-100 whitespace-nowrap"
-                  >
+                  <button onClick={handleCopiarTodas} className="w-full flex items-center gap-3 px-4 py-3 text-xs text-neutral-700 hover:bg-neutral-50 transition-colors text-left font-medium border-t border-neutral-100 whitespace-nowrap">
                     {tudoCopiado ? (
                       <>
                         <CheckCircle2 size={18} className="text-green-600" />
@@ -198,17 +164,11 @@ export const Header: React.FC = () => {
                       </>
                     )}
                   </button>
-                  <button
-                    onClick={handleBaixarHtmlTodas}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-xs text-neutral-700 hover:bg-neutral-50 transition-colors text-left font-medium border-t border-neutral-100 whitespace-nowrap"
-                  >
+                  <button onClick={handleBaixarHtmlTodas} className="w-full flex items-center gap-3 px-4 py-3 text-xs text-neutral-700 hover:bg-neutral-50 transition-colors text-left font-medium border-t border-neutral-100 whitespace-nowrap">
                     <FileText size={18} className="text-purple-600" />
                     Baixar Todas como HTML
                   </button>
-                  <button
-                    onClick={handleExportarPdfTodas}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-xs text-neutral-700 hover:bg-neutral-50 transition-colors text-left font-medium border-t border-neutral-100 whitespace-nowrap"
-                  >
+                  <button onClick={handleExportarPdfTodas} className="w-full flex items-center gap-3 px-4 py-3 text-xs text-neutral-700 hover:bg-neutral-50 transition-colors text-left font-medium border-t border-neutral-100 whitespace-nowrap">
                     <FileJson size={18} className="text-purple-600" />
                     Exportar Todas como PDF
                   </button>

@@ -70,10 +70,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
         abaAtiva: novaAba.id,
       });
     } else {
-      const proximaAba =
-        estado.abaAtiva === id
-          ? novasAbas[novasAbas.length - 1]
-          : estado.abas.find((a) => a.id !== id);
+      const proximaAba = estado.abaAtiva === id ? novasAbas[novasAbas.length - 1] : estado.abas.find((a) => a.id !== id);
       set({
         abas: novasAbas,
         abaAtiva: proximaAba?.id || novasAbas[0].id,

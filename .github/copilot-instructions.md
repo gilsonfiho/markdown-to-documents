@@ -44,17 +44,19 @@ lib/
 ### Sistema de Abas (Novo - Crítico!)
 
 O projeto agora gerencia **múltiplas abas** ao invés de um único documento. Cada aba:
+
 - Tem ID único gerado por `gerarIdUnico()` em `store.ts`
 - Contém `nome` (renomeável em `TabsBar.tsx`)
 - Contém `conteudo` (markdown editável)
 - Contém `salvoAoMemento` (timestamp visual "Salvo às HH:MM:SS")
 
 **Interface AbaData** (`lib/store.ts`):
+
 ```typescript
 interface AbaData {
-  id: string;                   // ID único
-  nome: string;                 // Nome da aba (ex: "Documento 1")
-  conteudo: string;             // Markdown editável
+  id: string; // ID único
+  nome: string; // Nome da aba (ex: "Documento 1")
+  conteudo: string; // Markdown editável
   salvoAoMemento: string | null; // Timestamp quando salva (limpa após 3s)
 }
 ```
@@ -65,7 +67,7 @@ interface AbaData {
 2. **Carregar Estado**: `app/page.tsx` → `useEffect([carregarDoStorage])` → restaura abas do localStorage
 3. **Edição Ativa**: User edita markdown → `MarkdownEditor.onChange()` → `useAppStore.atualizarAba(abaAtiva, conteudo)`
 4. **Preview em Tempo Real**: `abaAtual.conteudo` → `MarkdownPreview` → `ReactMarkdown` renderiza HTML + `MermaidDiagram` detecta ` ```mermaid `
-5. **Gerenciamento de Abas**: 
+5. **Gerenciamento de Abas**:
    - Adicionar: `TabsBar` → botão "+" → `adicionarAba()` → nova aba com `MARKDOWN_PADRAO`
    - Renomear: `TabsBar` → duplo clique → `finalizarRenomeacao()` → `atualizarAba(id, conteudo, novoNome)`
    - Remover: `TabsBar` → botão "x" → `removerAba(id)` (sempre mínimo 1 aba)
@@ -76,44 +78,50 @@ interface AbaData {
 ### Gerenciamento de Estado com Zustand (`lib/store.ts`)
 
 **Interface completa AppStore**:
+
 ```typescript
 interface AppStore {
   // Dados
-  abas: AbaData[];                            // Array de todas as abas
-  abaAtiva: string;                           // ID da aba ativa
-  
+  abas: AbaData[]; // Array de todas as abas
+  abaAtiva: string; // ID da aba ativa
+
   // Setters simples
-  setAbaAtiva: (id: string) => void;          // Muda aba ativa
-  
+  setAbaAtiva: (id: string) => void; // Muda aba ativa
+
   // Operações em abas
-  adicionarAba: () => void;                   // Cria nova aba com MARKDOWN_PADRAO
-  removerAba: (id: string) => void;           // Remove aba (mínimo 1)
+  adicionarAba: () => void; // Cria nova aba com MARKDOWN_PADRAO
+  removerAba: (id: string) => void; // Remove aba (mínimo 1)
   atualizarAba: (id: string, conteudo: string, nome?: string) => void; // Atualiza conteúdo/nome
   setSalvoAoMemento: (abaId: string, data: string | null) => void; // Set timestamp
-  
+
   // Persistência
-  carregarDoStorage: () => void;              // Restaura abas do localStorage ao iniciar
-  salvarNoStorage: (abaId?: string) => void;  // Salva todas as abas + mostra timestamp em uma aba
-  salvarTodasAsAbas: () => void;              // Salva todas + mostra timestamp em todas
-  fecharTodasAsAbas: () => void;              // Limpa localStorage + reinicia com 1 aba vazia
+  carregarDoStorage: () => void; // Restaura abas do localStorage ao iniciar
+  salvarNoStorage: (abaId?: string) => void; // Salva todas as abas + mostra timestamp em uma aba
+  salvarTodasAsAbas: () => void; // Salva todas + mostra timestamp em todas
+  fecharTodasAsAbas: () => void; // Limpa localStorage + reinicia com 1 aba vazia
 }
 ```
 
 **Padrão de uso em componentes**:
 
-1. **Em `page.tsx`**: 
+1. **Em `page.tsx`**:
+
    ```typescript
    const { carregarDoStorage } = useAppStore();
-   useEffect(() => { carregarDoStorage(); }, [carregarDoStorage]);
+   useEffect(() => {
+     carregarDoStorage();
+   }, [carregarDoStorage]);
    ```
 
 2. **Em `MarkdownEditor.tsx`**:
+
    ```typescript
    const { abaAtiva, atualizarAba } = useAppStore();
    onChange={(conteudo) => atualizarAba(abaAtiva, conteudo)}
    ```
 
 3. **Em `TabsBar.tsx`**:
+
    ```typescript
    const { abas, abaAtiva, adicionarAba, removerAba, atualizarAba, salvarNoStorage } = useAppStore();
    ```
@@ -124,6 +132,7 @@ interface AppStore {
    ```
 
 **Chaves localStorage**:
+
 - `'markdown-studio-abas'` — Array serializado de todas as abas
 - `'markdown-studio-aba-ativa'` — ID da aba ativa
 
@@ -301,6 +310,7 @@ import typography from '@tailwindcss/typography';
 5. **Versioning**: Exibe versão de `lib/versao.ts`
 
 **Padrão animação save feedback**:
+
 ```typescript
 {aba.salvoAoMemento ? (
   <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}>
@@ -314,11 +324,13 @@ import typography from '@tailwindcss/typography';
 ### MarkdownEditor Component (`components/MarkdownEditor.tsx`)
 
 **Funcionalidades**:
+
 - Textarea com suporte a Tab (insere `\t`)
 - Dropdown inteligente: Colar / Limpar e Colar
 - Estado `colado` para feedback visual (mostra CheckCircle2 por 2s)
 
 **Padrão Tab handling**:
+
 ```typescript
 const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
   if (e.key === 'Tab') {
@@ -336,6 +348,7 @@ const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
 ### TabsBar Component (`components/TabsBar.tsx`)
 
 **Funcionalidades**:
+
 - Array de abas com scroll horizontal
 - Adicionar aba: botão "+" → `adicionarAba()`
 - Remover aba: botão "x" por aba → `removerAba(id)` (mínimo 1)

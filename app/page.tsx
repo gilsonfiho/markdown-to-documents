@@ -28,11 +28,7 @@ export default function Home() {
   if (status === 'loading') {
     return (
       <div className="w-full h-screen flex items-center justify-center bg-white">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-          className="w-12 h-12 border-3 border-neutral-900 border-t-transparent rounded-full"
-        />
+        <motion.div animate={{ rotate: 360 }} transition={{ duration: 2, repeat: Infinity, ease: 'linear' }} className="w-12 h-12 border-3 border-neutral-900 border-t-transparent rounded-full" />
       </div>
     );
   }
@@ -48,19 +44,9 @@ export default function Home() {
       <Header />
       <TabsBar />
 
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-        className="flex flex-1 overflow-hidden gap-px"
-      >
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }} className="flex flex-1 overflow-hidden gap-px">
         {/* Editor Panel */}
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.2, duration: 0.5 }}
-          className="flex-1 flex flex-col overflow-hidden bg-white border-r border-neutral-200"
-        >
+        <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2, duration: 0.5 }} className="flex-1 flex flex-col overflow-hidden bg-white border-r border-neutral-200">
           <div className="px-6 py-3 border-b border-neutral-200 bg-neutral-50">
             <h2 className="text-sm font-semibold text-neutral-900">Editor</h2>
           </div>
@@ -77,12 +63,7 @@ export default function Home() {
         </motion.div>
 
         {/* Preview Panel */}
-        <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.2, duration: 0.5 }}
-          className="flex-1 flex flex-col overflow-hidden bg-neutral-50"
-        >
+        <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2, duration: 0.5 }} className="flex-1 flex flex-col overflow-hidden bg-neutral-50">
           <div className="px-6 py-3 border-b border-neutral-200 bg-white">
             <h2 className="text-sm font-semibold text-neutral-900">Preview</h2>
           </div>

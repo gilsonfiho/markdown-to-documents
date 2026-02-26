@@ -50,8 +50,7 @@ export const MermaidDiagram: React.FC<MermaidDiagramProps> = ({ content }) => {
 
           const suggestions = document.createElement('p');
           suggestions.className = 'text-red-600 text-xs';
-          suggestions.textContent =
-            '💡 Dicas: Verifique se usa <br/> nas labels (não suportado). Use quebras de linha naturais em vez disso.';
+          suggestions.textContent = '💡 Dicas: Verifique se usa <br/> nas labels (não suportado). Use quebras de linha naturais em vez disso.';
           errorElement.appendChild(suggestions);
 
           containerRef.current.appendChild(errorElement);
@@ -62,10 +61,5 @@ export const MermaidDiagram: React.FC<MermaidDiagramProps> = ({ content }) => {
     renderDiagram();
   }, [content]);
 
-  return (
-    <div
-      ref={containerRef}
-      className="flex justify-center items-center my-4 p-4 bg-neutral-50 rounded-lg border border-neutral-200 overflow-x-auto min-h-[200px]"
-    />
-  );
+  return <div ref={containerRef} className="flex justify-center items-center my-4 p-4 bg-neutral-50 rounded-lg border border-neutral-200 overflow-x-auto min-h-[200px]" />;
 };

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSession, signIn, signOut } from 'next-auth/react';
 import { useAppStore } from '@/lib/store';
-import { markdownToDocx, gerarBlobDocx } from '@/lib/markdown-to-docx';
+import { markdownToDocx, copiarParaAreaTransferencia } from '@/lib/markdown-to-docx';
 import { obterVersaoFormatada } from '@/lib/versao';
 import {
   LogOut,
@@ -42,15 +42,8 @@ export const Header: React.FC = () => {
   const handleCopiarTodas = async () => {
     setMenuExportarAberto(false);
     try {
-      const blobs: { [key: string]: Blob } = {};
-      for (const aba of abas) {
-        const blob = await gerarBlobDocx(aba.conteudo);
-        blobs[
-          `application/vnd.openxmlformats-officedocument.wordprocessingml.document;${aba.nome}`
-        ] = blob;
-      }
-      const item = new ClipboardItem(blobs);
-      await navigator.clipboard.write([item]);
+      const conteudos = abas.map((aba) => aba.conteudo).join('\n\n---\n\n');
+      await copiarParaAreaTransferencia(conteudos);
       setTudoCopiado(true);
       setTimeout(() => setTudoCopiado(false), 2000);
     } catch {

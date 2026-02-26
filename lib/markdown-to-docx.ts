@@ -228,6 +228,74 @@ function getHeadingLevel(level: number): any {
   return levels[level] || HeadingLevel.HEADING_1;
 }
 
+function gerarHtmlDocumento(markdown: string): string {
+  const parsed = parseMarkdown(markdown);
+  let html = '<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>';
+
+  parsed.forEach((item) => {
+    if (item.type === 'heading') {
+      const level = item.level || 1;
+      html += `<h${level}>${escapeHtml(item.content)}</h${level}>`;
+    } else if (item.type === 'paragraph') {
+      html += `<p>${formatarHtml(item.content)}</p>`;
+    } else if (item.type === 'list') {
+      const tag = item.ordered ? 'ol' : 'ul';
+      html += `<${tag}>`;
+      item.items?.forEach((itemText) => {
+        html += `<li>${formatarHtml(itemText)}</li>`;
+      });
+      html += `</${tag}>`;
+    } else if (item.type === 'code') {
+      html += `<pre><code>${escapeHtml(item.content)}</code></pre>`;
+    } else if (item.type === 'table' && item.linhas) {
+      html +=
+        '<table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse;">';
+      item.linhas.forEach((linhaData) => {
+        html += '<tr>';
+        linhaData.forEach((celula) => {
+          html += `<td>${formatarHtml(celula)}</td>`;
+        });
+        html += '</tr>';
+      });
+      html += '</table>';
+    } else if (item.type === 'mermaid') {
+      html += `<pre><code>${escapeHtml(item.content)}</code></pre>`;
+    } else if (item.type === 'hr') {
+      html += '<hr>';
+    }
+  });
+
+  html += '</body></html>';
+  return html;
+}
+
+function escapeHtml(text: string): string {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function formatarHtml(text: string): string {
+  let html = text;
+  html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/__(.*?)__/g, '<strong>$1</strong>');
+  html = html.replace(/_([^_]*?)_/g, '<em>$1</em>');
+  html = html.replace(/`([^`]*?)`/g, '<code>$1</code>');
+  return html;
+}
+
+export async function copiarParaAreaTransferencia(markdown: string): Promise<void> {
+  try {
+    const html = gerarHtmlDocumento(markdown);
+    const blob = new Blob([html], { type: 'text/html' });
+    const item = new ClipboardItem({ 'text/html': blob });
+    await navigator.clipboard.write([item]);
+  } catch {
+    const html = gerarHtmlDocumento(markdown);
+    await navigator.clipboard.writeText(html);
+  }
+}
+
 export async function gerarBlobDocx(markdown: string): Promise<Blob> {
   const parsed = parseMarkdown(markdown);
   const sections: (Paragraph | Table)[] = [];

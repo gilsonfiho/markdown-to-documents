@@ -172,19 +172,19 @@ export const Header: React.FC = () => {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 10 }}
-                  className="absolute right-0 mt-2 w-56 bg-white border border-neutral-200 rounded-lg shadow-xl z-50 overflow-hidden"
+                  className="absolute right-0 mt-2 w-72 bg-white border border-neutral-200 rounded-lg shadow-xl z-50 overflow-hidden"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <button
                     onClick={handleExportarTodas}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-neutral-700 hover:bg-neutral-50 transition-colors text-left font-medium"
+                    className="w-full flex items-center gap-3 px-4 py-3 text-xs text-neutral-700 hover:bg-neutral-50 transition-colors text-left font-medium whitespace-nowrap"
                   >
                     <Package size={18} className="text-purple-600" />
                     Baixar Todas (.docx)
                   </button>
                   <button
                     onClick={handleCopiarTodas}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-neutral-700 hover:bg-neutral-50 transition-colors text-left font-medium border-t border-neutral-100"
+                    className="w-full flex items-center gap-3 px-4 py-3 text-xs text-neutral-700 hover:bg-neutral-50 transition-colors text-left font-medium border-t border-neutral-100 whitespace-nowrap"
                   >
                     {tudoCopiado ? (
                       <>
@@ -200,14 +200,14 @@ export const Header: React.FC = () => {
                   </button>
                   <button
                     onClick={handleBaixarHtmlTodas}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-neutral-700 hover:bg-neutral-50 transition-colors text-left font-medium border-t border-neutral-100"
+                    className="w-full flex items-center gap-3 px-4 py-3 text-xs text-neutral-700 hover:bg-neutral-50 transition-colors text-left font-medium border-t border-neutral-100 whitespace-nowrap"
                   >
                     <FileText size={18} className="text-purple-600" />
                     Baixar Todas como HTML
                   </button>
                   <button
                     onClick={handleExportarPdfTodas}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-neutral-700 hover:bg-neutral-50 transition-colors text-left font-medium border-t border-neutral-100"
+                    className="w-full flex items-center gap-3 px-4 py-3 text-xs text-neutral-700 hover:bg-neutral-50 transition-colors text-left font-medium border-t border-neutral-100 whitespace-nowrap"
                   >
                     <FileJson size={18} className="text-purple-600" />
                     Exportar Todas como PDF

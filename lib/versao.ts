@@ -3,7 +3,7 @@
  * Sincronizada com package.json
  */
 
-export const VERSAO_APP = '1.0.13';
+export const VERSAO_APP = '1.0.18';
 
 /**
  * Obtém a versão formatada da aplicação

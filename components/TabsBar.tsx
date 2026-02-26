@@ -5,23 +5,23 @@ import { createPortal } from 'react-dom';
 import { type AbaData, useAppStore } from '@/lib/store';
 import {
   CheckCircle2,
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
+  Clipboard,
   Download,
+  FileJson,
+  FileText,
   Plus,
   Save,
   X,
-  Clipboard,
-  ChevronDown,
-  FileText,
-  FileJson,
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
-  markdownToDocx,
-  copiarParaAreaTransferencia,
   baixarHtmlDocumento,
+  copiarParaAreaTransferencia,
   exportarParaPdf,
+  markdownToDocx,
 } from '@/lib/markdown-to-docx';
 
 export const TabsBar: React.FC = () => {
@@ -194,7 +194,7 @@ export const TabsBar: React.FC = () => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 10 }}
               transition={{ duration: 0.2 }}
-              className={`flex items-center gap-2 px-2 py-1 rounded-lg font-bold cursor-pointer whitespace-nowrap transition-all flex-shrink-0 ${
+              className={`flex items-center gap-2 px-2 py-1 rounded-lg text-xs font-bold cursor-pointer whitespace-nowrap transition-all flex-shrink-0 ${
                 abaAtiva === aba.id
                   ? 'bg-white border border-neutral-300 shadow-sm'
                   : 'hover:bg-neutral-100 border border-transparent'
@@ -336,40 +336,40 @@ export const TabsBar: React.FC = () => {
                 initial={{ opacity: 0, y: 5 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 5 }}
-                className="fixed w-48 bg-white border border-neutral-200 rounded-lg shadow-lg z-[9999] overflow-hidden"
+                className="fixed w-64 bg-white border border-neutral-200 rounded-lg shadow-lg z-[9999] overflow-hidden"
                 style={{ top: posicaoMenuExportar.top, left: posicaoMenuExportar.left }}
                 onClick={(e) => e.stopPropagation()}
               >
                 <button
                   onClick={(e) => handleExportarAba(e, abaMenuAtivo)}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-xs text-neutral-700 hover:bg-neutral-100 transition-colors text-left font-medium"
+                  className="w-full flex items-center gap-2 px-4 py-3 text-xs text-neutral-700 hover:bg-neutral-100 transition-colors text-left font-medium whitespace-nowrap"
                 >
-                  <Download size={12} className="text-purple-500" />
+                  <Download size={12} className="text-purple-500 flex-shrink-0" />
                   Baixar Documento (.docx)
                 </button>
                 <button
                   onClick={(e) => handleCopiarAba(e, abaMenuAtivo)}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-xs text-neutral-700 hover:bg-neutral-100 transition-colors text-left font-medium border-t border-neutral-100"
+                  className="w-full flex items-center gap-2 px-4 py-3 text-xs text-neutral-700 hover:bg-neutral-100 transition-colors text-left font-medium border-t border-neutral-100 whitespace-nowrap"
                 >
                   {abaCopiadaId === abaMenuAtivo.id ? (
-                    <CheckCircle2 size={12} className="text-green-500" />
+                    <CheckCircle2 size={12} className="text-green-500 flex-shrink-0" />
                   ) : (
-                    <Clipboard size={12} className="text-purple-500" />
+                    <Clipboard size={12} className="text-purple-500 flex-shrink-0" />
                   )}
                   Copiar para Área de Transferência
                 </button>
                 <button
                   onClick={(e) => handleBaixarHtml(e, abaMenuAtivo)}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-xs text-neutral-700 hover:bg-neutral-100 transition-colors text-left font-medium border-t border-neutral-100"
+                  className="w-full flex items-center gap-2 px-4 py-3 text-xs text-neutral-700 hover:bg-neutral-100 transition-colors text-left font-medium border-t border-neutral-100 whitespace-nowrap"
                 >
-                  <FileText size={12} className="text-purple-500" />
+                  <FileText size={12} className="text-purple-500 flex-shrink-0" />
                   Baixar Documento (.html)
                 </button>
                 <button
                   onClick={(e) => handleExportarPdf(e, abaMenuAtivo)}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-xs text-neutral-700 hover:bg-neutral-100 transition-colors text-left font-medium border-t border-neutral-100"
+                  className="w-full flex items-center gap-2 px-4 py-3 text-xs text-neutral-700 hover:bg-neutral-100 transition-colors text-left font-medium border-t border-neutral-100 whitespace-nowrap"
                 >
-                  <FileJson size={12} className="text-purple-500" />
+                  <FileJson size={12} className="text-purple-500 flex-shrink-0" />
                   Baixar Documento (.pdf)
                 </button>
               </motion.div>

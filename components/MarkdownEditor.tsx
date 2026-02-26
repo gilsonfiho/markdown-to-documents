@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useState } from 'react';
-import { CheckCircle2, Clipboard, ChevronDown } from 'lucide-react';
+import { CheckCircle2, ChevronDown, Clipboard } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface MarkdownEditorProps {
@@ -127,7 +127,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({ value, onChange 
             <motion.button
               whileHover={{ backgroundColor: '#f3f4f6' }}
               onClick={handleColar}
-              className="w-full px-4 py-2 text-sm text-neutral-700 text-left rounded-t-lg transition-colors hover:bg-neutral-100 flex items-center gap-2"
+              className="w-full flex items-center gap-3 px-4 py-3 text-xs text-neutral-700 hover:bg-neutral-50 transition-colors text-left font-medium whitespace-nowrap"
             >
               <Clipboard size={14} />
               <span>Colar</span>
@@ -136,7 +136,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({ value, onChange 
             <motion.button
               whileHover={{ backgroundColor: '#f3f4f6' }}
               onClick={handleLimparEColar}
-              className="w-full px-4 py-2 text-sm text-neutral-700 text-left rounded-b-lg transition-colors hover:bg-neutral-100 flex items-center gap-2"
+              className="w-full flex items-center gap-3 px-4 py-3 text-xs text-neutral-700 hover:bg-neutral-50 transition-colors text-left font-medium whitespace-nowrap"
             >
               <Clipboard size={14} />
               <span>Limpar e colar</span>

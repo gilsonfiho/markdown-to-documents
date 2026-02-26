@@ -5,18 +5,21 @@ import { useSession, signIn, signOut } from 'next-auth/react';
 import { useAppStore } from '@/lib/store';
 import { markdownToDocx } from '@/lib/markdown-to-docx';
 import { obterVersaoFormatada } from '@/lib/versao';
-import { Download, LogOut, LogIn, Save, CheckCircle2 } from 'lucide-react';
+import { Download, LogOut, LogIn, Save, CheckCircle2, Package } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export const Header: React.FC = () => {
   const { data: session } = useSession();
-  const { markdown, fileName, salvarNoStorage, salvoAoMemento } = useAppStore();
+  const { abas, abaAtiva, salvarNoStorage, salvarTodasAsAbas } = useAppStore();
   const [isExporting, setIsExporting] = useState(false);
+  const [isExportingAll, setIsExportingAll] = useState(false);
 
-  const handleExport = async () => {
+  const abaAtual = abas.find((aba) => aba.id === abaAtiva);
+
+  const handleExportarAbas = async () => {
     setIsExporting(true);
     try {
-      await markdownToDocx(markdown, fileName || 'documento');
+      await markdownToDocx(abaAtual?.conteudo || '', abaAtual?.nome || 'documento');
     } catch (error) {
       console.error('Erro ao exportar:', error);
     } finally {
@@ -24,8 +27,26 @@ export const Header: React.FC = () => {
     }
   };
 
+  const handleExportarTodas = async () => {
+    setIsExportingAll(true);
+    try {
+      for (const aba of abas) {
+        await markdownToDocx(aba.conteudo, aba.nome);
+        await new Promise((resolve) => setTimeout(resolve, 500));
+      }
+    } catch (error) {
+      console.error('Erro ao exportar todas:', error);
+    } finally {
+      setIsExportingAll(false);
+    }
+  };
+
   const handleSalvar = () => {
-    salvarNoStorage();
+    salvarNoStorage(abaAtiva);
+  };
+
+  const handleSalvarTodas = () => {
+    salvarTodasAsAbas();
   };
 
   return (
@@ -68,9 +89,10 @@ export const Header: React.FC = () => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={handleSalvar}
-            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-neutral-400 disabled:cursor-not-allowed transition-colors relative"
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-neutral-400 disabled:cursor-not-allowed transition-colors"
+            title="Salvar a aba atual"
           >
-            {salvoAoMemento ? (
+            {abaAtual?.salvoAoMemento ? (
               <>
                 <motion.div
                   initial={{ scale: 0 }}
@@ -79,7 +101,7 @@ export const Header: React.FC = () => {
                 >
                   <CheckCircle2 size={18} />
                 </motion.div>
-                <span>Salvo às {salvoAoMemento}</span>
+                <span>Salvo {abaAtual.salvoAoMemento}</span>
               </>
             ) : (
               <>
@@ -92,9 +114,21 @@ export const Header: React.FC = () => {
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={handleExport}
+            onClick={handleSalvarTodas}
+            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-neutral-400 disabled:cursor-not-allowed transition-colors"
+            title="Salvar todas as abas"
+          >
+            <Save size={18} />
+            <span>Salvar tudo</span>
+          </motion.button>
+
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={handleExportarAbas}
             disabled={isExporting || !session}
             className="flex items-center gap-2 px-4 py-2 bg-neutral-900 text-white rounded-lg hover:bg-neutral-800 disabled:bg-neutral-400 disabled:cursor-not-allowed transition-colors"
+            title="Exportar aba atual para DOCX"
           >
             {isExporting ? (
               <>
@@ -106,7 +140,30 @@ export const Header: React.FC = () => {
             ) : (
               <>
                 <Download size={18} />
-                <span>Exportar DOCX</span>
+                <span>Exportar</span>
+              </>
+            )}
+          </motion.button>
+
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={handleExportarTodas}
+            disabled={isExportingAll || !session || abas.length === 0}
+            className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:bg-neutral-400 disabled:cursor-not-allowed transition-colors"
+            title="Exportar todas as abas para DOCX"
+          >
+            {isExportingAll ? (
+              <>
+                <div className="animate-spin">
+                  <Package size={18} />
+                </div>
+                <span>Exportando...</span>
+              </>
+            ) : (
+              <>
+                <Package size={18} />
+                <span>Exportar tudo</span>
               </>
             )}
           </motion.button>

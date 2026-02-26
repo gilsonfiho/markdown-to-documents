@@ -1,18 +1,27 @@
 import { create } from 'zustand';
 
-interface AppStore {
-  markdown: string;
-  setMarkdown: (content: string) => void;
-  fileName: string;
-  setFileName: (name: string) => void;
+export interface AbaData {
+  id: string;
+  nome: string;
+  conteudo: string;
   salvoAoMemento: string | null;
-  setSalvoAoMemento: (data: string) => void;
-  carregarDoStorage: () => void;
-  salvarNoStorage: () => void;
 }
 
-const CHAVE_STORAGE_MARKDOWN = 'markdown-studio-markdown';
-const CHAVE_STORAGE_NOME_ARQUIVO = 'markdown-studio-nome-arquivo';
+interface AppStore {
+  abas: AbaData[];
+  abaAtiva: string;
+  setAbaAtiva: (id: string) => void;
+  adicionarAba: () => void;
+  removerAba: (id: string) => void;
+  atualizarAba: (id: string, conteudo: string, nome?: string) => void;
+  setSalvoAoMemento: (abaId: string, data: string | null) => void;
+  carregarDoStorage: () => void;
+  salvarNoStorage: (abaId?: string) => void;
+  salvarTodasAsAbas: () => void;
+}
+
+const CHAVE_STORAGE_ABAS = 'markdown-studio-abas';
+const CHAVE_STORAGE_ABA_ATIVA = 'markdown-studio-aba-ativa';
 
 const MARKDOWN_PADRAO = `# Bem-vindo
 
@@ -28,34 +37,125 @@ const greeting = "Hello World";
 
 **Suporta** _markdown_ completo!`;
 
-export const useAppStore = create<AppStore>((set, get) => ({
-  markdown: MARKDOWN_PADRAO,
-  setMarkdown: (content: string) => set({ markdown: content }),
-  fileName: 'documento',
-  setFileName: (name: string) => set({ fileName: name }),
-  salvoAoMemento: null,
-  setSalvoAoMemento: (data: string) => set({ salvoAoMemento: data }),
-  carregarDoStorage: () => {
-    if (typeof window !== 'undefined') {
-      const markdownSalvo = localStorage.getItem(CHAVE_STORAGE_MARKDOWN);
-      const nomeArquivoSalvo = localStorage.getItem(CHAVE_STORAGE_NOME_ARQUIVO);
+const gerarIdUnico = () => `aba-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
+const criarNovaAba = (nome: string = 'Novo documento'): AbaData => ({
+  id: gerarIdUnico(),
+  nome,
+  conteudo: MARKDOWN_PADRAO,
+  salvoAoMemento: null,
+});
+
+export const useAppStore = create<AppStore>((set, get) => ({
+  abas: [criarNovaAba('Documento 1')],
+  abaAtiva: '',
+  setAbaAtiva: (id: string) => set({ abaAtiva: id }),
+  adicionarAba: () => {
+    const estado = get();
+    const novaAba = criarNovaAba(`Documento ${estado.abas.length + 1}`);
+    set({
+      abas: [...estado.abas, novaAba],
+      abaAtiva: novaAba.id,
+    });
+  },
+  removerAba: (id: string) => {
+    const estado = get();
+    const novasAbas = estado.abas.filter((aba) => aba.id !== id);
+
+    if (novasAbas.length === 0) {
+      const novaAba = criarNovaAba('Documento 1');
       set({
-        markdown: markdownSalvo || MARKDOWN_PADRAO,
-        fileName: nomeArquivoSalvo || 'documento',
+        abas: [novaAba],
+        abaAtiva: novaAba.id,
+      });
+    } else {
+      const proximaAba =
+        estado.abaAtiva === id
+          ? novasAbas[novasAbas.length - 1]
+          : estado.abas.find((a) => a.id !== id);
+      set({
+        abas: novasAbas,
+        abaAtiva: proximaAba?.id || novasAbas[0].id,
       });
     }
   },
-  salvarNoStorage: () => {
+  atualizarAba: (id: string, conteudo: string, nome?: string) => {
+    const estado = get();
+    set({
+      abas: estado.abas.map((aba) =>
+        aba.id === id
+          ? {
+              ...aba,
+              conteudo,
+              nome: nome !== undefined ? nome : aba.nome,
+            }
+          : aba,
+      ),
+    });
+  },
+  setSalvoAoMemento: (abaId: string, data: string | null) => {
+    const estado = get();
+    set({
+      abas: estado.abas.map((aba) =>
+        aba.id === abaId
+          ? {
+              ...aba,
+              salvoAoMemento: data,
+            }
+          : aba,
+      ),
+    });
+  },
+  carregarDoStorage: () => {
+    if (typeof window !== 'undefined') {
+      const abasSalvas = localStorage.getItem(CHAVE_STORAGE_ABAS);
+      const abaAtivaId = localStorage.getItem(CHAVE_STORAGE_ABA_ATIVA);
+
+      if (abasSalvas) {
+        const abas = JSON.parse(abasSalvas) as AbaData[];
+        const abaAtiva = abaAtivaId || abas[0]?.id || '';
+        set({
+          abas,
+          abaAtiva,
+        });
+      } else {
+        const novaAba = criarNovaAba('Documento 1');
+        set({
+          abas: [novaAba],
+          abaAtiva: novaAba.id,
+        });
+      }
+    }
+  },
+  salvarNoStorage: (abaId?: string) => {
     if (typeof window !== 'undefined') {
       const estado = get();
-      localStorage.setItem(CHAVE_STORAGE_MARKDOWN, estado.markdown);
-      localStorage.setItem(CHAVE_STORAGE_NOME_ARQUIVO, estado.fileName);
-      set({ salvoAoMemento: new Date().toLocaleTimeString('pt-BR') });
+      const idAba = abaId || estado.abaAtiva;
+
+      localStorage.setItem(CHAVE_STORAGE_ABAS, JSON.stringify(estado.abas));
+      localStorage.setItem(CHAVE_STORAGE_ABA_ATIVA, estado.abaAtiva);
+
+      const horario = new Date().toLocaleTimeString('pt-BR');
+      get().setSalvoAoMemento(idAba, horario);
 
       setTimeout(() => {
-        set({ salvoAoMemento: null });
+        get().setSalvoAoMemento(idAba, null);
       }, 3000);
+    }
+  },
+  salvarTodasAsAbas: () => {
+    if (typeof window !== 'undefined') {
+      const estado = get();
+      localStorage.setItem(CHAVE_STORAGE_ABAS, JSON.stringify(estado.abas));
+      localStorage.setItem(CHAVE_STORAGE_ABA_ATIVA, estado.abaAtiva);
+
+      const horario = new Date().toLocaleTimeString('pt-BR');
+      estado.abas.forEach((aba) => {
+        get().setSalvoAoMemento(aba.id, horario);
+        setTimeout(() => {
+          get().setSalvoAoMemento(aba.id, null);
+        }, 3000);
+      });
     }
   },
 }));

@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Header } from '@/components/Header';
+import { TabsBar } from '@/components/TabsBar';
 import { MarkdownEditor } from '@/components/MarkdownEditor';
 import { MarkdownPreview } from '@/components/MarkdownPreview';
 import { useAppStore } from '@/lib/store';
@@ -12,7 +13,7 @@ import { motion } from 'framer-motion';
 export default function Home() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const { markdown, setMarkdown, carregarDoStorage } = useAppStore();
+  const { abas, abaAtiva, atualizarAba, carregarDoStorage } = useAppStore();
 
   useEffect(() => {
     carregarDoStorage();
@@ -40,9 +41,12 @@ export default function Home() {
     return null;
   }
 
+  const abaAtual = abas.find((aba) => aba.id === abaAtiva);
+
   return (
     <div className="w-screen h-screen flex flex-col bg-white overflow-hidden">
       <Header />
+      <TabsBar />
 
       <motion.div
         initial={{ opacity: 0 }}
@@ -61,7 +65,14 @@ export default function Home() {
             <h2 className="text-sm font-semibold text-neutral-900">Editor</h2>
           </div>
           <div className="flex-1 overflow-auto">
-            <MarkdownEditor value={markdown} onChange={setMarkdown} />
+            <MarkdownEditor
+              value={abaAtual?.conteudo || ''}
+              onChange={(conteudo) => {
+                if (abaAtiva) {
+                  atualizarAba(abaAtiva, conteudo);
+                }
+              }}
+            />
           </div>
         </motion.div>
 
@@ -76,7 +87,7 @@ export default function Home() {
             <h2 className="text-sm font-semibold text-neutral-900">Preview</h2>
           </div>
           <div className="flex-1 overflow-auto p-8">
-            <MarkdownPreview content={markdown} />
+            <MarkdownPreview content={abaAtual?.conteudo || ''} />
           </div>
         </motion.div>
       </motion.div>

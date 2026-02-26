@@ -60,12 +60,13 @@ interface AppStore {
   setFileName: (name: string) => void;
   salvoAoMemento: string | null;
   setSalvoAoMemento: (data: string) => void;
-  carregarDoStorage: () => void;      // Carrega markdown e fileName do localStorage
-  salvarNoStorage: () => void;        // Persiste estado + mostra timestamp "Salvo às HH:MM:SS"
+  carregarDoStorage: () => void; // Carrega markdown e fileName do localStorage
+  salvarNoStorage: () => void; // Persiste estado + mostra timestamp "Salvo às HH:MM:SS"
 }
 ```
 
 **Padrão de uso em componentes**:
+
 1. Em `page.tsx`: chamar `carregarDoStorage()` em `useEffect([carregarDoStorage])` para restaurar estado ao montar
 2. Em `Header.tsx`: chamar `salvarNoStorage()` ao clicar botão "Salvar" — mostra animação e limpa `salvoAoMemento` após 3s
 3. Chaves localStorage: `'markdown-studio-markdown'` e `'markdown-studio-nome-arquivo'`
@@ -217,6 +218,7 @@ import typography from '@tailwindcss/typography';
 ### 5. **Configuração Prettier e ESLint Específicas**
 
 **`.prettierrc.cjs`** (configs importantes):
+
 - `printWidth: 100` — Limite de 100 caracteres por linha
 - `singleQuote: true` — Aspas simples em JS/TS
 - **Overrides**: TSX usa `jsxSingleQuote: false` (aspas duplas em JSX)
@@ -224,6 +226,7 @@ import typography from '@tailwindcss/typography';
 - Markdown e MDX com parser `markdown`
 
 **`.eslintrc.cjs`** (regras críticas):
+
 - `@typescript-eslint/no-explicit-any: ['off']` — Necessário para props em `react-markdown`
 - `@typescript-eslint/no-unused-vars: ['warn', { argsIgnorePattern: '^_' }]` — Permite underscore para variáveis não utilizadas
 - `react/react-in-jsx-scope: 'off'` — React 19 não requer import
@@ -236,6 +239,7 @@ import typography from '@tailwindcss/typography';
 ### Header Component (`components/Header.tsx`)
 
 **Funcionalidades principais**:
+
 1. **Botão Exportar DOCX**: Chama `markdownToDocx()` com `setIsExporting` para UI feedback
 2. **Botão Salvar**: Chama `salvarNoStorage()` → exibe timestamp animado via `salvoAoMemento` → limpa após 3s
 3. **User Info**: Exibe `session.user.name` e `session.user.email` quando autenticado
@@ -243,6 +247,7 @@ import typography from '@tailwindcss/typography';
 5. **Versioning**: Exibe versão formatada com `obterVersaoFormatada()` de `lib/versao.ts`
 
 **Padrão animação save feedback**:
+
 ```typescript
 {salvoAoMemento ? (
   <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}>
@@ -257,6 +262,7 @@ import typography from '@tailwindcss/typography';
 ### Editor Component (`components/MarkdownEditor.tsx`)
 
 **Padrão Tab handling**:
+
 ```typescript
 const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
   if (e.key === 'Tab') {
@@ -265,7 +271,9 @@ const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     const start = textarea.selectionStart;
     const newValue = value.substring(0, start) + '\t' + value.substring(end);
     onChange(newValue);
-    setTimeout(() => { textarea.selectionStart = start + 1; }, 0);
+    setTimeout(() => {
+      textarea.selectionStart = start + 1;
+    }, 0);
   }
 };
 ```
@@ -273,6 +281,7 @@ const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
 ### Page Component (`app/page.tsx`)
 
 **Padrão de proteção e estado initial**:
+
 - `useSession()` + `useRouter().push('/auth/signin')` se não autenticado
 - `carregarDoStorage()` em `useEffect([carregarDoStorage])` ao montar
 - `status === 'loading'` renderiza spinner animado com Framer Motion

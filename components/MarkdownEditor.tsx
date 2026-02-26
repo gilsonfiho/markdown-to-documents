@@ -31,13 +31,13 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({ value, onChange 
   };
 
   return (
-    <div className="relative h-full">
+    <div className="relative h-full flex flex-col">
       <textarea
         ref={textareaRef}
         value={value}
         onChange={handleInput}
         onKeyDown={handleKeyDown}
-        className="w-full h-full p-6 font-mono text-sm text-neutral-900 bg-white resize-none focus:outline-none border-r border-neutral-200"
+        className="flex-1 p-6 font-mono text-sm text-neutral-900 bg-white resize-none focus:outline-none border-r border-neutral-200"
         placeholder="Coloque seu markdown aqui..."
         spellCheck="false"
       />

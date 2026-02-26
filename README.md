@@ -201,14 +201,15 @@ A aplicação suporta renderização em tempo real de diagramas Mermaid. Basta u
 
 \`\`\`mermaid
 graph TD
-    A[Início] --> B{Decisão}
-    B -->|Sim| C[Ação 1]
-    B -->|Não| D[Ação 2]
-    C --> E[Fim]
-    D --> E
+A[Início] --> B{Decisão}
+B -->|Sim| C[Ação 1]
+B -->|Não| D[Ação 2]
+C --> E[Fim]
+D --> E
 \`\`\`
 
 Tipos suportados:
+
 - **Flowchart**: `graph TD`, `graph LR`, etc.
 - **Sequence Diagram**: `sequenceDiagram`
 - **Class Diagram**: `classDiagram`
@@ -266,6 +267,7 @@ carregarDoStorage(); // Chamado em app/page.tsx no useEffect
 ```
 
 **Chaves utilizadas**:
+
 - `markdown-studio-markdown` — Conteúdo markdown
 - `markdown-studio-nome-arquivo` — Nome do arquivo para export
 
@@ -440,23 +442,23 @@ Se persistirem erros, verifique que `tsconfig.json` tem `strict: true` e todos o
 
 ## 📦 Dependências Principais
 
-| Pacote               | Versão  | Propósito                           |
-| -------------------- | ------- | ----------------------------------- |
-| next                 | ^16.1.6 | Framework web com App Router        |
-| react                | ^19.0.0 | UI library (JSX Transform)          |
-| next-auth            | ^4.24.0 | Autenticação OAuth 2.0              |
-| docx                 | ^8.5.0  | Export DOCX                         |
-| react-markdown       | ^9.0.0  | Parse e renderização markdown       |
-| remark-gfm           | ^4.0.0  | GitHub Flavored Markdown support    |
-| mermaid              | ^11.12.3| Renderização de diagramas           |
-| zustand              | ^4.4.0  | State management minimalista        |
-| framer-motion        | ^11.0.0 | Animações e transições              |
-| tailwindcss          | ^3.3.0  | CSS utilitário                      |
-| lucide-react         | ^0.575.0| Ícones SVG                          |
-| @tailwindcss/typography| ^0.5.19| Prose styling para markdown         |
-| eslint               | ^8.57.1 | Linting JavaScript/TypeScript       |
-| prettier             | ^3.8.1  | Code formatting                     |
-| typescript           | ^5.3.0  | Tipagem estática (strict mode)      |
+| Pacote                  | Versão   | Propósito                        |
+| ----------------------- | -------- | -------------------------------- |
+| next                    | ^16.1.6  | Framework web com App Router     |
+| react                   | ^19.0.0  | UI library (JSX Transform)       |
+| next-auth               | ^4.24.0  | Autenticação OAuth 2.0           |
+| docx                    | ^8.5.0   | Export DOCX                      |
+| react-markdown          | ^9.0.0   | Parse e renderização markdown    |
+| remark-gfm              | ^4.0.0   | GitHub Flavored Markdown support |
+| mermaid                 | ^11.12.3 | Renderização de diagramas        |
+| zustand                 | ^4.4.0   | State management minimalista     |
+| framer-motion           | ^11.0.0  | Animações e transições           |
+| tailwindcss             | ^3.3.0   | CSS utilitário                   |
+| lucide-react            | ^0.575.0 | Ícones SVG                       |
+| @tailwindcss/typography | ^0.5.19  | Prose styling para markdown      |
+| eslint                  | ^8.57.1  | Linting JavaScript/TypeScript    |
+| prettier                | ^3.8.1   | Code formatting                  |
+| typescript              | ^5.3.0   | Tipagem estática (strict mode)   |
 
 ## 🚀 Deploy
 
@@ -492,22 +494,22 @@ Para agentes de IA (GitHub Copilot, Claude, etc.), consulte [`.github/copilot-in
 
 ### Arquivos Principais
 
-| Arquivo | Propósito |
-| --- | --- |
-| `app/page.tsx` | Página principal (split-view editor) |
-| `app/layout.tsx` | Root layout com providers |
-| `app/auth/signin/page.tsx` | Página de login |
-| `components/Header.tsx` | Navbar com botões Export/Auth |
-| `components/MarkdownEditor.tsx` | Textarea do editor |
-| `components/MarkdownPreview.tsx` | Preview com React Markdown |
-| `components/MermaidDiagram.tsx` | Renderizador de diagramas Mermaid |
-| `lib/store.ts` | Zustand store (estado global) |
-| `lib/markdown-to-docx.ts` | Lógica de conversão markdown → DOCX |
-| `lib/mermaid-cleaner.ts` | Utilitários para limpeza de diagramas Mermaid |
-| `.env.local.example` | Variáveis de ambiente necessárias |
-| `.eslintrc.cjs` | Configuração ESLint + Prettier |
-| `.prettierrc.cjs` | Configuração Prettier |
-| `tsconfig.json` | Configuração TypeScript (strict mode) |
+| Arquivo                          | Propósito                                     |
+| -------------------------------- | --------------------------------------------- |
+| `app/page.tsx`                   | Página principal (split-view editor)          |
+| `app/layout.tsx`                 | Root layout com providers                     |
+| `app/auth/signin/page.tsx`       | Página de login                               |
+| `components/Header.tsx`          | Navbar com botões Export/Auth                 |
+| `components/MarkdownEditor.tsx`  | Textarea do editor                            |
+| `components/MarkdownPreview.tsx` | Preview com React Markdown                    |
+| `components/MermaidDiagram.tsx`  | Renderizador de diagramas Mermaid             |
+| `lib/store.ts`                   | Zustand store (estado global)                 |
+| `lib/markdown-to-docx.ts`        | Lógica de conversão markdown → DOCX           |
+| `lib/mermaid-cleaner.ts`         | Utilitários para limpeza de diagramas Mermaid |
+| `.env.local.example`             | Variáveis de ambiente necessárias             |
+| `.eslintrc.cjs`                  | Configuração ESLint + Prettier                |
+| `.prettierrc.cjs`                | Configuração Prettier                         |
+| `tsconfig.json`                  | Configuração TypeScript (strict mode)         |
 
 ---
 

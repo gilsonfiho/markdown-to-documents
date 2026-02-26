@@ -2,11 +2,12 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useAppStore, type AbaData } from '@/lib/store';
-import { Plus, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, X, ChevronLeft, ChevronRight, Save, CheckCircle2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export const TabsBar: React.FC = () => {
-  const { abas, abaAtiva, setAbaAtiva, adicionarAba, removerAba, atualizarAba } = useAppStore();
+  const { abas, abaAtiva, setAbaAtiva, adicionarAba, removerAba, atualizarAba, salvarNoStorage } =
+    useAppStore();
   const [editandoId, setEditandoId] = useState<string | null>(null);
   const [novoNome, setNovoNome] = useState('');
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -15,6 +16,11 @@ export const TabsBar: React.FC = () => {
 
   const handleAdicionarAba = () => {
     adicionarAba();
+  };
+
+  const handleSalvarAba = (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    salvarNoStorage(id);
   };
 
   const handleRemoverAba = (e: React.MouseEvent, id: string) => {
@@ -135,8 +141,24 @@ export const TabsBar: React.FC = () => {
                   {aba.nome}
                 </span>
                 {aba.salvoAoMemento && (
-                  <span className="text-xs text-green-600 font-semibold">✓</span>
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    exit={{ scale: 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <CheckCircle2 size={16} className="text-green-600" />
+                  </motion.div>
                 )}
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={(e) => handleSalvarAba(e, aba.id)}
+                  className="flex items-center justify-center text-neutral-400 hover:text-blue-600 p-1 rounded hover:bg-blue-100 transition-colors"
+                  title="Salvar aba"
+                >
+                  <Save size={14} />
+                </motion.button>
               </>
             )}
 

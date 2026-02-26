@@ -228,39 +228,7 @@ function getHeadingLevel(level: number): any {
   return levels[level] || HeadingLevel.HEADING_1;
 }
 
-function criarTabela(linhas: string[][]): Table {
-  if (linhas.length === 0) {
-    return new Table({ rows: [] });
-  }
-
-  const linhasTabela = linhas.map((celulasDaLinha, indiceLinhaAtual) => {
-    const celulasCriadas = celulasDaLinha.map((conteudoCelula) => {
-      const ehCabecalho = indiceLinhaAtual === 0;
-      return new TableCell({
-        children: [
-          new Paragraph({
-            children: formatText(conteudoCelula),
-            spacing: { line: 240 },
-          }),
-        ],
-        shading: {
-          fill: ehCabecalho ? 'D3D3D3' : 'FFFFFF',
-        },
-      });
-    });
-
-    return new TableRow({
-      children: celulasCriadas,
-    });
-  });
-
-  return new Table({
-    rows: linhasTabela,
-    width: { size: 100, type: 'pct' },
-  });
-}
-
-export async function markdownToDocx(markdown: string, fileName: string = 'documento') {
+export async function gerarBlobDocx(markdown: string): Promise<Blob> {
   const parsed = parseMarkdown(markdown);
   const sections: (Paragraph | Table)[] = [];
 
@@ -280,73 +248,72 @@ export async function markdownToDocx(markdown: string, fileName: string = 'docum
           spacing: { line: 360, after: 200 },
         }),
       );
+    } else if (item.type === 'list') {
+      item.items?.forEach((itemText) => {
+        const prefix = item.ordered ? '1.' : '•';
+        sections.push(
+          new Paragraph({
+            text: `${prefix} ${itemText}`,
+            spacing: { line: 240, after: 100 },
+            indent: { left: 400 },
+          }),
+        );
+      });
     } else if (item.type === 'code') {
-      const linhasCodeigo = item.content.split('\n');
-      const paragrafosCodeigo = linhasCodeigo.map((linha) => {
-        return new Paragraph({
-          children: [
-            new TextRun({
-              text: linha || ' ',
-              font: 'Courier New',
-              size: 18,
-              color: '333333',
-            }),
-          ],
-          style: 'Normal',
-          spacing: { line: 240 },
-          border:
-            linha === linhasCodeigo[0]
-              ? {
+      const linhasCode = item.content.split('\n');
+      linhasCode.forEach((linha) => {
+        sections.push(
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: linha || ' ',
+                font: 'Courier New',
+                size: 18,
+                color: '333333',
+              }),
+            ],
+            style: 'Normal',
+            spacing: { line: 240 },
+            border: {
+              top:
+                linha === linhasCode[0]
+                  ? { color: 'CCCCCC', space: 1, style: BorderStyle.SINGLE, size: 6 }
+                  : undefined,
+              bottom:
+                linha === linhasCode[linhasCode.length - 1]
+                  ? { color: 'CCCCCC', space: 1, style: BorderStyle.SINGLE, size: 6 }
+                  : undefined,
+              left: { color: 'CCCCCC', space: 1, style: BorderStyle.SINGLE, size: 6 },
+              right: { color: 'CCCCCC', space: 1, style: BorderStyle.SINGLE, size: 6 },
+            },
+            shading: { fill: 'F5F5F5' },
+          }),
+        );
+      });
+    } else if (item.type === 'table' && item.linhas) {
+      const rows = item.linhas.map((linhaData) => {
+        return new TableRow({
+          children: linhaData.map(
+            (celula) =>
+              new TableCell({
+                children: [
+                  new Paragraph({
+                    children: formatText(celula),
+                  }),
+                ],
+                shading: { fill: 'F0F0F0' },
+                borders: {
                   top: { color: 'CCCCCC', space: 1, style: BorderStyle.SINGLE, size: 6 },
                   bottom: { color: 'CCCCCC', space: 1, style: BorderStyle.SINGLE, size: 6 },
                   left: { color: 'CCCCCC', space: 1, style: BorderStyle.SINGLE, size: 6 },
                   right: { color: 'CCCCCC', space: 1, style: BorderStyle.SINGLE, size: 6 },
-                }
-              : linha === linhasCodeigo[linhasCodeigo.length - 1]
-                ? {
-                    bottom: { color: 'CCCCCC', space: 1, style: BorderStyle.SINGLE, size: 6 },
-                    left: { color: 'CCCCCC', space: 1, style: BorderStyle.SINGLE, size: 6 },
-                    right: { color: 'CCCCCC', space: 1, style: BorderStyle.SINGLE, size: 6 },
-                  }
-                : {
-                    left: { color: 'CCCCCC', space: 1, style: BorderStyle.SINGLE, size: 6 },
-                    right: { color: 'CCCCCC', space: 1, style: BorderStyle.SINGLE, size: 6 },
-                  },
-          shading: { fill: 'F5F5F5' },
+                },
+              }),
+          ),
         });
       });
-      paragrafosCodeigo.forEach((p) => sections.push(p));
-    } else if (item.type === 'list' && item.items) {
-      // Renderizar listas usando parágrafos com marcadores manuais para evitar dependências de símbolos não exportados pela versão instalada de 'docx'.
-      const listaParagrafos = item.items.map((textoItem, indice) => {
-        const marcador = item.ordered ? `${indice + 1}. ` : '• ';
-        const runs = formatText(textoItem);
-        // Adicionar o marcador como primeiro TextRun
-        const children: TextRun[] = [new TextRun({ text: marcador })].concat(runs as TextRun[]);
-        return new Paragraph({ children, spacing: { after: 100 } });
-      });
-
-      listaParagrafos.forEach((p) => sections.push(p));
-    } else if (item.type === 'table' && item.linhas) {
-      const tabela = criarTabela(item.linhas);
-      sections.push(tabela);
+      sections.push(new Table({ rows }));
     } else if (item.type === 'mermaid') {
-      // Renderizar diagrama Mermaid como bloco de código (representação textual)
-      sections.push(
-        new Paragraph({
-          children: [
-            new TextRun({
-              text: '[Diagrama Mermaid]',
-              font: 'Courier New',
-              bold: true,
-              size: 20,
-              color: '0066CC',
-            }),
-          ],
-          spacing: { before: 200, after: 100 },
-        }),
-      );
-
       const linhasMermaid = item.content.split('\n');
       const paragrafosMermaid = linhasMermaid.map((linha) => {
         return new Paragraph({
@@ -409,6 +376,11 @@ export async function markdownToDocx(markdown: string, fileName: string = 'docum
   });
 
   const blob = await Packer.toBlob(doc);
+  return blob;
+}
+
+export async function markdownToDocx(markdown: string, fileName: string = 'documento') {
+  const blob = await gerarBlobDocx(markdown);
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;

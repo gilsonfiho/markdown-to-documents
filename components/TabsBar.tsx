@@ -15,7 +15,7 @@ import {
   ChevronDown,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { markdownToDocx } from '@/lib/markdown-to-docx';
+import { markdownToDocx, gerarBlobDocx } from '@/lib/markdown-to-docx';
 
 export const TabsBar: React.FC = () => {
   const { abas, abaAtiva, setAbaAtiva, adicionarAba, removerAba, atualizarAba, salvarNoStorage } =
@@ -61,7 +61,11 @@ export const TabsBar: React.FC = () => {
     setMenuExportarId(null);
     setPosicaoMenuExportar(null);
     try {
-      await navigator.clipboard.writeText(aba.conteudo);
+      const blob = await gerarBlobDocx(aba.conteudo);
+      const item = new ClipboardItem({
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document': blob,
+      });
+      await navigator.clipboard.write([item]);
       setAbaCopiadaId(aba.id);
       setTimeout(() => setAbaCopiadaId(null), 2000);
     } catch {

@@ -2,8 +2,8 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { type AbaData, useAppStore } from '@/lib/store';
-import { CheckCircle2, ChevronLeft, ChevronRight, Download, Plus, Save, X } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { CheckCircle2, ChevronLeft, ChevronRight, Download, Plus, Save, X, Clipboard, ChevronDown } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { markdownToDocx } from '@/lib/markdown-to-docx';
 
 export const TabsBar: React.FC = () => {
@@ -15,6 +15,8 @@ export const TabsBar: React.FC = () => {
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
   const [abaExportando, setAbaExportando] = useState<string | null>(null);
+  const [menuExportarId, setMenuExportarId] = useState<string | null>(null);
+  const [abaCopiadaId, setAbaCopiadaId] = useState<string | null>(null);
 
   const handleAdicionarAba = () => {
     adicionarAba();
@@ -27,13 +29,26 @@ export const TabsBar: React.FC = () => {
 
   const handleExportarAba = async (e: React.MouseEvent, aba: AbaData) => {
     e.stopPropagation();
+    setMenuExportarId(null);
     setAbaExportando(aba.id);
     try {
       await markdownToDocx(aba.conteudo, aba.nome);
-    } catch (error) {
-      console.error('Erro ao exportar aba:', error);
+    } catch (_error) {
+      // Erro tratado silenciosamente
     } finally {
       setAbaExportando(null);
+    }
+  };
+
+  const handleCopiarAba = async (e: React.MouseEvent, aba: AbaData) => {
+    e.stopPropagation();
+    setMenuExportarId(null);
+    try {
+      await navigator.clipboard.writeText(aba.conteudo);
+      setAbaCopiadaId(aba.id);
+      setTimeout(() => setAbaCopiadaId(null), 2000);
+    } catch (_error) {
+      // Erro tratado silenciosamente
     }
   };
 
@@ -78,6 +93,12 @@ export const TabsBar: React.FC = () => {
     }
   }, [abas]);
 
+  useEffect(() => {
+    const handleFecharMenu = () => setMenuExportarId(null);
+    window.addEventListener('click', handleFecharMenu);
+    return () => window.removeEventListener('click', handleFecharMenu);
+  }, []);
+
   const rolarEsquerda = () => {
     if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollBy({ left: -200, behavior: 'smooth' });
@@ -108,7 +129,7 @@ export const TabsBar: React.FC = () => {
       {/* Container com scroll horizontal */}
       <div
         ref={scrollContainerRef}
-        className="flex-1 flex items-center gap-1 px-2 overflow-x-auto overflow-y-hidden scroll-smooth"
+        className="flex-1 flex items-center gap-1 px-2 overflow-x-auto overflow-y-visible scroll-smooth"
         style={{
           scrollbarWidth: 'thin',
           scrollbarColor: '#d1d5db #f3f4f6',
@@ -173,21 +194,61 @@ export const TabsBar: React.FC = () => {
                 >
                   <Save size={13} />
                 </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={(e) => handleExportarAba(e, aba)}
-                  className="flex items-center justify-center text-neutral-400 hover:text-purple-600 p-1 rounded hover:bg-purple-100 transition-colors"
-                  title="Exportar aba"
-                >
-                  {abaExportando === aba.id ? (
-                    <div className="animate-spin">
-                      <Download size={13} />
-                    </div>
-                  ) : (
-                    <Download size={13} />
-                  )}
-                </motion.button>
+                <div className="relative">
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setMenuExportarId(menuExportarId === aba.id ? null : aba.id);
+                    }}
+                    className={`flex items-center gap-0.5 text-neutral-400 hover:text-purple-600 p-1 rounded hover:bg-purple-100 transition-colors ${
+                      menuExportarId === aba.id ? 'bg-purple-100 text-purple-600' : ''
+                    }`}
+                    title="Exportar aba"
+                  >
+                    {abaExportando === aba.id ? (
+                      <div className="animate-spin">
+                        <Download size={13} />
+                      </div>
+                    ) : (
+                      <>
+                        <Download size={13} />
+                        <ChevronDown size={10} />
+                      </>
+                    )}
+                  </motion.button>
+                  <AnimatePresence>
+                    {menuExportarId === aba.id && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 5 }}
+                        className="absolute right-0 mt-1 w-48 bg-white border border-neutral-200 rounded-lg shadow-lg z-50 overflow-hidden"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <button
+                          onClick={(e) => handleExportarAba(e, aba)}
+                          className="w-full flex items-center gap-2 px-3 py-2 text-xs text-neutral-700 hover:bg-neutral-100 transition-colors text-left font-medium"
+                        >
+                          <Download size={12} className="text-purple-500" />
+                          Baixar Documento (.docx)
+                        </button>
+                        <button
+                          onClick={(e) => handleCopiarAba(e, aba)}
+                          className="w-full flex items-center gap-2 px-3 py-2 text-xs text-neutral-700 hover:bg-neutral-100 transition-colors text-left font-medium border-t border-neutral-100"
+                        >
+                          {abaCopiadaId === aba.id ? (
+                            <CheckCircle2 size={12} className="text-green-500" />
+                          ) : (
+                            <Clipboard size={12} className="text-purple-500" />
+                          )}
+                          Copiar para Área de Transferência
+                        </button>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               </>
             )}
 

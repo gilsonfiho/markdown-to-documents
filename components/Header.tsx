@@ -1,31 +1,61 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSession, signIn, signOut } from 'next-auth/react';
 import { useAppStore } from '@/lib/store';
 import { markdownToDocx } from '@/lib/markdown-to-docx';
 import { obterVersaoFormatada } from '@/lib/versao';
-import { LogOut, LogIn, Save, Package, X } from 'lucide-react';
-import { motion } from 'framer-motion';
+import {
+  LogOut,
+  LogIn,
+  Save,
+  Package,
+  X,
+  Clipboard,
+  ChevronDown,
+  CheckCircle2,
+} from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export const Header: React.FC = () => {
   const { data: session } = useSession();
   const { abas, salvarTodasAsAbas, fecharTodasAsAbas } = useAppStore();
   const [isExportingAll, setIsExportingAll] = useState(false);
+  const [menuExportarAberto, setMenuExportarAberto] = useState(false);
+  const [tudoCopiado, setTudoCopiado] = useState(false);
 
   const handleExportarTodas = async () => {
+    setMenuExportarAberto(false);
     setIsExportingAll(true);
     try {
       for (const aba of abas) {
         await markdownToDocx(aba.conteudo, aba.nome);
         await new Promise((resolve) => setTimeout(resolve, 500));
       }
-    } catch (error) {
-      console.error('Erro ao exportar todas:', error);
+    } catch (_error) {
+      console.error('Erro ao exportar todas:', _error);
     } finally {
       setIsExportingAll(false);
     }
   };
+
+  const handleCopiarTodas = async () => {
+    setMenuExportarAberto(false);
+    try {
+      const conteudoFinal = abas.map((aba) => `--- ${aba.nome} ---\n${aba.conteudo}`).join('\n\n');
+      await navigator.clipboard.writeText(conteudoFinal);
+      setTudoCopiado(true);
+      setTimeout(() => setTudoCopiado(false), 2000);
+    } catch (_error) {
+      // Erro silenciado
+    }
+  };
+
+  useEffect(() => {
+    const handleFecharMenu = () => setMenuExportarAberto(false);
+    window.addEventListener('click', handleFecharMenu);
+    return () => window.removeEventListener('click', handleFecharMenu);
+  }, []);
 
   const handleSalvarTodas = () => {
     salvarTodasAsAbas();
@@ -81,28 +111,70 @@ export const Header: React.FC = () => {
             <span>Salvar tudo</span>
           </motion.button>
 
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={handleExportarTodas}
-            disabled={isExportingAll || !session || abas.length === 0}
-            className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:bg-neutral-400 disabled:cursor-not-allowed transition-colors"
-            title="Exportar todas as abas para DOCX"
-          >
-            {isExportingAll ? (
-              <>
-                <div className="animate-spin">
+          <div className="relative">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={(e) => {
+                e.stopPropagation();
+                setMenuExportarAberto(!menuExportarAberto);
+              }}
+              disabled={isExportingAll || !session || abas.length === 0}
+              className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:bg-neutral-400 disabled:cursor-not-allowed transition-colors"
+              title="Opções de exportação para todas as abas"
+            >
+              {isExportingAll ? (
+                <>
+                  <div className="animate-spin">
+                    <Package size={18} />
+                  </div>
+                  <span>Exportando...</span>
+                </>
+              ) : (
+                <>
                   <Package size={18} />
-                </div>
-                <span>Exportando...</span>
-              </>
-            ) : (
-              <>
-                <Package size={18} />
-                <span>Exportar tudo</span>
-              </>
-            )}
-          </motion.button>
+                  <span>Exportar tudo</span>
+                  <ChevronDown size={14} />
+                </>
+              )}
+            </motion.button>
+
+            <AnimatePresence>
+              {menuExportarAberto && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  className="absolute right-0 mt-2 w-56 bg-white border border-neutral-200 rounded-lg shadow-xl z-50 overflow-hidden"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <button
+                    onClick={handleExportarTodas}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-neutral-700 hover:bg-neutral-50 transition-colors text-left font-medium"
+                  >
+                    <Package size={18} className="text-purple-600" />
+                    Baixar Todas (.docx)
+                  </button>
+                  <button
+                    onClick={handleCopiarTodas}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-neutral-700 hover:bg-neutral-50 transition-colors text-left font-medium border-t border-neutral-100"
+                  >
+                    {tudoCopiado ? (
+                      <>
+                        <CheckCircle2 size={18} className="text-green-600" />
+                        Copiado!
+                      </>
+                    ) : (
+                      <>
+                        <Clipboard size={18} className="text-purple-600" />
+                        Copiar Todas para Área de Transf.
+                      </>
+                    )}
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
 
           <motion.button
             whileHover={{ scale: 1.05 }}

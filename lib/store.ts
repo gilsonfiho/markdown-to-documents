@@ -18,6 +18,7 @@ interface AppStore {
   carregarDoStorage: () => void;
   salvarNoStorage: (abaId?: string) => void;
   salvarTodasAsAbas: () => void;
+  fecharTodasAsAbas: () => void;
 }
 
 const CHAVE_STORAGE_ABAS = 'markdown-studio-abas';
@@ -156,6 +157,17 @@ export const useAppStore = create<AppStore>((set, get) => ({
           get().setSalvoAoMemento(aba.id, null);
         }, 3000);
       });
+    }
+  },
+  fecharTodasAsAbas: () => {
+    const novaAba = criarNovaAba('Documento 1');
+    set({
+      abas: [novaAba],
+      abaAtiva: novaAba.id,
+    });
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('markdown-studio-abas');
+      localStorage.removeItem('markdown-studio-aba-ativa');
     }
   },
 }));

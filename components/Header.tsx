@@ -46,8 +46,8 @@ export const Header: React.FC = () => {
       await navigator.clipboard.writeText(conteudoFinal);
       setTudoCopiado(true);
       setTimeout(() => setTudoCopiado(false), 2000);
-    } catch (_error) {
-      // Erro silenciado
+    } catch {
+      setTudoCopiado(false);
     }
   };
 

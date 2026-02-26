@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
-import { useAppStore, type AbaData } from '@/lib/store';
-import { Plus, X, ChevronLeft, ChevronRight, Save, CheckCircle2 } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { type AbaData, useAppStore } from '@/lib/store';
+import { CheckCircle2, ChevronLeft, ChevronRight, Download, Plus, Save, X } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { markdownToDocx } from '@/lib/markdown-to-docx';
 
 export const TabsBar: React.FC = () => {
   const { abas, abaAtiva, setAbaAtiva, adicionarAba, removerAba, atualizarAba, salvarNoStorage } =
@@ -13,6 +14,7 @@ export const TabsBar: React.FC = () => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
+  const [abaExportando, setAbaExportando] = useState<string | null>(null);
 
   const handleAdicionarAba = () => {
     adicionarAba();
@@ -21,6 +23,18 @@ export const TabsBar: React.FC = () => {
   const handleSalvarAba = (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
     salvarNoStorage(id);
+  };
+
+  const handleExportarAba = async (e: React.MouseEvent, aba: AbaData) => {
+    e.stopPropagation();
+    setAbaExportando(aba.id);
+    try {
+      await markdownToDocx(aba.conteudo, aba.nome);
+    } catch (error) {
+      console.error('Erro ao exportar aba:', error);
+    } finally {
+      setAbaExportando(null);
+    }
   };
 
   const handleRemoverAba = (e: React.MouseEvent, id: string) => {
@@ -77,7 +91,7 @@ export const TabsBar: React.FC = () => {
   };
 
   return (
-    <div className="flex items-center gap-0 px-2 py-3 bg-neutral-50 border-b border-neutral-200">
+    <div className="flex items-center gap-0 px-1 py-1 bg-neutral-50 border-b border-neutral-200">
       {/* Botão scroll esquerda */}
       {canScrollLeft && (
         <motion.button
@@ -107,7 +121,7 @@ export const TabsBar: React.FC = () => {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 10 }}
             transition={{ duration: 0.2 }}
-            className={`flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer whitespace-nowrap transition-all flex-shrink-0 ${
+            className={`flex items-center gap-2 px-2 py-1 rounded-lg font-bold cursor-pointer whitespace-nowrap transition-all flex-shrink-0 ${
               abaAtiva === aba.id
                 ? 'bg-white border border-neutral-300 shadow-sm'
                 : 'hover:bg-neutral-100 border border-transparent'
@@ -147,7 +161,7 @@ export const TabsBar: React.FC = () => {
                     exit={{ scale: 0 }}
                     transition={{ duration: 0.2 }}
                   >
-                    <CheckCircle2 size={16} className="text-green-600" />
+                    <CheckCircle2 size={13} className="text-green-600" />
                   </motion.div>
                 )}
                 <motion.button
@@ -157,7 +171,22 @@ export const TabsBar: React.FC = () => {
                   className="flex items-center justify-center text-neutral-400 hover:text-blue-600 p-1 rounded hover:bg-blue-100 transition-colors"
                   title="Salvar aba"
                 >
-                  <Save size={14} />
+                  <Save size={13} />
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={(e) => handleExportarAba(e, aba)}
+                  className="flex items-center justify-center text-neutral-400 hover:text-purple-600 p-1 rounded hover:bg-purple-100 transition-colors"
+                  title="Exportar aba"
+                >
+                  {abaExportando === aba.id ? (
+                    <div className="animate-spin">
+                      <Download size={13} />
+                    </div>
+                  ) : (
+                    <Download size={13} />
+                  )}
                 </motion.button>
               </>
             )}

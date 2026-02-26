@@ -1,14 +1,15 @@
 # Markdown Studio
 
-Uma aplicação web moderna e minimalista que permite converter markdown para documentos Word (.docx) em tempo real, com autenticação segura via Google. Desenvolvida com Next.js 16, React 19 e Tailwind CSS, oferece uma interface split-view profissional para máxima produtividade.
+Uma aplicação web moderna e minimalista que permite converter markdown para documentos Word (.docx) em tempo real, com autenticação segura via Google. Desenvolvida com Next.js 16, React 19 e Tailwind CSS, oferece uma interface split-view profissional com suporte a múltiplas abas para máxima produtividade.
 
 **Status**: ✅ Completo e funcional
 
 ## 🎯 Funcionalidades
 
 - ✅ **Editor Split-View**: Editor markdown lado a lado com preview em tempo real (sem delay)
+- ✅ **Sistema de Abas**: Gerencia múltiplos documentos simultaneamente com abas renomeáveis
 - ✅ **Autenticação Google**: Login seguro com NextAuth.js
-- ✅ **Exportação DOCX**: Converta markdown para Word com um clique
+- ✅ **Exportação DOCX Individual e em Lote**: Exporte um documento ou todos de uma vez
 - ✅ **Suporte Markdown Completo**: Headings (H1-H6), listas ordenadas/desordenadas, código com syntax highlight, blocos de citação, links, tabelas, linhas horizontais
 - ✅ **Diagramas Mermaid**: Renderização em tempo real de diagramas (flow, sequence, state, gantt, etc.) com suporte completo
 - ✅ **Estruturas de Árvore e Diagramas ASCII**: Detecta e renderiza automaticamente diagramas com caracteres `├──`, `└──`, `│`, etc.
@@ -16,8 +17,9 @@ Uma aplicação web moderna e minimalista que permite converter markdown para do
 - ✅ **Responsivo**: Funciona em desktop, tablets e mobile
 - ✅ **Formatação Inline**: Suporte a **negrito**, _itálico_ e `` `código inline` ``
 - ✅ **Animações Suaves**: Transições elegantes com Framer Motion
-- ✅ **Persistência Local**: Salva automaticamente markdown e nome do arquivo no localStorage
+- ✅ **Persistência Local**: Salva automaticamente todas as abas e seus conteúdos no localStorage
 - ✅ **Linting e Formatting**: ESLint + Prettier pré-configurados
+- ✅ **Clipboard Inteligente**: Colar conteúdo normalmente ou limpar e colar de uma vez
 
 ## 🛠️ Stack Tecnológico
 
@@ -56,10 +58,12 @@ Export: markdown-to-docx.ts (parse → DOCX via docx library)
 
 ### Fluxo de Dados
 
-1. User edita markdown em `MarkdownEditor`
-2. Estado atualiza em Zustand `useAppStore`
-3. `MarkdownPreview` renderiza em tempo real com `ReactMarkdown`
-4. Ao clicar "Exportar DOCX", `markdown-to-docx.ts` converte e faz download
+1. User edita markdown em `MarkdownEditor` (painel esquerdo)
+2. Estado atualiza em Zustand `useAppStore.atualizarAba()`
+3. `MarkdownPreview` renderiza em tempo real com `ReactMarkdown` (painel direito)
+4. User gerencia abas em `TabsBar` (adicionar, renomear, remover, exportar individual)
+5. User clica "Exportar Todas" em `Header` → lote de exportações DOCX com delay entre elas
+6. Persistência: `salvarNoStorage()` → localStorage com todas as abas
 
 ## 📋 Pré-requisitos
 
@@ -238,6 +242,7 @@ markdown-to-docx/
 │   ├── MarkdownEditor.tsx
 │   ├── MarkdownPreview.tsx
 │   ├── MermaidDiagram.tsx
+│   ├── TabsBar.tsx
 │   └── Providers.tsx
 ├── lib/
 │   ├── markdown-to-docx.ts
@@ -254,22 +259,56 @@ markdown-to-docx/
 
 ## 🔑 Padrões Importantes
 
-### Persistência Local (localStorage)
+### Persistência Local (localStorage) com Sistema de Abas
 
-O estado markdown e fileName são automaticamente salvos no localStorage:
+O estado de **todas as abas** é automaticamente salvo no localStorage:
 
 ```typescript
 // Salvar no localStorage
-salvarNoStorage(); // Disponível em Header.tsx
+salvarNoStorage();         // Salva aba ativa + mostra timestamp
+salvarTodasAsAbas();       // Salva todas as abas + mostra timestamp em todas
+fecharTodasAsAbas();       // Limpa localStorage + reinicia com 1 aba vazia
 
 // Carregar do localStorage ao iniciar
-carregarDoStorage(); // Chamado em app/page.tsx no useEffect
+carregarDoStorage();       // Chamado em app/page.tsx no useEffect
 ```
 
 **Chaves utilizadas**:
 
-- `markdown-studio-markdown` — Conteúdo markdown
-- `markdown-studio-nome-arquivo` — Nome do arquivo para export
+- `markdown-studio-abas` — Array serializado de todas as abas (AbaData[])
+- `markdown-studio-aba-ativa` — ID da aba ativa
+
+**Exemplo de estrutura salva**:
+```json
+{
+  "abas": [
+    {
+      "id": "aba-1708234567890-abc123def",
+      "nome": "Documento 1",
+      "conteudo": "# Bem-vindo\n\n...",
+      "salvoAoMemento": null
+    },
+    {
+      "id": "aba-1708234568901-xyz789uvw",
+      "nome": "Documento 2",
+      "conteudo": "# Segundo documento\n\n...",
+      "salvoAoMemento": "14:32:45"
+    }
+  ],
+  "abaAtiva": "aba-1708234567890-abc123def"
+}
+```
+
+### Gerenciamento de Abas (`components/TabsBar.tsx`)
+
+**Funcionalidades principais**:
+
+1. **Adicionar Aba**: Clique em "+" → nova aba com nome "Documento N" e markdown padrão
+2. **Renomear Aba**: Duplo clique no nome da aba → input inline → Enter para confirmar
+3. **Remover Aba**: Clique em "x" por aba → remove (sempre mantém mínimo 1 aba)
+4. **Salvar Individual**: Clique no ícone Save → `salvarNoStorage(abaId)` → mostra "Salvo às HH:MM:SS"
+5. **Exportar Individual**: Clique no ícone Download → `markdownToDocx(conteudo, nome)` → faz download do DOCX
+6. **Scroll Horizontal**: Botões ◀ ▶ aparecem em viewports pequenas para navegar entre abas
 
 ### Client vs Server Components
 

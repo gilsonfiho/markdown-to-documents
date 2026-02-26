@@ -1,13 +1,13 @@
 import {
+  BorderStyle,
   Document,
+  HeadingLevel,
   Packer,
   Paragraph,
-  TextRun,
-  HeadingLevel,
   Table,
   TableCell,
   TableRow,
-  BorderStyle,
+  TextRun,
 } from 'docx';
 
 interface ParsedMarkdown {
@@ -294,6 +294,41 @@ export async function copiarParaAreaTransferencia(markdown: string): Promise<voi
     const html = gerarHtmlDocumento(markdown);
     await navigator.clipboard.writeText(html);
   }
+}
+
+export async function baixarHtmlDocumento(markdown: string, nomeArquivo: string = 'documento') {
+  const html = gerarHtmlDocumento(markdown);
+  const blob = new Blob([html], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `${nomeArquivo}.html`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+export async function exportarParaPdf(markdown: string, nomeArquivo: string = 'documento') {
+  await import('jspdf');
+  const html2pdf = (await import('html2pdf.js')).default;
+
+  const html = gerarHtmlDocumento(markdown);
+
+  const elemento = document.createElement('div');
+  elemento.innerHTML = html;
+  elemento.style.padding = '20px';
+  elemento.style.fontFamily = 'Arial, sans-serif';
+
+  const opcoes = {
+    margin: 10,
+    filename: `${nomeArquivo}.pdf`,
+    image: { type: 'png' as const, quality: 0.98 },
+    html2canvas: { scale: 2 },
+    jsPDF: { orientation: 'portrait' as const, unit: 'mm' as const, format: 'a4' as const },
+  };
+
+  await html2pdf().set(opcoes).from(elemento).save();
 }
 
 export async function gerarBlobDocx(markdown: string): Promise<Blob> {

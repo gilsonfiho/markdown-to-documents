@@ -13,9 +13,16 @@ import {
   X,
   Clipboard,
   ChevronDown,
+  FileText,
+  FileJson,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { markdownToDocx, copiarParaAreaTransferencia } from '@/lib/markdown-to-docx';
+import {
+  markdownToDocx,
+  copiarParaAreaTransferencia,
+  baixarHtmlDocumento,
+  exportarParaPdf,
+} from '@/lib/markdown-to-docx';
 
 export const TabsBar: React.FC = () => {
   const { abas, abaAtiva, setAbaAtiva, adicionarAba, removerAba, atualizarAba, salvarNoStorage } =
@@ -66,6 +73,28 @@ export const TabsBar: React.FC = () => {
       setTimeout(() => setAbaCopiadaId(null), 2000);
     } catch {
       setAbaCopiadaId(null);
+    }
+  };
+
+  const handleBaixarHtml = async (e: React.MouseEvent, aba: AbaData) => {
+    e.stopPropagation();
+    setMenuExportarId(null);
+    setPosicaoMenuExportar(null);
+    try {
+      await baixarHtmlDocumento(aba.conteudo, aba.nome);
+    } catch {
+      // Erro silenciado
+    }
+  };
+
+  const handleExportarPdf = async (e: React.MouseEvent, aba: AbaData) => {
+    e.stopPropagation();
+    setMenuExportarId(null);
+    setPosicaoMenuExportar(null);
+    try {
+      await exportarParaPdf(aba.conteudo, aba.nome);
+    } catch {
+      // Erro silenciado
     }
   };
 
@@ -328,6 +357,20 @@ export const TabsBar: React.FC = () => {
                     <Clipboard size={12} className="text-purple-500" />
                   )}
                   Copiar para Área de Transferência
+                </button>
+                <button
+                  onClick={(e) => handleBaixarHtml(e, abaMenuAtivo)}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-xs text-neutral-700 hover:bg-neutral-100 transition-colors text-left font-medium border-t border-neutral-100"
+                >
+                  <FileText size={12} className="text-purple-500" />
+                  Baixar Documento (.html)
+                </button>
+                <button
+                  onClick={(e) => handleExportarPdf(e, abaMenuAtivo)}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-xs text-neutral-700 hover:bg-neutral-100 transition-colors text-left font-medium border-t border-neutral-100"
+                >
+                  <FileJson size={12} className="text-purple-500" />
+                  Baixar Documento (.pdf)
                 </button>
               </motion.div>
             </AnimatePresence>,

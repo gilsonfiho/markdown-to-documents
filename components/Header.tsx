@@ -3,7 +3,12 @@
 import React, { useState, useEffect } from 'react';
 import { useSession, signIn, signOut } from 'next-auth/react';
 import { useAppStore } from '@/lib/store';
-import { markdownToDocx, copiarParaAreaTransferencia } from '@/lib/markdown-to-docx';
+import {
+  markdownToDocx,
+  copiarParaAreaTransferencia,
+  baixarHtmlDocumento,
+  exportarParaPdf,
+} from '@/lib/markdown-to-docx';
 import { obterVersaoFormatada } from '@/lib/versao';
 import {
   LogOut,
@@ -14,6 +19,8 @@ import {
   Clipboard,
   ChevronDown,
   CheckCircle2,
+  FileText,
+  FileJson,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -48,6 +55,26 @@ export const Header: React.FC = () => {
       setTimeout(() => setTudoCopiado(false), 2000);
     } catch {
       setTudoCopiado(false);
+    }
+  };
+
+  const handleBaixarHtmlTodas = async () => {
+    setMenuExportarAberto(false);
+    try {
+      const conteudos = abas.map((aba) => aba.conteudo).join('\n\n---\n\n');
+      await baixarHtmlDocumento(conteudos, 'documentos-completo');
+    } catch {
+      // Erro silenciado
+    }
+  };
+
+  const handleExportarPdfTodas = async () => {
+    setMenuExportarAberto(false);
+    try {
+      const conteudos = abas.map((aba) => aba.conteudo).join('\n\n---\n\n');
+      await exportarParaPdf(conteudos, 'documentos-completo');
+    } catch {
+      // Erro silenciado
     }
   };
 
@@ -170,6 +197,20 @@ export const Header: React.FC = () => {
                         Copiar Todas para Área de Transf.
                       </>
                     )}
+                  </button>
+                  <button
+                    onClick={handleBaixarHtmlTodas}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-neutral-700 hover:bg-neutral-50 transition-colors text-left font-medium border-t border-neutral-100"
+                  >
+                    <FileText size={18} className="text-purple-600" />
+                    Baixar Todas como HTML
+                  </button>
+                  <button
+                    onClick={handleExportarPdfTodas}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-neutral-700 hover:bg-neutral-50 transition-colors text-left font-medium border-t border-neutral-100"
+                  >
+                    <FileJson size={18} className="text-purple-600" />
+                    Exportar Todas como PDF
                   </button>
                 </motion.div>
               )}

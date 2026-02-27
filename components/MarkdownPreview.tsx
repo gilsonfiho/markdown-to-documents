@@ -42,7 +42,7 @@ export const MarkdownPreview: React.FC<MarkdownPreviewProps> = ({ content }) => 
             }
 
             return inline ? (
-              <code className="bg-neutral-100 text-neutral-900 px-2 py-1 rounded font-mono text-sm border border-neutral-200" {...spreadProps}>
+              <code className="bg-neutral-200 text-neutral-900 px-2 py-1 rounded font-bold text-sm whitespace-nowrap inline" {...spreadProps}>
                 {children}
               </code>
             ) : (

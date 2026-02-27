@@ -1,4 +1,4 @@
-name: Deploy to Vercel
+name: Deploy para Vercel
 
 on:
   push:
@@ -14,6 +14,13 @@ jobs:
     steps:
       - name: Checkout do código
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configurar Git
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
 
       - name: Instalar Node
         uses: actions/setup-node@v4
@@ -23,11 +30,31 @@ jobs:
       - name: Instalar dependências
         run: npm install
 
+      - name: Incrementar versão
+        id: versao
+        run: |
+          VERSAO_ATUAL=$(node -p "require('./package.json').version")
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSAO_ATUAL"
+          PATCH=$((PATCH + 1))
+          NOVA_VERSAO="$MAJOR.$MINOR.$PATCH"
+          npm version $NOVA_VERSAO --no-git-tag-version
+          echo "NOVA_VERSAO=$NOVA_VERSAO" >> $GITHUB_OUTPUT
+          echo "Versão incrementada: $VERSAO_ATUAL → $NOVA_VERSAO"
+
+      - name: Fazer commit da versão
+        run: |
+          git add package.json
+          git commit -m "chore: bump version to ${{ steps.versao.outputs.NOVA_VERSAO }}"
+          git push
+
       - name: Build do projeto
         run: npm run build
+        env:
+          NEXT_PUBLIC_APP_VERSION: ${{ steps.versao.outputs.NOVA_VERSAO }}
 
       - name: Deploy para Vercel
         run: npx vercel --prod --token=${{ secrets.VERCEL_TOKEN }}
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          NEXT_PUBLIC_APP_VERSION: ${{ steps.versao.outputs.NOVA_VERSAO }}

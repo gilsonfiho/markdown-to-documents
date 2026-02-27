@@ -27,14 +27,6 @@ jobs:
         with:
           node-version: 22
 
-      - name: Instalar dependências
-        run: npm install
-
-
-      - name: Build do projeto
-        run: npm run build
-
-
       - name: Deploy para Vercel
         run: npx vercel --prod --token=${{ secrets.VERCEL_TOKEN }}
         env:

@@ -30,22 +30,33 @@ export const MarkdownPreview: React.FC<MarkdownPreviewProps> = ({ content }) => 
           strong: (props: any) => <strong className="font-semibold text-neutral-900" {...props} />,
           em: (props: any) => <em className="italic text-neutral-700" {...props} />,
           code: (props: any) => {
-            const { inline, className, children, ...rest } = props as any;
+            const { className, children, ...rest } = props as any;
             const spreadProps = rest as React.HTMLAttributes<HTMLElement>;
+
+            // Detectar se é backticks simples ou triplos pela presença de quebras de linha
+            const temQuebrasDelinha = typeof children === 'string' && children.includes('\n');
 
             // Verificar se é um bloco de código Mermaid
             const linguagem = className?.replace(/language-/, '') || '';
-            if (!inline && linguagem === 'mermaid' && typeof children === 'string') {
+
+            // Se tem quebras de linha (triplos) e é Mermaid
+            if (temQuebrasDelinha && linguagem === 'mermaid' && typeof children === 'string') {
               // Limpar automaticamente <br/> do diagrama
               const diagramaLimpo = limparDiagramaMermaid(children);
               return <MermaidDiagram content={diagramaLimpo} />;
             }
 
-            return inline ? (
-              <code className="bg-neutral-200 text-neutral-900 px-2 py-1 rounded font-bold text-sm whitespace-nowrap inline" {...spreadProps}>
-                {children}
-              </code>
-            ) : (
+            // Se NÃO tem quebras de linha, é backticks simples (inline)
+            if (!temQuebrasDelinha) {
+              return (
+                <code className="bg-neutral-200 text-neutral-900 px-2 py-1 rounded font-bold text-sm whitespace-nowrap inline" {...spreadProps}>
+                  {children}
+                </code>
+              );
+            }
+
+            // Se tem quebras de linha, é backticks triplos (bloco)
+            return (
               <code className="bg-neutral-900 text-neutral-50 px-4 py-3 rounded-lg font-mono text-sm block my-4 overflow-x-auto whitespace-pre-wrap break-words" {...spreadProps}>
                 {children}
               </code>

@@ -18,7 +18,7 @@ describe('useAppStore', () => {
   });
 
   it('deve remover uma aba', () => {
-    const { adicionarAba, removerAba, abas } = useAppStore.getState();
+    const { adicionarAba, removerAba } = useAppStore.getState();
     adicionarAba();
 
     const { abas: abasComNova } = useAppStore.getState();

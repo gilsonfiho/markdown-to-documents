@@ -1,7 +1,11 @@
-name: Deploy to Vercel
+name: Deploy para Vercel
 
 on:
+  push:
+    branches: [ "main" ]
   pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -10,20 +14,22 @@ jobs:
     steps:
       - name: Checkout do código
         uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Configurar Git
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
 
       - name: Instalar Node
         uses: actions/setup-node@v4
         with:
           node-version: 22
 
-      - name: Instalar dependências
-        run: npm install
-
-      - name: Build do projeto
-        run: npm run build
-
       - name: Deploy para Vercel
         run: npx vercel --prod --token=${{ secrets.VERCEL_TOKEN }}
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+

@@ -3,6 +3,7 @@
 import React, { useRef, useState } from 'react';
 import { CheckCircle2, ChevronDown, Clipboard } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useAppStore } from '@/lib/store';
 
 interface MarkdownEditorProps {
   value: string;
@@ -13,6 +14,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({ value, onChange 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [colado, setColado] = useState(false);
   const [dropdownAberto, setDropdownAberto] = useState(false);
+  const { setTextoSelecionado } = useAppStore();
 
   const handleColar = async () => {
     try {
@@ -61,6 +63,24 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({ value, onChange 
 
   const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     onChange(e.target.value);
+    atualizarSelecionado();
+  };
+
+  const atualizarSelecionado = () => {
+    if (textareaRef.current) {
+      const inicio = textareaRef.current.selectionStart;
+      const fim = textareaRef.current.selectionEnd;
+      const selecionado = value.substring(inicio, fim);
+      setTextoSelecionado(selecionado);
+    }
+  };
+
+  const handleMouseUp = () => {
+    atualizarSelecionado();
+  };
+
+  const handleKeyUp = () => {
+    atualizarSelecionado();
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -86,6 +106,8 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({ value, onChange 
         value={value}
         onChange={handleInput}
         onKeyDown={handleKeyDown}
+        onMouseUp={handleMouseUp}
+        onKeyUp={handleKeyUp}
         className="flex-1 p-6 font-mono text-sm text-neutral-900 bg-white resize-none focus:outline-none border-r border-neutral-200"
         placeholder="Coloque seu markdown aqui..."
         spellCheck="false"

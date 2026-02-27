@@ -1,9 +1,10 @@
 /**
  * Configuração de versão da aplicação
+ * Lê a versão da variável de ambiente NEXT_PUBLIC_APP_VERSION
  * Sincronizada com package.json
  */
 
-export const VERSAO_APP = '1.0.18';
+export const VERSAO_APP = process.env.NEXT_PUBLIC_APP_VERSION || '1.0.28';
 
 /**
  * Obtém a versão formatada da aplicação

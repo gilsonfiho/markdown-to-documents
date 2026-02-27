@@ -3,6 +3,12 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import remarkBreaks from 'remark-breaks';
+import remarkEmoji from 'remark-emoji';
+import remarkToc from 'remark-toc';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
 import { MermaidDiagram } from './MermaidDiagram';
 import { limparDiagramaMermaid } from '@/lib/mermaid-cleaner';
 
@@ -14,7 +20,8 @@ export const MarkdownPreview: React.FC<MarkdownPreviewProps> = ({ content }) => 
   return (
     <div className="markdown-preview prose prose-sm max-w-none">
       <ReactMarkdown
-        remarkPlugins={[remarkGfm]}
+        remarkPlugins={[remarkGfm, remarkBreaks, remarkEmoji, remarkToc, remarkMath]}
+        rehypePlugins={[rehypeKatex]}
         components={{
           h1: (props: any) => <h1 className="text-3xl font-bold text-neutral-900 mt-8 mb-4 border-b-2 border-neutral-200 pb-2" {...props} />,
           h2: (props: any) => <h2 className="text-2xl font-bold text-neutral-800 mt-6 mb-3" {...props} />,
@@ -23,22 +30,33 @@ export const MarkdownPreview: React.FC<MarkdownPreviewProps> = ({ content }) => 
           strong: (props: any) => <strong className="font-semibold text-neutral-900" {...props} />,
           em: (props: any) => <em className="italic text-neutral-700" {...props} />,
           code: (props: any) => {
-            const { inline, className, children, ...rest } = props as any;
+            const { className, children, ...rest } = props as any;
             const spreadProps = rest as React.HTMLAttributes<HTMLElement>;
+
+            // Detectar se é backticks simples ou triplos pela presença de quebras de linha
+            const temQuebrasDelinha = typeof children === 'string' && children.includes('\n');
 
             // Verificar se é um bloco de código Mermaid
             const linguagem = className?.replace(/language-/, '') || '';
-            if (!inline && linguagem === 'mermaid' && typeof children === 'string') {
+
+            // Se tem quebras de linha (triplos) e é Mermaid
+            if (temQuebrasDelinha && linguagem === 'mermaid' && typeof children === 'string') {
               // Limpar automaticamente <br/> do diagrama
               const diagramaLimpo = limparDiagramaMermaid(children);
               return <MermaidDiagram content={diagramaLimpo} />;
             }
 
-            return inline ? (
-              <code className="bg-neutral-100 text-neutral-900 px-2 py-1 rounded font-mono text-sm border border-neutral-200" {...spreadProps}>
-                {children}
-              </code>
-            ) : (
+            // Se NÃO tem quebras de linha, é backticks simples (inline)
+            if (!temQuebrasDelinha) {
+              return (
+                <code className="bg-neutral-200 text-neutral-900 px-2 py-1 rounded font-bold text-sm whitespace-nowrap inline" {...spreadProps}>
+                  {children}
+                </code>
+              );
+            }
+
+            // Se tem quebras de linha, é backticks triplos (bloco)
+            return (
               <code className="bg-neutral-900 text-neutral-50 px-4 py-3 rounded-lg font-mono text-sm block my-4 overflow-x-auto whitespace-pre-wrap break-words" {...spreadProps}>
                 {children}
               </code>

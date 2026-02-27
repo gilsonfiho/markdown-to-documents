@@ -13,6 +13,12 @@ Uma aplicação web moderna e minimalista que permite converter markdown para do
 - ✅ **Suporte Markdown Completo**: Headings (H1-H6), listas ordenadas/desordenadas, código com syntax highlight, blocos de citação, links, tabelas, linhas horizontais
 - ✅ **Diagramas Mermaid**: Renderização em tempo real de diagramas (flow, sequence, state, gantt, etc.) com suporte completo
 - ✅ **Estruturas de Árvore e Diagramas ASCII**: Detecta e renderiza automaticamente diagramas com caracteres `├──`, `└──`, `│`, etc.
+- ✅ **Plugins Remark Avançados**: 
+  - 📝 **remark-breaks** - Quebras de linha simples em `<br>` tags
+  - 😄 **remark-emoji** - Suporte para emojis (`:smile:` → 😄)
+  - 📚 **remark-toc** - Tabela de conteúdos automática
+  - 🧮 **remark-math + rehype-katex** - Equações matemáticas LaTeX renderizadas com KaTeX
+  - 🔗 **remark-slug** - Links internos com slugs automáticos nos headings
 - ✅ **Interface Minimalista**: Design refinado e profissional
 - ✅ **Responsivo**: Funciona em desktop, tablets e mobile
 - ✅ **Formatação Inline**: Suporte a **negrito**, _itálico_ e `` `código inline` ``
@@ -33,6 +39,13 @@ Uma aplicação web moderna e minimalista que permite converter markdown para do
 - **docx 8.5.0** (exportação DOCX)
 - **Mermaid 11.12.3** (renderização de diagramas em preview)
 - **Lucide React 0.575.0** (ícones SVG)
+- **Plugins Remark** (markdown avançado):
+  - **remark-gfm 4.0.0** (GitHub Flavored Markdown - tabelas, strikethrough, task lists)
+  - **remark-breaks 4.0.0** (quebras de linha simples em `<br>`)
+  - **remark-emoji** (suporte para emojis)
+  - **remark-toc** (tabela de conteúdos automática)
+  - **remark-math** + **rehype-katex** (equações matemáticas LaTeX)
+  - **remark-slug** (slugs automáticos para headings)
 
 ### Ferramentas de Desenvolvimento
 
@@ -135,8 +148,20 @@ Acesse [http://localhost:3000](http://localhost:3000)
 - `npm run dev` — Dev server
 - `npm run build && npm start` — Produção
 - `npm run lint` — ESLint (falha se houver warnings)
-- `npm run lint:fix` — Corrigir automaticamente
-- `npm run format` — Prettier --write
+
+## 📚 Documentação dos Plugins Remark
+
+Para conhecer em detalhes como usar os plugins remark instalados (emojis, equações matemáticas, tabela de conteúdos, etc.), consulte o documento:
+
+👉 **[docs/REMARK_PLUGINS.md](docs/REMARK_PLUGINS.md)**
+
+Nele você encontrará:
+- Como usar cada plugin
+- Exemplos práticos
+- Limitações na exportação DOCX
+- Dicas e truques para combinar múltiplos recursos
+
+
 - `npm run format:check` — Prettier --check
 
 ## 📚 Uso

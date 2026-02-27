@@ -10,7 +10,9 @@ export interface AbaData {
 interface AppStore {
   abas: AbaData[];
   abaAtiva: string;
+  textoSelecionado: string;
   setAbaAtiva: (id: string) => void;
+  setTextoSelecionado: (texto: string) => void;
   adicionarAba: () => void;
   removerAba: (id: string) => void;
   atualizarAba: (id: string, conteudo: string, nome?: string) => void;
@@ -50,7 +52,9 @@ const criarNovaAba = (nome: string = 'Novo documento'): AbaData => ({
 export const useAppStore = create<AppStore>((set, get) => ({
   abas: [criarNovaAba('Documento 1')],
   abaAtiva: '',
+  textoSelecionado: '',
   setAbaAtiva: (id: string) => set({ abaAtiva: id }),
+  setTextoSelecionado: (texto: string) => set({ textoSelecionado: texto }),
   adicionarAba: () => {
     const estado = get();
     const novaAba = criarNovaAba(`Documento ${estado.abas.length + 1}`);

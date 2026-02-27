@@ -8,7 +8,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { baixarHtmlDocumento, copiarParaAreaTransferencia, exportarParaPdf, markdownToDocx } from '@/lib/markdown-to-docx';
 
 export const TabsBar: React.FC = () => {
-  const { abas, abaAtiva, setAbaAtiva, adicionarAba, removerAba, atualizarAba, salvarNoStorage } = useAppStore();
+  const { abas, abaAtiva, setAbaAtiva, adicionarAba, removerAba, atualizarAba, salvarNoStorage, textoSelecionado } = useAppStore();
   const [editandoId, setEditandoId] = useState<string | null>(null);
   const [novoNome, setNovoNome] = useState('');
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -37,7 +37,8 @@ export const TabsBar: React.FC = () => {
     setPosicaoMenuExportar(null);
     setAbaExportando(aba.id);
     try {
-      await markdownToDocx(aba.conteudo, aba.nome);
+      const conteudo = textoSelecionado || aba.conteudo;
+      await markdownToDocx(conteudo, aba.nome);
     } catch {
       setAbaExportando(null);
       return;
@@ -50,7 +51,8 @@ export const TabsBar: React.FC = () => {
     setMenuExportarId(null);
     setPosicaoMenuExportar(null);
     try {
-      await copiarParaAreaTransferencia(aba.conteudo);
+      const conteudo = textoSelecionado || aba.conteudo;
+      await copiarParaAreaTransferencia(conteudo);
       setAbaCopiadaId(aba.id);
       setTimeout(() => setAbaCopiadaId(null), 2000);
     } catch {
@@ -63,7 +65,8 @@ export const TabsBar: React.FC = () => {
     setMenuExportarId(null);
     setPosicaoMenuExportar(null);
     try {
-      await baixarHtmlDocumento(aba.conteudo, aba.nome);
+      const conteudo = textoSelecionado || aba.conteudo;
+      await baixarHtmlDocumento(conteudo, aba.nome);
     } catch {
       // Erro silenciado
     }
@@ -74,7 +77,8 @@ export const TabsBar: React.FC = () => {
     setMenuExportarId(null);
     setPosicaoMenuExportar(null);
     try {
-      await exportarParaPdf(aba.conteudo, aba.nome);
+      const conteudo = textoSelecionado || aba.conteudo;
+      await exportarParaPdf(conteudo, aba.nome);
     } catch {
       // Erro silenciado
     }
@@ -143,6 +147,17 @@ export const TabsBar: React.FC = () => {
   };
 
   const abaMenuAtivo = menuExportarId ? abas.find((aba) => aba.id === menuExportarId) : null;
+
+  const obterTextoExportacao = (tipo: 'docx' | 'copiar' | 'html' | 'pdf'): string => {
+    const sufixo = textoSelecionado ? 'Seleção' : 'Documento';
+    const textos: Record<string, string> = {
+      docx: `Exportar ${sufixo} (.docx)`,
+      copiar: `Copiar ${sufixo}`,
+      html: `Exportar ${sufixo} (.html)`,
+      pdf: `Exportar ${sufixo} (.pdf)`,
+    };
+    return textos[tipo] || '';
+  };
 
   return (
     <>
@@ -308,28 +323,28 @@ export const TabsBar: React.FC = () => {
               >
                 <button onClick={(e) => handleExportarAba(e, abaMenuAtivo)} className="w-full flex items-center gap-2 px-4 py-3 text-xs text-neutral-700 hover:bg-neutral-100 transition-colors text-left font-medium whitespace-nowrap">
                   <Download size={12} className="text-purple-500 flex-shrink-0" />
-                  Baixar Documento (.docx)
+                  {obterTextoExportacao('docx')}
                 </button>
                 <button
                   onClick={(e) => handleCopiarAba(e, abaMenuAtivo)}
                   className="w-full flex items-center gap-2 px-4 py-3 text-xs text-neutral-700 hover:bg-neutral-100 transition-colors text-left font-medium border-t border-neutral-100 whitespace-nowrap"
                 >
                   {abaCopiadaId === abaMenuAtivo.id ? <CheckCircle2 size={12} className="text-green-500 flex-shrink-0" /> : <Clipboard size={12} className="text-purple-500 flex-shrink-0" />}
-                  Copiar para Área de Transferência
+                  {obterTextoExportacao('copiar')}
                 </button>
                 <button
                   onClick={(e) => handleBaixarHtml(e, abaMenuAtivo)}
                   className="w-full flex items-center gap-2 px-4 py-3 text-xs text-neutral-700 hover:bg-neutral-100 transition-colors text-left font-medium border-t border-neutral-100 whitespace-nowrap"
                 >
                   <FileText size={12} className="text-purple-500 flex-shrink-0" />
-                  Baixar Documento (.html)
+                  {obterTextoExportacao('html')}
                 </button>
                 <button
                   onClick={(e) => handleExportarPdf(e, abaMenuAtivo)}
                   className="w-full flex items-center gap-2 px-4 py-3 text-xs text-neutral-700 hover:bg-neutral-100 transition-colors text-left font-medium border-t border-neutral-100 whitespace-nowrap"
                 >
                   <FileJson size={12} className="text-purple-500 flex-shrink-0" />
-                  Baixar Documento (.pdf)
+                  {obterTextoExportacao('pdf')}
                 </button>
               </motion.div>
             </AnimatePresence>,

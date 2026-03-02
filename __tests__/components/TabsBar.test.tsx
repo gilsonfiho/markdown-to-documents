@@ -1,16 +1,21 @@
-import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { TabsBar } from '@/components/TabsBar';
 import { useAppStore } from '@/lib/store';
 import { toast } from 'sonner';
+import { useSession } from 'next-auth/react';
 
 jest.mock('@/lib/store');
 jest.mock('sonner');
+jest.mock('next-auth/react');
 jest.mock('@/lib/markdown-to-docx', () => ({
   markdownToDocx: jest.fn(),
   copiarParaAreaTransferencia: jest.fn(),
   baixarHtmlDocumento: jest.fn(),
   exportarParaPdf: jest.fn(),
+}));
+jest.mock('@/lib/google-drive', () => ({
+  salvarNoGoogleDrive: jest.fn(),
+  salvarTodasNoGoogleDrive: jest.fn(),
 }));
 
 describe('TabsBar.tsx', () => {
@@ -33,7 +38,12 @@ describe('TabsBar.tsx', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    (useAppStore as jest.Mock).mockReturnValue(mockUseAppStore);
+    (useSession as unknown as jest.Mock).mockReturnValue({
+      data: null,
+      status: 'unauthenticated',
+      update: jest.fn(),
+    });
+    (useAppStore as unknown as jest.Mock).mockReturnValue(mockUseAppStore);
   });
 
   it('deve renderizar todas as abas', () => {
@@ -113,7 +123,7 @@ describe('TabsBar.tsx', () => {
   });
 
   it('deve mostrar ícone de "Salvo" quando salvoAoMemento está ativo', () => {
-    (useAppStore as jest.Mock).mockReturnValue({
+    (useAppStore as unknown as jest.Mock).mockReturnValue({
       ...mockUseAppStore,
       abas: [{ id: '1', nome: 'Aba 1', conteudo: 'Conteúdo 1', salvoAoMemento: '13:45:30' }],
     });
@@ -126,7 +136,7 @@ describe('TabsBar.tsx', () => {
   });
 
   it('deve desabilitar remover aba se houver apenas uma aba', () => {
-    (useAppStore as jest.Mock).mockReturnValue({
+    (useAppStore as unknown as jest.Mock).mockReturnValue({
       ...mockUseAppStore,
       abas: [{ id: '1', nome: 'Aba 1', conteudo: 'Conteúdo 1', salvoAoMemento: null }],
     });

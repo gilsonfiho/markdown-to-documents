@@ -1,302 +1,529 @@
-# Plugins Remark - Guia de Uso
+# Plugins Remark - Markdown Studio
 
-Este documento descreve os plugins remark instalados e como utilizá-los no Markdown Studio.
+## 📚 Visão Geral dos Plugins
 
-## Plugins Instalados
+Os plugins remark são usados em `components/MarkdownPreview.tsx` para estender a funcionalidade de parsing e renderização de markdown. A **ordem dos plugins é crítica** — devem estar nesta sequência:
 
-### 1. **remark-breaks**
+```typescript
+const remarkPlugins = [
+  remarkGfm, // 1. GitHub Flavored Markdown
+  remarkBreaks, // 2. Quebras de linha simples
+  remarkEmoji, // 3. Suporte a emojis
+  remarkToc, // 4. Tabela de conteúdos
+  remarkMath, // 5. Equações matemáticas
+];
 
-Converte quebras de linha simples em tags `<br>` HTML.
+const rehypePlugins = [
+  [rehypeKatex, {}], // Renderização KaTeX
+];
+```
 
-**Como usar:**
+## 1️⃣ remarkGfm (4.0.0)
+
+**Propósito:** Suporte para GitHub Flavored Markdown
+
+**Funcionalidades:**
+
+- Tabelas
+- Strikethrough (`~~texto~~`)
+- Task lists (`- [x] Tarefa completa`)
+- Autolinks (`www.exemplo.com` → link)
+- URLs de mídia (`![alt](url)` com validação)
+
+### Exemplos
+
+**Tabelas:**
 
 ```markdown
-Primeira linha
-Segunda linha será exibida abaixo
-
-(sem necessidade de duplo espaço ou dois <br> no final)
+| Coluna 1 | Coluna 2 |
+| -------- | -------- |
+| Célula 1 | Célula 2 |
+| Célula 3 | Célula 4 |
 ```
 
-**Resultado em preview:**
-
-```
-Primeira linha
-Segunda linha será exibida abaixo
-```
-
----
-
-### 2. **remark-emoji**
-
-Converte códigos de emoji em emojis reais.
-
-**Como usar:**
+**Strikethrough:**
 
 ```markdown
-:smile: Bem-vindo ao Markdown Studio! :rocket:
-:heart: Isso é incrível! :tada:
-:fire: Código fogo :fire:
+~~Texto riscado~~
 ```
 
-**Emojis suportados:**
+**Task Lists:**
 
-- `:smile:` → 😄
-- `:rocket:` → 🚀
-- `:heart:` → ❤️
-- `:fire:` → 🔥
-- `:tada:` → 🎉
-- `:sun:` → ☀️
-- `:star:` → ⭐
-- E centenas de outros...
+```markdown
+- [x] Tarefa completa
+- [ ] Tarefa pendente
+```
 
-[Lista completa de emojis suportados](https://github.com/rhysd/remark-emoji)
+### Saída HTML
 
----
+```html
+<table>
+  <thead>
+    <tr>
+      <th>Coluna 1</th>
+      <th>Coluna 2</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Célula 1</td>
+      <td>Célula 2</td>
+    </tr>
+  </tbody>
+</table>
 
-### 3. **remark-toc**
+<del>Texto riscado</del>
 
-Gera automaticamente um índice (tabela de conteúdos) a partir dos headings.
+<ul>
+  <li><input type="checkbox" checked /> Tarefa completa</li>
+  <li><input type="checkbox" /> Tarefa pendente</li>
+</ul>
+```
 
-**Como usar:**
+### Integração em DOCX
+
+⚠️ **Limitação:** Tabelas em markdown são convertidas para `Table` em DOCX, mas task lists e strikethrough são renderizados como `Paragraph` com símbolos.
+
+## 2️⃣ remarkBreaks (4.0.0)
+
+**Propósito:** Converter quebras de linha simples (`\n`) em tags `<br/>`
+
+**Por que é importante:**
+
+- Markdown padrão ignora quebras de linha simples
+- `remarkBreaks` permite quebras de linha sem precisar de duplos espaços ou `<br/>`
+
+### Exemplos
+
+**Sem remarkBreaks:**
+
+```markdown
+Linha 1
+Linha 2
+```
+
+Renderiza como:
+
+```html
+<p>Linha 1 Linha 2</p>
+```
+
+**Com remarkBreaks:**
+
+```markdown
+Linha 1
+Linha 2
+```
+
+Renderiza como:
+
+```html
+<p>Linha 1<br />Linha 2</p>
+```
+
+### Casos de Uso
+
+- Endereços com quebras de linha
+- Poesia
+- Listagens formatadas visualmente
+
+## 3️⃣ remarkEmoji (5.0.2)
+
+**Propósito:** Converter codes de emoji em caracteres reais
+
+**Sintaxe:** `:nome-do-emoji:`
+
+### Exemplos
+
+| Código       | Resultado | Código    | Resultado |
+| ------------ | --------- | --------- | --------- |
+| `:smile:`    | 😄        | `:heart:` | ❤️        |
+| `:rocket:`   | 🚀        | `:star:`  | ⭐        |
+| `:thumbsup:` | 👍        | `:tada:`  | 🎉        |
+| `:bug:`      | 🐛        | `:fire:`  | 🔥        |
+| `:warning:`  | ⚠️        | `:check:` | ✅        |
+
+### Markdown Completo
+
+```markdown
+# Bem-vindo! :wave:
+
+Este projeto é :rocket: e :star: demais!
+
+- :thumbsup: Ótimo
+- :fire: Excelente
+- :tada: Fantástico
+```
+
+### Saída HTML
+
+```html
+<h1>Bem-vindo! 👋</h1>
+<p>Este projeto é 🚀 e ⭐ demais!</p>
+<ul>
+  <li>👍 Ótimo</li>
+  <li>🔥 Excelente</li>
+  <li>🎉 Fantástico</li>
+</ul>
+```
+
+### Integração em DOCX
+
+✅ Emojis são preservados naturalmente em DOCX (compatibilidade dependente do Word/versão)
+
+## 4️⃣ remarkToc (9.0.0)
+
+**Propósito:** Gerar tabela de conteúdos automática
+
+**Acionador:** Inserir `## Table of Contents` no markdown
+
+### Exemplos
+
+**Markdown:**
 
 ```markdown
 # Meu Documento
 
-## Índice
-
-(o conteúdo será preenchido automaticamente aqui)
+## Table of Contents
 
 ## Seção 1
 
-Conteúdo da seção 1...
+### Subseção 1.1
 
 ## Seção 2
 
-Conteúdo da seção 2...
+### Subseção 2.1
 
-### Subsseção 2.1
-
-Conteúdo da subseção...
+#### Subsubseção 2.1.1
 ```
 
-**Resultado:**
-O índice será automaticamente preenchido com links para cada seção (H2, H3, etc.)
+**Saída HTML Gerada:**
 
-**Marcadores válidos para o índice:**
+```html
+<h1>Meu Documento</h1>
 
-- `## Índice`
-- `## Table of Contents`
-- `## Tabela de Conteúdos`
-- `## Contents`
+<h2>Table of Contents</h2>
+<ul>
+  <li>
+    <a href="#seção-1">Seção 1</a>
+    <ul>
+      <li><a href="#subseção-11">Subseção 1.1</a></li>
+    </ul>
+  </li>
+  <li>
+    <a href="#seção-2">Seção 2</a>
+    <ul>
+      <li>
+        <a href="#subseção-21">Subseção 2.1</a>
+        <ul>
+          <li><a href="#subsubseção-211">Subsubseção 2.1.1</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
 
----
+<h2 id="seção-1">Seção 1</h2>
+<!-- ... conteúdo ... -->
+```
 
-### 4. **remark-math**
+### Comportamento
 
-Adiciona suporte para equações matemáticas no formato LaTeX.
+- Scans todos os headings (`h2` e abaixo)
+- Gera slugs automáticos (minúsculas, sem acentos)
+- Cria links internos (anchor links)
+- Respeita hierarquia de headings
 
-**Como usar:**
+### Integração em DOCX
 
-**Matemática inline:**
+⚠️ **Limitação:** Tabela de conteúdos é exportada como lista aninhada em DOCX. Anchors não funcionam em DOCX nativamente.
+
+## 5️⃣ remarkMath (6.0.0) + rehypeKatex (7.0.1)
+
+**Propósito:** Suporte para equações matemáticas via LaTeX
+
+**Delimitadores:**
+
+| Tipo    | Exemplo               | Saída            |
+| ------- | --------------------- | ---------------- |
+| Inline  | `$a + b = c$`         | Fórmula inline   |
+| Display | `$$a^2 + b^2 = c^2$$` | Fórmula centrada |
+
+### Exemplos
+
+**Inline Math:**
 
 ```markdown
-A fórmula do teorema de Pitágoras é $a^2 + b^2 = c^2$.
+A fórmula de Pitágoras é $a^2 + b^2 = c^2$, onde...
 ```
 
-**Bloco matemático:**
+Renderiza como:
+
+```
+A fórmula de Pitágoras é [fórmula renderizada], onde...
+```
+
+**Display Math:**
 
 ```markdown
-$$
-\int_{-\infty}^{+\infty} e^{-x^2} dx = \sqrt{\pi}
-$$
+A integral de $f(x)$ é:
+
+$$\int_{a}^{b} f(x) \, dx = F(b) - F(a)$$
+
+Onde $F$ é a antiderivada.
 ```
 
-**Exemplos:**
+### Sintaxe LaTeX Comum
 
-- Quadrado: `$x^2$`
-- Raiz quadrada: `$\sqrt{x}$`
-- Fração: `$\frac{a}{b}$`
-- Letra grega: `$\alpha, \beta, \gamma$`
-- Somatório: `$\sum_{i=1}^{n} i = \frac{n(n+1)}{2}$`
-- Integral: `$\int_a^b f(x) dx$`
+```latex
+% Potências
+a^2      % a ao quadrado
+a^{2+3}  % a elevado a (2+3)
 
-**Equações complexas:**
+% Índices
+a_1      % a com índice 1
+a_{1,2}  % a com índice (1,2)
+
+% Frações
+\frac{a}{b}    % a / b
+
+% Raízes
+\sqrt{a}       % raiz quadrada
+\sqrt[n]{a}    % raiz enésima
+
+% Somatórios
+\sum_{i=1}^{n} i  % soma de i=1 até n
+
+% Integrais
+\int_{a}^{b} f(x) \, dx  % integral definida
+
+% Limites
+\lim_{x \to \infty} f(x)  % limite
+
+% Matrizes
+\begin{matrix}
+a & b \\
+c & d
+\end{matrix}
+
+% Símbolos
+\alpha \beta \gamma \delta \epsilon \zeta \eta \theta
+
+% Operadores
+\leq \geq \neq \approx \sim \propto \pm \times \div
+```
+
+### ⚠️ Importação CSS Obrigatória
+
+**Em `app/layout.tsx` ou `components/MarkdownPreview.tsx`:**
+
+```typescript
+import 'katex/dist/katex.min.css';
+```
+
+**Sem esta importação:** Fórmulas renderizam como texto em vez de elementos formatados.
+
+### Saída HTML
+
+```html
+<!-- Inline: $a + b = c$ -->
+<span class="katex">
+  <span class="katex-mathml">
+    <math><!-- MathML aqui --></math>
+  </span>
+  <span class="katex-html"><!-- HTML renderizado --></span>
+</span>
+
+<!-- Display: $$...$$ -->
+<div class="katex-display">
+  <span class="katex"><!-- ... --></span>
+</div>
+```
+
+### Integração em DOCX
+
+⚠️ **Limitação:** Equações matemáticas não são exportadas para DOCX. São renderizadas como texto plano ou blocos de código.
+
+**Solução Alternativa:** Usar MathML ou imagem de equação (não suportado nativamente)
+
+## 📦 Ordem de Plugins - CRÍTICO!
+
+A ordem importa porque cada plugin modifica o AST (Abstract Syntax Tree) para o próximo:
+
+```
+Markdown bruto
+    ↓
+remarkGfm (parse tabelas, strikethrough, etc.)
+    ↓
+remarkBreaks (convertter \n em <br/>)
+    ↓
+remarkEmoji (substituir :emoji: em emojis)
+    ↓
+remarkToc (gerar Table of Contents)
+    ↓
+remarkMath (parse delimitadores $...$)
+    ↓
+HTML com placeholders
+    ↓
+rehypeKatex (renderizar placeholders com KaTeX)
+    ↓
+HTML Final
+```
+
+**⚠️ Se mudar a ordem:**
+
+- `remarkGfm` **deve ser primeiro** (baseline para GFM)
+- `remarkMath` **deve ser último** nos remark plugins (prepara para rehype)
+- `rehypeKatex` **deve ser depois** de toda a cadeia remark
+
+## 🔧 Adicionar Novo Plugin
+
+### Exemplo: Adicionar `remark-slug` (para gerar IDs automáticos em headings)
+
+**1. Instalar:**
+
+```bash
+npm install remark-slug
+```
+
+**2. Importar em `MarkdownPreview.tsx`:**
+
+```typescript
+import remarkSlug from 'remark-slug';
+
+const remarkPlugins = [
+  remarkGfm,
+  remarkBreaks,
+  remarkEmoji,
+  [remarkSlug, {}], // Novo plugin aqui
+  remarkToc, // Após remarkSlug (porque TOC usa slugs)
+  remarkMath,
+];
+```
+
+**3. Testar:**
 
 ```markdown
-$$
-\begin{align}
-y &= mx + b \\
-x &= \frac{y - b}{m}
-\end{align}
-$$
+# Meu Heading
+
+Renderiza como:
+
+<h1 id="meu-heading">Meu Heading</h1>
 ```
 
----
+## 🐛 Problemas Comuns com Plugins
 
-### 5. **rehype-katex**
+### Problema: "Plugin não funciona"
 
-Plugin rehype que renderiza as equações matemáticas do remark-math usando KaTeX.
+**Checklist:**
 
-**Instalado junto com remark-math** - Trabalham juntos!
+- ✅ Plugin está instalado (`npm list remark-xxx`)
+- ✅ Importado corretamente em `MarkdownPreview.tsx`
+- ✅ Adicionado no array `remarkPlugins`
+- ✅ Ordem está correta
+- ✅ CSS obrigatório importado (ex: `katex.min.css`)
 
----
+### Problema: "KaTeX renderiza como texto"
 
-## Exemplos Combinados
+**Causa:** Falta `import 'katex/dist/katex.min.css'`
 
-### Documento Técnico Completo
+**Solução:**
+
+```typescript
+// Em MarkdownPreview.tsx
+import 'katex/dist/katex.min.css';
+import { renderToString } from 'react-markdown';
+```
+
+### Problema: "Table of Contents não gera"
+
+**Causa:** Não tem `## Table of Contents` no markdown
+
+**Solução:** Adicionar linha ao markdown:
 
 ```markdown
-# Guia de Cálculo Diferencial
+# Meu Documento
 
-## Índice
+## Table of Contents
 
-(preenchido automaticamente)
+## Seção 1
 
-## Introdução :wave:
-
-O cálculo diferencial estuda as **derivadas** e suas aplicações.
-
-## Conceitos Fundamentais
-
-### Definição de Derivada
-
-A derivada de uma função $f(x)$ é definida como:
-
-$$
-f'(x) = \lim_{h \to 0} \frac{f(x+h) - f(x)}{h}
-$$
-
-### Exemplo Prático
-
-Primeira linha de código
-Segunda linha de código
-(quebras de linha simples funcionam agora)
-
-### Tabela de Derivadas Comuns
-
-| Função    | Derivada   |
-| --------- | ---------- |
-| $x^n$     | $nx^{n-1}$ |
-| $e^x$     | $e^x$      |
-| $\sin(x)$ | $\cos(x)$  |
-
-## Exercícios :pencil:
-
-1. Calcule a derivada de $f(x) = 3x^2 + 2x + 1$
-2. Encontre $f'(2)$ para $f(x) = x^3$
-3. Determine os pontos críticos de $f(x) = x^3 - 3x$
-
----
-
-[Voltar ao topo](#guia-de-calculo-diferencial)
+...
 ```
 
----
+### Problema: "Tabelas quebradas após adicionar remarkXXX"
 
-## Performance e Considerações
+**Causa:** `remarkGfm` não é o primeiro plugin
 
-### Quando usar cada plugin
+**Solução:** Colocar `remarkGfm` **sempre primeiro**:
 
-| Plugin        |               Use quando...                |                 Evite quando...                  |
-| ------------- | :----------------------------------------: | :----------------------------------------------: |
-| remark-breaks | Precisa respeitar quebras de linha simples | Quer o comportamento padrão markdown (2 espaços) |
-| remark-emoji  |  Quer documentos mais amigáveis e visuais  |    Cria documentos formais (relatórios, PDFs)    |
-| remark-toc    |       Documento tem mais de 5 seções       |       Documento é muito curto (<1 página)        |
-| remark-math   |  Contém equações matemáticas/científicas   |          Documentos puramente textuais           |
-| remark-slug   | Quer navegação interna e índices clicáveis |          Documentos sem links internos           |
+```typescript
+const remarkPlugins = [
+  remarkGfm, // SEMPRE PRIMEIRO
+  outroPlugin,
+];
+```
 
----
+### Problema: "Diagramas Mermaid não funcionam com markdown"
 
-## Limitações na Exportação DOCX
+**Nota:** Mermaid é renderizado separadamente em `MermaidDiagram.tsx`, não via plugins remark.
 
-⚠️ **Importante**: Nem todos os recursos funcionam na exportação para DOCX:
+Plugins remark são para markdown. Mermaid tem:
 
-- ✅ **Emojis** - Exportam normalmente
-- ✅ **Quebras de linha** - Exportam como `<br>`
-- ✅ **Slugs** - IDs dos headings são preservados
-- ⚠️ **Tabela de conteúdos** - Exporte como texto, não como índice dinâmico
-- ⚠️ **Equações matemáticas** - Exportam como imagens estáticas (renderizadas pelo KaTeX)
-- ⚠️ **Links internos** - Funcionam no preview, podem não funcionar em alguns visualizadores DOCX
+- Detecção: ` ```mermaid ` code blocks
+- Renderização: Component `<MermaidDiagram>`
+- Limpeza: Função `limparDiagramaMermaid()` em `lib/mermaid-cleaner.ts`
 
----
+## 📊 Matriz de Compatibilidade
 
-## Dicas e Truques
+| Plugin       | Versão | React 19 | Next.js 16 | DOCX | Observação                  |
+| ------------ | ------ | -------- | ---------- | ---- | --------------------------- |
+| remarkGfm    | 4.0.0  | ✅       | ✅         | ⚠️   | Deve ser primeiro           |
+| remarkBreaks | 4.0.0  | ✅       | ✅         | ✅   | Preserva quebras            |
+| remarkEmoji  | 5.0.2  | ✅       | ✅         | ✅   | Compatível                  |
+| remarkToc    | 9.0.0  | ✅       | ✅         | ⚠️   | Links não funcionam em DOCX |
+| remarkMath   | 6.0.0  | ✅       | ✅         | ❌   | Não exporta para DOCX       |
+| rehypeKatex  | 7.0.1  | ✅       | ✅         | ❌   | Requer CSS obrigatório      |
 
-### 1. **Combinar Múltiplos Recursos**
+## 📝 Referências de Sintaxe Rápida
+
+**GFM:**
 
 ```markdown
-# Projeto :rocket:
+| Col 1 | Col 2 |
+| ----- | ----- |
+| Dado  | Dado  |
 
-## Índice
+~~Riscado~~
 
-(gerado automaticamente)
-
-### Equação Principal
-
-A fórmula é $E = mc^2$ :fire:
-
-Primeira linha
-Segunda linha
-(ambas aparecem com quebra de linha)
+- [x] Feito
+- [ ] Pendente
 ```
 
-### 2. **Emojis em Headings**
+**Emojis:**
 
 ```markdown
-# 📚 Documentação
-
-## ✨ Features
-
-### 🎯 Objetivos
+:smile: :rocket: :tada: :heart: :thumbsup:
 ```
 
-### 3. **Equações em Listas**
+**Quebras de Linha:**
 
 ```markdown
-1. Primeira equação: $x = \frac{-b \pm \sqrt{b^2-4ac}}{2a}$
-2. Segunda equação: $y = mx + b$
-3. Terceira equação: $E = mc^2$
+Linha 1
+Linha 2
 ```
 
-### 4. **Navegação com Slugs**
+**Table of Contents:**
 
 ```markdown
-# Capítulo 1
-
-[Ir para Capítulo 2](#capitulo-2)
-
----
-
-# Capítulo 2
-
-[Voltar para Capítulo 1](#capitulo-1)
-[Ir para Capítulo 3](#capitulo-3)
-
----
-
-# Capítulo 3
-
-[Voltar para Capítulo 2](#capitulo-2)
+## Table of Contents
 ```
 
----
+**Math:**
 
-## Referências
+```markdown
+Inline: $a + b = c$
 
-- [remark-breaks](https://github.com/remarkjs/remark-breaks)
-- [remark-emoji](https://github.com/rhysd/remark-emoji)
-- [remark-toc](https://github.com/remarkjs/remark-toc)
-- [remark-math](https://github.com/remarkjs/remark-math)
-- [remark-slug](https://github.com/remarkjs/remark-slug)
-- [KaTeX Documentation](https://katex.org/)
-- [emoji cheat sheet](https://www.webfx.com/tools/emoji-cheat-sheet/)
-
----
-
-## Suporte
-
-Para dúvidas ou problemas com os plugins:
-
-1. Verifique a documentação oficial do plugin
-2. Abra uma issue no repositório
-3. Consulte os exemplos neste documento
+Display:
+$$\int_0^{\infty} e^{-x^2} dx = \frac{\sqrt{\pi}}{2}$$
+```

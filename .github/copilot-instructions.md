@@ -8,11 +8,12 @@
 
 - **Next.js 16.1.6** (App Router, Turbopack)
 - **React 19.0.0** com React Markdown 9.0.0 + remark-gfm 4.0.0
-- **NextAuth.js 4.24.0** (autenticação Google OAuth)
+- **NextAuth.js 4.24.0** (autenticação Google OAuth com escopo Google Drive)
 - **Tailwind CSS 3.3** + **Framer Motion 11.0.0** (animações)
 - **Zustand 4.4.0** (estado global com abas, persistência localStorage)
 - **docx 8.5.0** (exportação DOCX)
 - **Mermaid 11.12.3** (renderização de diagramas em preview)
+- **googleapis 171.4.0** (integração Google Drive para salvar DOCX na nuvem)
 - **TypeScript 5.3** + **ESLint 8.57 + Prettier 3.8** (linting e formatação)
 
 ## 🏗️ Arquitetura e Fluxo de Dados
@@ -312,13 +313,70 @@ const typography = require('@tailwindcss/typography');
 import typography from '@tailwindcss/typography';
 ```
 
-### 4. **Autenticação NextAuth**
+### 4. **Autenticação NextAuth e Integração Google Drive**
+
+#### NextAuth Configuration
 
 - Google OAuth via `GOOGLE_CLIENT_ID` e `GOOGLE_CLIENT_SECRET`
+- **Escopo crítico**: `https://www.googleapis.com/auth/drive.file` (permite salvar arquivos no Google Drive)
 - Callback: `/api/auth/callback/google`
 - Sessão persistida em context React (`SessionProvider` em `Providers.tsx`)
 - Acesso em componentes: `useSession()` hook
-- **Configuração**: `app/api/auth/[...nextauth].ts` define `authOptions` e pagina signin customizada `/auth/signin/page.tsx`
+- **Configuração**: `app/api/auth/[...nextauth].ts` define `authOptions` com callbacks JWT e session
+
+#### JWT/Session Callbacks Pattern
+
+```typescript
+// Em [...nextauth].ts: Armazena accessToken na sessão
+callbacks: {
+  async jwt({ token, account }) {
+    if (account) {
+      token.accessToken = account.access_token;
+      token.refreshToken = account.refresh_token;
+      token.expiresAt = account.expires_at;
+    }
+    return token;
+  },
+  async session({ session, token }) {
+    if (session.user) {
+      (session.user as any).accessToken = token.accessToken; // ✅ Acesso no cliente via useSession()
+    }
+    return session;
+  },
+}
+```
+
+#### Google Drive Integration (`lib/google-drive.ts` + `app/api/salvar-no-drive/route.ts`)
+
+**Client-side** (`lib/google-drive.ts`):
+
+- Função `salvarNoGoogleDrive(conteudo: string, nomeArquivo: string)` converte markdown → DOCX Blob → envia para API
+- Resposta: `{ sucesso, mensagem, idArquivo, urlArquivo }`
+
+**Server-side** (`app/api/salvar-no-drive/route.ts`):
+
+- Middleware: Valida sessão autenticada + extrai `accessToken` da sessão
+- Usa biblioteca `googleapis` para criar arquivo no Google Drive: `google.drive({ auth }).files.create()`
+- MIME type: `application/vnd.openxmlformats-officedocument.wordprocessingml.document`
+- Retorna: link público do arquivo (`https://drive.google.com/file/d/{id}/view`)
+
+**Padrão de uso em componentes**:
+
+```typescript
+const { data: session } = useSession();
+if (session?.user) {
+  const resultado = await salvarNoGoogleDrive(conteudo, nomeArquivo);
+  if (resultado.sucesso) {
+    // Mostrar toast: "Salvo em: " + resultado.urlArquivo
+  }
+}
+```
+
+**Padrão de segurança**:
+
+- API valida `session` servidor-side antes de acessar Google Drive
+- AccessToken obtido do JWT armazenado em NextAuth
+- Escopo `drive.file` garante permissões limitadas (apenas criar/editar próprios arquivos)
 
 ### 5. **Configuração Prettier e ESLint Específicas**
 
@@ -349,7 +407,7 @@ import typography from '@tailwindcss/typography';
 - **Padrão de testes**: `**/__tests__/**/*.[jt]s?(x)` ou `**/?(*.)+(spec|test).[jt]s?(x)`
 - **Coverage**: Coleta de `app/`, `components/`, `lib/` (exclui `.d.ts`, `node_modules`, `.next`, `coverage`)
 
-⚠️ **Nota crítica**: `jest.config.js` usa ES modules com `import nextJest from 'next/jest.js'`. O último `module.exports` é necessário para compatibilidade com Jest.
+⚠️ **Nota crítica**: `jest.config.cjs` usa ES modules com `import nextJest from 'next/jest.js'`. O último `module.exports` é necessário para compatibilidade com Jest. **Regra ESLint** `@typescript-eslint/no-require-imports` está **desativada** neste arquivo especificamente.
 
 ### **Estrutura de Testes para Store Zustand** (`__tests__/lib/store.test.ts`)
 
@@ -426,13 +484,22 @@ describe('MyComponent', () => {
 });
 ```
 
-### **Scripts de Teste**
+### **Scripts de Teste e Checklist Pre-Commit**
 
 ```bash
 npm run test                # Rodar testes uma vez
 npm run test:watch         # Modo watch (re-roda ao salvar)
 npm run test:coverage      # Coverage report (exclui .d.ts, node_modules, .next)
+npm run lint               # Falha se houver warnings (--max-warnings=0)
+npm run format:check       # Verifica formatação sem aplicar
 ```
+
+**Checklist antes de fazer commit**:
+
+1. `npm run lint:fix` — Corrigir problemas de linting
+2. `npm run format` — Formatar código com Prettier
+3. `npm run test` — Todos os testes passam
+4. `npm run build` — Build sem erros TypeScript
 
 ---
 
@@ -509,9 +576,51 @@ const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
 
 ### Documemtação de Desenvolvimento e Debug
 
-Usar a pasta ./docs para documentação de desenvolvimento, debug e armadilhas comuns. Esta seção é crítica para manutenção futura e onboarding de novos desenvolvedores.
+Usar a pasta `./docs/` para documentação de desenvolvimento, debug e armadilhas comuns. Esta seção é **crítica para manutenção futura** e onboarding de novos desenvolvedores.
+
+**Estrutura recomendada para `./docs/`**:
+
+- `ARCHITECTURE.md` — Diagrama e fluxos de dados detalhados
+- `REMARK_PLUGINS.md` — Documentação de todos os plugins remark instalados
+- `TROUBLESHOOTING.md` — Guia expandido de debugging e soluções
+- `CONTRIBUTING.md` — Padrões de desenvolvimento e conventions
+- `API_ROUTES.md` — Documentação de endpoints (auth, google-drive, etc.)
+- `GIT_HOOKS.md` — Git hooks automáticos pre-commit
+
 Todos os detalhes técnicos, padrões de código, armadilhas comuns e soluções de debug devem ser documentados aqui para referência rápida.
-O padrao é markdown com seções claras, exemplos de código e explicações detalhadas.
+O padrão é markdown com seções claras, exemplos de código e explicações detalhadas.
+
+### Git Hooks Automáticos
+
+**Arquivo:** `.husky/pre-commit`
+
+Git hooks pré-commit foram configurados para garantir qualidade antes de cada commit:
+
+1. **ESLint** — Linting e correção automática (`npm run lint:fix`)
+2. **Prettier** — Formatação de código (`npm run format`)
+3. **Jest** — Testes unitários (`npm run test`)
+4. **TypeScript Build** — Verificação de tipos (`npm run build`)
+
+**Arquivo:** `.husky/post-merge`
+
+Hook post-merge executa automaticamente após `git pull` se `package.json` ou `.husky` foram modificados:
+
+- Garante que hooks estão sempre sincronizados
+- Roda `npm run setup-hooks` automaticamente
+
+**Setup:**
+
+```bash
+# Primeira vez após clone
+npm run setup-hooks
+
+# Ou manual
+npx husky install
+chmod +x .husky/pre-commit
+chmod +x .husky/post-merge
+```
+
+**Uso:** Automático em cada `git commit` e `git pull`. Ver `docs/GIT_HOOKS.md` para mais detalhes.
 
 ### Build e Desenvolvimento
 
@@ -523,22 +632,191 @@ npm start                     # Produção
 npm run lint                  # Verificar linting
 npm run lint:fix              # Corrigir problemas automáticos
 npm run format                # Formatar código com Prettier
+npm run format:check          # Verificar formatação sem aplicar
+npm run test:watch            # Testes em modo watch durante desenvolvimento
 ```
 
-### Debug Comum
+### Variáveis de Ambiente Obrigatórias (`.env.local`)
 
-- **"Abas não salvam"**: Verificar `salvarNoStorage()` e localStorage em DevTools → localStorage
-- **"Aba não renderiza preview"**: Verificar `abaAtual` em `page.tsx` (deve ser não-nulo) → pode estar undefined
-- **"Export não funciona"**: Verificar console — `markdownToDocx()` deve não lançar erro
-- **"Type errors"**: Rodar `npx tsc --noEmit` para verificar tipos
-- **"NEXTAUTH_SECRET missing"**: Adicionar variável de ambiente aleatória (mínimo 32 bytes) → `openssl rand -base64 32`
-- **"Session null"**: Verificar `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `NEXTAUTH_SECRET` em `.env.local`
-- **"Mermaid não renderiza"**: Verificar sintaxe em [mermaid.live](https://mermaid.live) → provavelmente erro na sintaxe do diagrama
-- **"Zustand state não atualiza"**: Verificar que componente está marcado com `'use client'` → necessário para hooks
-- **"Jest test fails com 'module is not defined'"**: `jest.config.js` está em ES module mas precisa `module.exports` no final — regra ESLint `@typescript-eslint/no-require-imports` desativada para este arquivo
-- **"ReferenceError: localStorage is not defined"**: Sempre usar `typeof window !== 'undefined'` antes de acessar `localStorage` (SSR safety)
-- **"Plugins remark não funcionam"**: Verificar ordem em `remarkPlugins={[remarkGfm, remarkBreaks, remarkEmoji, remarkToc, remarkMath]}` — ordem importa!
-- **"KaTeX não renderiza"**: Incluir `import 'katex/dist/katex.min.css'` antes de usar `rehypeKatex`
+```env
+# NextAuth
+NEXTAUTH_SECRET=<gerar com: openssl rand -base64 32>
+NEXTAUTH_URL=http://localhost:3000
+
+# Google OAuth
+GOOGLE_CLIENT_ID=seu-google-client-id
+GOOGLE_CLIENT_SECRET=seu-google-client-secret
+```
+
+**Para Produção (Vercel/Deploy)**:
+
+- `NEXTAUTH_SECRET` — novo aleatório (nunca copiar do dev!)
+- `NEXTAUTH_URL` — seu domínio de produção (ex: https://seu-dominio.com)
+- Google OAuth — adicionar URI autorizada no Google Cloud Console
+
+### Debug Comum - Checklist Rápido
+
+**"Session is null" ou "Not authenticated"**
+
+```bash
+# 1. Verificar .env.local:
+cat .env.local | grep -E "NEXTAUTH|GOOGLE"
+
+# 2. Regenerar NEXTAUTH_SECRET se vazio
+openssl rand -base64 32
+
+# 3. Limpar cookies e cache no navegador
+# F12 > Application > Storage > Clear Site Data
+
+# 4. Reiniciar servidor
+npm run dev
+```
+
+**"Abas não salvam"**
+
+- Verificar localStorage em DevTools: F12 > Application > Storage
+- Confirmar que `salvarNoStorage()` é chamado
+- Verificar keys: `markdown-studio-abas` e `markdown-studio-aba-ativa`
+- Se corrompidas: `localStorage.clear()` no console do navegador
+
+**"Aba não renderiza preview"**
+
+- Verificar se `abaAtiva` está definida em `page.tsx` (deve ser non-null)
+- Testar com markdown simples: `# Título\nParágrafo`
+- Verificar console do navegador para erros do `ReactMarkdown`
+
+**"Export não funciona"**
+
+- Verificar console → `markdownToDocx()` deve não lançar erro
+- Se muito grande, quebrar em seções menores
+- Usuário deve estar autenticado
+
+**"Diagramas Mermaid não renderizam"**
+
+- Validar sintaxe em https://mermaid.live
+- Remover tags `<br/>` dentro do diagrama (não suportadas)
+- Verificar console para mensagens de erro específicas
+
+**"Salvar no Google Drive falha"**
+
+- Verificar escopo OAuth: `https://www.googleapis.com/auth/drive.file` (em `[...nextauth].ts`)
+- Confirmar que `accessToken` está na sessão: `useSession()` → `session.user.accessToken`
+- Validar API endpoint: `POST /api/salvar-no-drive`
+- Se erro 401: fazer logout e login novamente para renovar token
+
+**"Type errors ao fazer build"**
+
+```bash
+npx tsc --noEmit     # Verificar tipos sem build
+npm run build         # Build completo
+```
+
+**"ESLint/Prettier errors"**
+
+```bash
+npm run lint:fix     # Corrige automaticamente
+npm run format       # Formata com Prettier
+```
+
+**"Jest test fails com 'module is not defined'"**
+
+- `jest.config.cjs` está em ES module mas precisa `module.exports` no final
+- Regra ESLint `@typescript-eslint/no-require-imports` está desativada para este arquivo
+- **Solução**: Não editar jest.config.cjs (já configurado corretamente)
+
+**"ReferenceError: localStorage is not defined"**
+
+- Sempre usar `typeof window !== 'undefined'` antes de acessar `localStorage` (SSR safety)
+- Pattern correto: `if (typeof window !== 'undefined') { localStorage.getItem(...) }`
+
+**"Plugins remark não funcionam"**
+
+- Verificar ordem: `[remarkGfm, remarkBreaks, remarkEmoji, remarkToc, remarkMath]` — **ordem importa!**
+- KaTeX: Incluir `import 'katex/dist/katex.min.css'` antes de usar `rehypeKatex`
+- Validar sintaxe especial (ex: `$...$` para math, `## Table of Contents` para TOC)
+
+**"Porta 3000 já em uso"**
+
+```bash
+# macOS/Linux
+kill -9 $(lsof -t -i :3000)
+
+# Ou usar porta diferente
+PORT=3001 npm run dev
+```
+
+**"Dependências com conflito"**
+
+```bash
+rm -rf node_modules package-lock.json
+npm install
+npm run dev
+```
+
+---
+
+## 🎯 Padrões Críticos e Fluxos de Desenvolvimento
+
+### Adicionando Novas Funcionalidades ao Editor Markdown
+
+**Padrão para novos plugins remark**:
+
+1. Instalar plugin npm (ex: `npm install remark-nova-feature`)
+2. Importar em `MarkdownPreview.tsx` → `remarkPlugins={[..., remarkNovaFeature]}`
+3. Adicionar CSS global se necessário (ex: KaTeX precisa de `katex.min.css`)
+4. Testar com markdown específico no editor
+5. Validar que a ordem dos plugins está correta (GFM deve ser primeiro!)
+
+### Adicionando Novos Componentes de UI
+
+**Padrão para shadcn/ui components**:
+
+1. Usar `npx shadcn-ui@latest add nome-componente`
+2. Componentes gerados em `components/ui/`
+3. Importar como `import { NovoComponente } from '@/components/ui/novo-componente'`
+4. Marcar componente parent com `'use client'` se usar interação
+5. Componentes shadcn são acessíveis por padrão (ARIA labels inclusos)
+
+### Estendendo o Sistema de Abas
+
+**Padrão para novas operações em abas**:
+
+1. Adicionar tipo/interface em `lib/store.ts` (exemplo: `interface NovosDados { ... }`)
+2. Estender `AbaData` se for persistir dados por aba
+3. Adicionar ação no `useAppStore` (exemplo: `novaOperacao: () => void`)
+4. Atualizar persistência em `carregarDoStorage()` se precisar migrar dados antigos
+5. Validar que `fecharTodasAsAbas()` limpa dados corretamente
+
+### Atualizando a Conversão Markdown → DOCX
+
+**Padrão para novos elementos markdown**:
+
+1. Adicionar tipo em `ParsedMarkdown[]` em `markdown-to-docx.ts` (ex: `myNewType`)
+2. Adicionar regex/parsing para detectar o elemento
+3. Adicionar handler em `Document.create()` que converte para `Paragraph` ou estrutura docx equivalente
+4. **Testar exportação**: criar markdown com novo elemento → clicar "Exportar" → validar DOCX em Word/Google Docs
+5. Lembrar: `docx@8.5.0` não suporta `ListItem` (usar `Paragraph` com marcadores) nem SVG inline
+
+### Modificando Estilo/Tema
+
+**Padrão para customizar design**:
+
+1. Cores primárias: Tailwind default é `neutral-{50..900}` (sem cores como `blue`, `red`)
+2. Adicionar cores customizadas em `tailwind.config.ts` → `colors: { custom: { ... } }`
+3. Typography: Plugin `@tailwindcss/typography` fornece clase `prose` para markdown
+4. Animações: Framer Motion com `motion.div`, `motion.button` em componentes React
+5. Responsividade: usar `md:`, `lg:` prefixes (mobile-first) - testar em DevTools
+
+### Integrando Nova API Externa
+
+**Padrão para API routes**:
+
+1. Criar arquivo em `app/api/novo-endpoint/route.ts`
+2. Usar `NextRequest` / `NextResponse` do next/server
+3. Se precisar autenticação: `const session = await getServerSession(authOptions)`
+4. Se precisar Google Drive scope: validar `session.user.accessToken` está disponível
+5. Retornar `NextResponse.json({ ... })` para sucesso ou erro com status code apropriado
+6. Testar com `curl` ou Postman antes de integrar no frontend
 
 ---
 
@@ -576,3 +854,8 @@ Sincronizadas com `package.json`:
 - `@typescript-eslint@8.0.0` — TypeScript ESLint
 - `prettier@3.8.1` — Code formatting
 - `typescript@5.3.0` — Tipagem estrita
+
+## IMPORTANTE
+
+So criar um novo arquivo markdown para cada seção (ex: `ARCHITECTURE.md`, `REMARK_PLUGINS.md`, etc.) e linkar aqui. Manter este arquivo como um índice de instruções e padrões críticos, com links para documentação detalhada em `./docs/`.
+Nao criar novos. Só se solicitado em prompts futuros.

@@ -455,49 +455,6 @@ Se persistirem, verificar que `tsconfig.json` tem `"strict": true` e todos os ti
 
 A pasta `./docs` contém documentação técnica abrangente para desenvolvimentos, troubleshooting e onboarding de novos desenvolvedores. Esta seção é **crítica para manutenção futura** da aplicação.
 
-### Conteúdo da Documentação
-
-Todos os arquivos de documentação estão estruturados em **markdown com seções claras, exemplos de código executáveis e explicações detalhadas**:
-
-| Documento                       | Descrição                                | Conteúdo                                            |
-| ------------------------------- | ---------------------------------------- | --------------------------------------------------- |
-| **REMARK_PLUGINS.md**           | Guia completo de plugins remark          | Como usar emoji, math, TOC, breaks com exemplos     |
-| **GUIA_RAPIDO_SHADCN.md**       | Referência rápida de componentes         | Componentes shadcn/ui disponíveis, props e patterns |
-| **GUIA_TESTES.md**              | Padrões de testes Jest + RTL             | Estrutura, mocks, assertions com exemplos completos |
-| **ESLINT_TESTS.md**             | Checklist ESLint/Prettier                | Regras ativas, overrides, debugging de linting      |
-| **INSTALACAO_PLUGINS.md**       | Processo de instalação de remark plugins | Passo-a-passo para adicionar novos plugins          |
-| **COMPONENTES_SHADCN.md**       | Componentes UI disponíveis               | Lista de componentes com exemplos de uso            |
-| **exemplo-completo-plugins.md** | Exemplos completos e funcionais          | Markdown com todos os plugins simultâneos           |
-| **ANTES_DEPOIS.md**             | Histórico de evolução                    | Mudanças maiores da aplicação ao longo do tempo     |
-| **CHECKLIST_FINAL.md**          | Checklist de deploy                      | Validações antes de colocar em produção             |
-
-### Padrões Documentados
-
-A documentação cobre:
-
-- ✅ **Padrões de Código**: Convenções React, Next.js, TypeScript usadas no projeto
-- ✅ **Armadilhas Comuns**: Problemas frequentes durante desenvolvimento e como evitá-los
-- ✅ **Soluções de Debug**: Troubleshooting específico com etapas de resolução
-- ✅ **Exemplos Práticos**: Código completo e funcionário para cada padrão
-- ✅ **Detalhes Técnicos**: Explicação profunda de implementações complexas
-
-### Como Usar a Documentação
-
-1. **Iniciar novo desenvolvimento**: Consulte `.github/copilot-instructions.md` para contexto arquitetural
-2. **Adicionar novo plugin remark**: Veja `docs/INSTALACAO_PLUGINS.md` e `docs/REMARK_PLUGINS.md`
-3. **Escrever testes**: Consulte `docs/GUIA_TESTES.md` para padrões Jest e RTL
-4. **Debugar problemas**: Comece por `docs/ESLINT_TESTS.md` ou a seção **Troubleshooting** abaixo
-5. **Componentes UI**: Consulte `docs/COMPONENTES_SHADCN.md` para referência rápida
-6. **Deploy em produção**: Verifique `docs/CHECKLIST_FINAL.md` antes de ir ao ar
-
-### Recursos Adicionais
-
-- **GitHub Copilot/Claude**: Use `.github/copilot-instructions.md` para IA compreender arquitetura
-- **Novos Desenvolvedores**: Comece por `docs/GUIA_RAPIDO_SHADCN.md` + `docs/GUIA_TESTES.md`
-- **Code Review**: Verifique `docs/ESLINT_TESTS.md` para consistência com o projeto
-
----
-
 ### Estado e Persistência
 
 **Abas não salvam**

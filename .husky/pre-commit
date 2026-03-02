@@ -1,0 +1,60 @@
+
+echo "🔍 Executando verificações pre-commit..."
+echo ""
+
+PRECISA_RETRY=0
+
+# 1. ESLint + Prettier
+echo "📝 Executando ESLint..."
+if ! npm run lint:fix; then
+  echo "❌ ESLint encontrou problemas"
+  PRECISA_RETRY=1
+fi
+
+echo "✅ ESLint corrigido"
+echo ""
+
+# 2. Prettier
+echo "🎨 Formatando com Prettier..."
+if ! npm run format; then
+  echo "❌ Prettier encontrou problemas"
+  PRECISA_RETRY=1
+fi
+
+echo "✅ Prettier aplicado"
+echo ""
+
+# Se ESLint ou Prettier tiveram problemas, pedir para committar novamente
+if [ $PRECISA_RETRY -eq 1 ]; then
+  echo ""
+  echo "⚠️  Prettier ou ESLint fizeram alterações"
+  echo ""
+  echo "Execute novamente:"
+  echo "   git add ."
+  echo "   git commit -m \"<sua mensagem>\""
+  echo ""
+  exit 1
+fi
+
+# 3. Testes
+echo "🧪 Executando testes..."
+if ! npm run test -- --passWithNoTests; then
+  echo "❌ Testes falharam"
+  exit 1
+fi
+
+echo "✅ Testes passaram"
+echo ""
+
+# 4. Build TypeScript
+echo "🔨 Verificando build..."
+if ! npm run build; then
+  echo "❌ Build falhou"
+  exit 1
+fi
+
+echo "✅ Build passou"
+echo ""
+
+echo "✅ Todas as verificações passaram! Commit permitido."
+

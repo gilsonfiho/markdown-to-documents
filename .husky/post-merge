@@ -1,0 +1,24 @@
+
+echo "🔄 Git pull detectado..."
+echo ""
+
+# Verificar se package.json foi modificado
+if git diff --name-only HEAD@{1} HEAD | grep -q "package.json"; then
+  echo "📦 package.json ou .husky foram modificados"
+  echo "🔧 Executando setup de hooks..."
+  echo ""
+
+  # Executar setup-hooks
+  if npm install; then
+    echo ""
+    echo "✅ Bibliotecas atualizadas com sucesso!"
+  else
+    echo ""
+    echo "⚠️ Erro ao atualizar hooks. Por favor, execute manualmente:"
+    echo "   npm install"
+  fi
+else
+  echo "✅ Nenhuma alteração em package.json"
+fi
+
+echo ""

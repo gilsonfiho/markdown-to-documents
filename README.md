@@ -459,17 +459,17 @@ A pasta `./docs` contém documentação técnica abrangente para desenvolvimento
 
 Todos os arquivos de documentação estão estruturados em **markdown com seções claras, exemplos de código executáveis e explicações detalhadas**:
 
-| Documento | Descrição | Conteúdo |
-|-----------|-----------|----------|
-| **REMARK_PLUGINS.md** | Guia completo de plugins remark | Como usar emoji, math, TOC, breaks com exemplos |
-| **GUIA_RAPIDO_SHADCN.md** | Referência rápida de componentes | Componentes shadcn/ui disponíveis, props e patterns |
-| **GUIA_TESTES.md** | Padrões de testes Jest + RTL | Estrutura, mocks, assertions com exemplos completos |
-| **ESLINT_TESTS.md** | Checklist ESLint/Prettier | Regras ativas, overrides, debugging de linting |
-| **INSTALACAO_PLUGINS.md** | Processo de instalação de remark plugins | Passo-a-passo para adicionar novos plugins |
-| **COMPONENTES_SHADCN.md** | Componentes UI disponíveis | Lista de componentes com exemplos de uso |
-| **exemplo-completo-plugins.md** | Exemplos completos e funcionais | Markdown com todos os plugins simultâneos |
-| **ANTES_DEPOIS.md** | Histórico de evolução | Mudanças maiores da aplicação ao longo do tempo |
-| **CHECKLIST_FINAL.md** | Checklist de deploy | Validações antes de colocar em produção |
+| Documento                       | Descrição                                | Conteúdo                                            |
+| ------------------------------- | ---------------------------------------- | --------------------------------------------------- |
+| **REMARK_PLUGINS.md**           | Guia completo de plugins remark          | Como usar emoji, math, TOC, breaks com exemplos     |
+| **GUIA_RAPIDO_SHADCN.md**       | Referência rápida de componentes         | Componentes shadcn/ui disponíveis, props e patterns |
+| **GUIA_TESTES.md**              | Padrões de testes Jest + RTL             | Estrutura, mocks, assertions com exemplos completos |
+| **ESLINT_TESTS.md**             | Checklist ESLint/Prettier                | Regras ativas, overrides, debugging de linting      |
+| **INSTALACAO_PLUGINS.md**       | Processo de instalação de remark plugins | Passo-a-passo para adicionar novos plugins          |
+| **COMPONENTES_SHADCN.md**       | Componentes UI disponíveis               | Lista de componentes com exemplos de uso            |
+| **exemplo-completo-plugins.md** | Exemplos completos e funcionais          | Markdown com todos os plugins simultâneos           |
+| **ANTES_DEPOIS.md**             | Histórico de evolução                    | Mudanças maiores da aplicação ao longo do tempo     |
+| **CHECKLIST_FINAL.md**          | Checklist de deploy                      | Validações antes de colocar em produção             |
 
 ### Padrões Documentados
 

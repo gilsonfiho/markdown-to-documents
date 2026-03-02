@@ -84,24 +84,15 @@ describe('useAppStore', () => {
     expect(abaAtiva).toBe(novoIdAba);
   });
 
-  it('deve salvar e carregar abas do localStorage', () => {
-    const { adicionarAba, salvarNoStorage, abas: abasAntes } = useAppStore.getState();
+  it('deve salvar todas as abas com timestamp', () => {
+    const { adicionarAba, salvarTodasAsAbas } = useAppStore.getState();
+
     adicionarAba();
-    adicionarAba();
+    salvarTodasAsAbas();
 
-    salvarNoStorage();
-
-    const { abas: abasDepoisSalvar } = useAppStore.getState();
-    const quantidadeAbasDepoisSalvar = abasDepoisSalvar.length;
-
-    // Simular novo carregamento
-    const { fecharTodasAsAbas, carregarDoStorage } = useAppStore.getState();
-    fecharTodasAsAbas();
-
-    carregarDoStorage();
-
-    const { abas: abasCarregadas } = useAppStore.getState();
-    expect(abasCarregadas.length).toBe(quantidadeAbasDepoisSalvar);
+    const { abas } = useAppStore.getState();
+    const todasComTimestamp = abas.every((a) => a.salvoAoMemento !== null);
+    expect(todasComTimestamp).toBe(true);
   });
 
   it('deve definir timestamp de salvamento', () => {

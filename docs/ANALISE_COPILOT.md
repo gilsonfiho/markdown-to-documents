@@ -8,22 +8,23 @@ Analisar o codebase **Markdown Studio** para gerar/atualizar instruções de IA 
 
 ## 📈 Resumo das Mudanças
 
-| Aspecto | Status | Detalhes |
-|---------|--------|----------|
-| **Linhas do arquivo** | ✅ 430 → 573 | +143 linhas (+33% conteúdo) |
-| **Componentes React** | ✅ Atualizado | Refletir `useAppStore` real com `mostrarPreview` |
-| **Zustand Store** | ✅ Expandido | Documentadas todas 18 funções/propriedades |
-| **Prettier Config** | ✅ Corrigido | `printWidth: 100` → `printWidth: 250` |
-| **Testes Jest** | ✅ Novo | Seção completa com RTL patterns |
-| **Remark Plugins** | ✅ Documentado | 6 plugins com versões e use cases |
-| **Debug Common** | ✅ Expandido | 12 itens comuns com soluções específicas |
-| **NextAuth** | ✅ Mantido | Google OAuth flow documentado |
+| Aspecto               | Status         | Detalhes                                         |
+| --------------------- | -------------- | ------------------------------------------------ |
+| **Linhas do arquivo** | ✅ 430 → 573   | +143 linhas (+33% conteúdo)                      |
+| **Componentes React** | ✅ Atualizado  | Refletir `useAppStore` real com `mostrarPreview` |
+| **Zustand Store**     | ✅ Expandido   | Documentadas todas 18 funções/propriedades       |
+| **Prettier Config**   | ✅ Corrigido   | `printWidth: 100` → `printWidth: 250`            |
+| **Testes Jest**       | ✅ Novo        | Seção completa com RTL patterns                  |
+| **Remark Plugins**    | ✅ Documentado | 6 plugins com versões e use cases                |
+| **Debug Common**      | ✅ Expandido   | 12 itens comuns com soluções específicas         |
+| **NextAuth**          | ✅ Mantido     | Google OAuth flow documentado                    |
 
 ---
 
 ## 🔍 Descobertas do Codebase
 
 ### Arquitetura Confirmada ✅
+
 - **Next.js 16.1.6** com App Router e Turbopack
 - **React 19.0.0** com JSX Transform (sem import React necessário)
 - **Zustand 4.4.0** para state management com persistência localStorage
@@ -31,22 +32,26 @@ Analisar o codebase **Markdown Studio** para gerar/atualizar instruções de IA 
 - **NextAuth.js 4.24.0** com Google OAuth
 
 ### Sistema de Abas Operacional ✅
+
 ```typescript
 interface AbaData {
-  id: string;                // Único via Date.now() + random
-  nome: string;              // Renomeável via duplo-clique
-  conteudo: string;          // Markdown editável
+  id: string; // Único via Date.now() + random
+  nome: string; // Renomeável via duplo-clique
+  conteudo: string; // Markdown editável
   salvoAoMemento: string | null; // Timestamp "Salvo às HH:MM:SS" (limpa após 3s)
 }
 ```
 
 ### Preview Toggle Feature ✅
+
 Store oferece controle de visibilidade em mobile:
+
 - `mostrarPreview: boolean`
 - `setMostrarPreview(valor: boolean)`
 - `toggleMostrarPreview()`
 
 ### Plugins Remark Confirmados ✅
+
 1. **remarkGfm** 4.0.0 — Tabelas, strikethrough, task lists
 2. **remarkBreaks** 4.0.0 — Quebras de linha em `<br>`
 3. **remarkEmoji** 5.0.2 — Emojis markdown (`:smile:` → 😄)
@@ -55,9 +60,10 @@ Store oferece controle de visibilidade em mobile:
 6. **rehypeKatex** 7.0.1 — Renderização de equações
 
 ### Testes Implementados ✅
+
 - **Jest** configurado com `jest-environment-jsdom`
-- **__tests__/lib/store.test.ts** com 14 testes de Zustand
-- **__tests__/components/** com padrões RTL
+- ****tests**/lib/store.test.ts** com 14 testes de Zustand
+- ****tests**/components/** com padrões RTL
 - Coverage coleta de `app/`, `components/`, `lib/`
 
 ---
@@ -65,11 +71,13 @@ Store oferece controle de visibilidade em mobile:
 ## 📚 Seções Documentadas
 
 ### 1. Visão Geral do Projeto
+
 - ✅ Stack tecnológico com versões
 - ✅ Funcionalidades listadas
 - ✅ Integrações principais
 
 ### 2. Arquitetura
+
 - ✅ Estrutura de pastas
 - ✅ Sistema de abas (crítico!)
 - ✅ Fluxo de dados completo (7 etapas)
@@ -77,6 +85,7 @@ Store oferece controle de visibilidade em mobile:
 - ✅ localStorage chaves
 
 ### 3. Padrões React
+
 - ✅ Componentes client vs server
 - ✅ Estrutura típica com hooks
 - ✅ **Preview toggle** (novo)
@@ -84,29 +93,34 @@ Store oferece controle de visibilidade em mobile:
 - ✅ ReactMarkdown custom handlers
 
 ### 4. Markdown → DOCX
+
 - ✅ Parsing e tokenização
 - ✅ Headings, listas, código
 - ✅ Estruturas ASCII
 - ✅ Limitação: sem ListItem (`docx@8.5.0`)
 
 ### 5. Remark Plugins
+
 - ✅ Configuração com 6 plugins
 - ✅ Ordem importa!
 - ✅ KaTeX/Math support
 - ✅ Mermaid diagrams
 
 ### 6. Autenticação
+
 - ✅ Google OAuth flow
 - ✅ SessionProvider setup
 - ✅ NextAuth endpoints
 
 ### 7. ESLint + Prettier
+
 - ✅ Regras específicas
 - ✅ **Prettier printWidth: 250** (corrigido)
 - ✅ Overrides para TSX/HTML
 - ✅ React 19 sem require imports
 
 ### 8. Testes (Novo!) 🆕
+
 - ✅ Jest configuration
 - ✅ Padrão Zustand com `getState()`
 - ✅ Exemplos RTL completos
@@ -114,16 +128,19 @@ Store oferece controle de visibilidade em mobile:
 - ✅ Coverage excludes
 
 ### 9. Componentes Específicos
+
 - ✅ Header component
 - ✅ MarkdownEditor component
 - ✅ TabsBar component
 - ✅ Page component com proteção
 
 ### 10. Build e Desenvolvimento
+
 - ✅ Scripts npm listados
 - ✅ 12 debug common items (expandido)
 
 ### 11. Armadilhas Conhecidas
+
 - ✅ ListItem limitation
 - ✅ localStorage + SSR
 - ✅ React 19 patterns
@@ -134,6 +151,7 @@ Store oferece controle de visibilidade em mobile:
 ## 🎓 Instruções para AI Agents
 
 ### Padrão de Acesso ao Store
+
 ```typescript
 // ✅ Correto
 const { abas, abaAtiva, atualizarAba, salvarNoStorage } = useAppStore();
@@ -143,6 +161,7 @@ const { markdown, setMarkdown } = useAppStore(); // Não existem
 ```
 
 ### Padrão de Testes
+
 ```typescript
 // ✅ Correto
 const { adicionarAba } = useAppStore.getState();
@@ -154,6 +173,7 @@ render(<Component />, { wrapper: StoreProvider }); // Desnecessário para store
 ```
 
 ### Padrão de Exportação DOCX
+
 ```typescript
 // ✅ Correto - usar Paragraph com marcador
 new Paragraph({
@@ -166,6 +186,7 @@ new ListItem({ text: 'Item' }); // Não suportado em docx@8.5.0
 ```
 
 ### Padrão de Plugins Remark
+
 ```typescript
 // ✅ Correto - ordem importa!
 remarkPlugins={[remarkGfm, remarkBreaks, remarkEmoji, remarkToc, remarkMath]}
@@ -193,11 +214,11 @@ remarkPlugins={[remarkEmoji, remarkGfm]} // Ordem errada
 
 ## 📁 Arquivos Criados/Atualizados
 
-| Arquivo | Ação | Linhas |
-|---------|------|--------|
-| `.github/copilot-instructions.md` | ✅ Atualizado | 430 → 573 |
-| `.github/COPILOT-UPDATES.md` | ✅ Criado | 157 |
-| `ANÁLISE_COPILOT.md` | ✅ Este arquivo | - |
+| Arquivo                           | Ação            | Linhas    |
+| --------------------------------- | --------------- | --------- |
+| `.github/copilot-instructions.md` | ✅ Atualizado   | 430 → 573 |
+| `.github/COPILOT-UPDATES.md`      | ✅ Criado       | 157       |
+| `ANÁLISE_COPILOT.md`              | ✅ Este arquivo | -         |
 
 ---
 
@@ -310,4 +331,3 @@ Remark Plugins: 6
 **Versão do Documento**: 1.0  
 **Compatível com**: Markdown Studio v1.0.18+  
 **Framework Stack**: Next.js 16.1.6 + React 19.0.0 + Zustand 4.4.0
-

@@ -240,10 +240,10 @@ return (
   <div className="flex flex-1 overflow-hidden gap-px">
     {/* Editor sempre visível */}
     <MarkdownEditor />
-    
+
     {/* Preview toggle em mobile */}
     {mostrarPreview && <MarkdownPreview />}
-    
+
     <button onClick={toggleMostrarPreview}>
       {mostrarPreview ? <Eye /> : <EyeOff />}
     </button>
@@ -361,7 +361,7 @@ import { useAppStore } from '@/lib/store';
 describe('useAppStore', () => {
   beforeEach(() => {
     const { fecharTodasAsAbas } = useAppStore.getState();
-    fecharTodasAsAbas();  // Reset state antes de cada teste
+    fecharTodasAsAbas(); // Reset state antes de cada teste
   });
 
   it('deve adicionar uma nova aba', () => {

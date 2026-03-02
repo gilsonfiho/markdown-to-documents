@@ -3,12 +3,14 @@
 ## 📊 Resumo das Mudanças
 
 ### Antes
+
 - **Linhas**: 430
 - **Seções**: 11
 - **Exemplos de código**: 12
 - **Testes documentados**: ❌ Não
 
 ### Depois ✨
+
 - **Linhas**: 573 (+33%)
 - **Seções**: 12 (+1)
 - **Exemplos de código**: 24 (+100%)
@@ -21,11 +23,13 @@
 ### 1️⃣ Componentes React (CORRIGIDO)
 
 **ANTES**:
+
 ```typescript
 const { markdown, setMarkdown } = useAppStore();
 ```
 
 **DEPOIS** ✅:
+
 ```typescript
 const { abas, abaAtiva, salvarNoStorage } = useAppStore();
 // Reflete função real do store
@@ -38,6 +42,7 @@ const { abas, abaAtiva, salvarNoStorage } = useAppStore();
 **ANTES**: Não documentado
 
 **DEPOIS** ✅:
+
 ```typescript
 const { mostrarPreview, toggleMostrarPreview } = useAppStore();
 
@@ -50,6 +55,7 @@ const { mostrarPreview, toggleMostrarPreview } = useAppStore();
 ### 3️⃣ Zustand Store Interface
 
 **ANTES**:
+
 ```typescript
 interface AppStore {
   abas: AbaData[];
@@ -59,15 +65,16 @@ interface AppStore {
 ```
 
 **DEPOIS** ✅:
+
 ```typescript
 interface AppStore {
   abas: AbaData[];
   abaAtiva: string;
-  mostrarPreview: boolean;        // ← NOVO
-  textoSelecionado: string;       // ← NOVO
-  
-  setMostrarPreview: (valor: boolean) => void;    // ← NOVO
-  toggleMostrarPreview: () => void;               // ← NOVO
+  mostrarPreview: boolean; // ← NOVO
+  textoSelecionado: string; // ← NOVO
+
+  setMostrarPreview: (valor: boolean) => void; // ← NOVO
+  toggleMostrarPreview: () => void; // ← NOVO
   // ... 18 funções (completo)
 }
 ```
@@ -77,11 +84,13 @@ interface AppStore {
 ### 4️⃣ Prettier Configuration (CORRIGIDO)
 
 **ANTES**:
+
 ```
 printWidth: 100
 ```
 
 **DEPOIS** ✅:
+
 ```
 printWidth: 250  ✓ Alinhado com .prettierrc.cjs real
 ```
@@ -93,16 +102,18 @@ printWidth: 250  ✓ Alinhado com .prettierrc.cjs real
 **ANTES**: Nenhuma seção de testes
 
 **DEPOIS** ✅: Seção completa `🧪 Padrões de Testes` com:
+
 - Jest configuration details
 - Zustand store test patterns
 - React Testing Library examples
 - Test scripts documentation
 
 **Exemplo incluído**:
+
 ```typescript
 beforeEach(() => {
   const { fecharTodasAsAbas } = useAppStore.getState();
-  fecharTodasAsAbas();  // Reset antes de cada teste
+  fecharTodasAsAbas(); // Reset antes de cada teste
 });
 
 it('deve adicionar uma nova aba', () => {
@@ -116,11 +127,13 @@ it('deve adicionar uma nova aba', () => {
 ### 6️⃣ Remark Plugins (EXPANDIDO)
 
 **ANTES**:
+
 ```
 - Renderização de Diagramas Mermaid
 ```
 
 **DEPOIS** ✅:
+
 ```
 - remarkGfm 4.0.0
 - remarkBreaks 4.0.0
@@ -144,12 +157,14 @@ Com notas sobre:
 **DEPOIS** ✅: 12 itens (+50%)
 
 **Novos items**:
+
 - "Jest test fails com 'module is not defined'"
 - "ReferenceError: localStorage is not defined"
 - "Plugins remark não funcionam"
 - "KaTeX não renderiza"
 
 **Exemplo**:
+
 ```
 "Jest test fails..." → Explicar jest.config.js ES modules
 "localStorage..." → SSR safety check typeof window
@@ -163,18 +178,18 @@ Com notas sobre:
 
 ### Coverage Melhorada
 
-| Tópico | Antes | Depois | Status |
-|--------|-------|--------|--------|
-| Arquitetura | ✅ | ✅✅ | Expandido |
-| Padrões React | ✅ | ✅✅ | +Preview Toggle |
-| Zustand Store | ✅ | ✅✅ | Completo |
-| Autenticação | ✅ | ✅ | Mantido |
-| ESLint/Prettier | ✅ | ✅✅ | Corrigido printWidth |
-| **Testes** | ❌ | ✅✅ | **NOVO** |
-| Markdown Export | ✅ | ✅ | Mantido |
-| Remark Plugins | ✅ | ✅✅ | Expandido |
-| Debug Common | ✅ | ✅✅ | +50% items |
-| Versões | ✅ | ✅ | Sincronizado |
+| Tópico          | Antes | Depois | Status               |
+| --------------- | ----- | ------ | -------------------- |
+| Arquitetura     | ✅    | ✅✅   | Expandido            |
+| Padrões React   | ✅    | ✅✅   | +Preview Toggle      |
+| Zustand Store   | ✅    | ✅✅   | Completo             |
+| Autenticação    | ✅    | ✅     | Mantido              |
+| ESLint/Prettier | ✅    | ✅✅   | Corrigido printWidth |
+| **Testes**      | ❌    | ✅✅   | **NOVO**             |
+| Markdown Export | ✅    | ✅     | Mantido              |
+| Remark Plugins  | ✅    | ✅✅   | Expandido            |
+| Debug Common    | ✅    | ✅✅   | +50% items           |
+| Versões         | ✅    | ✅     | Sincronizado         |
 
 ---
 
@@ -307,4 +322,3 @@ Por favor, indique se alguma seção está:
 **Data**: 2026-03-02  
 **Versão**: 1.0  
 **Compatível com**: Markdown Studio v1.0.18+
-

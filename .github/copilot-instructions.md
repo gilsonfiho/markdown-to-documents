@@ -585,9 +585,41 @@ Usar a pasta `./docs/` para documentação de desenvolvimento, debug e armadilha
 - `TROUBLESHOOTING.md` — Guia expandido de debugging e soluções
 - `CONTRIBUTING.md` — Padrões de desenvolvimento e conventions
 - `API_ROUTES.md` — Documentação de endpoints (auth, google-drive, etc.)
+- `GIT_HOOKS.md` — Git hooks automáticos pre-commit
 
 Todos os detalhes técnicos, padrões de código, armadilhas comuns e soluções de debug devem ser documentados aqui para referência rápida.
 O padrão é markdown com seções claras, exemplos de código e explicações detalhadas.
+
+### Git Hooks Automáticos
+
+**Arquivo:** `.husky/pre-commit`
+
+Git hooks pré-commit foram configurados para garantir qualidade antes de cada commit:
+
+1. **ESLint** — Linting e correção automática (`npm run lint:fix`)
+2. **Prettier** — Formatação de código (`npm run format`)
+3. **Jest** — Testes unitários (`npm run test`)
+4. **TypeScript Build** — Verificação de tipos (`npm run build`)
+
+**Arquivo:** `.husky/post-merge`
+
+Hook post-merge executa automaticamente após `git pull` se `package.json` ou `.husky` foram modificados:
+- Garante que hooks estão sempre sincronizados
+- Roda `npm run setup-hooks` automaticamente
+
+**Setup:**
+
+```bash
+# Primeira vez após clone
+npm run setup-hooks
+
+# Ou manual
+npx husky install
+chmod +x .husky/pre-commit
+chmod +x .husky/post-merge
+```
+
+**Uso:** Automático em cada `git commit` e `git pull`. Ver `docs/GIT_HOOKS.md` para mais detalhes.
 
 ### Build e Desenvolvimento
 

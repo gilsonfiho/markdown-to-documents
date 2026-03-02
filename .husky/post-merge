@@ -1,0 +1,29 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+echo "🔄 Git pull detectado..."
+echo ""
+
+# Verificar se package.json foi modificado
+if git diff --name-only HEAD@{1} HEAD | grep -q "package.json\|.husky"; then
+  echo "📦 package.json ou .husky foram modificados"
+  echo "🔧 Executando setup de hooks..."
+  echo ""
+
+  # Executar setup-hooks
+  npm run setup-hooks
+
+  if [ $? -eq 0 ]; then
+    echo ""
+    echo "✅ Hooks atualizados com sucesso!"
+  else
+    echo ""
+    echo "⚠️ Erro ao atualizar hooks. Execute manualmente:"
+    echo "   npm run setup-hooks"
+  fi
+else
+  echo "✅ Nenhuma alteração em package.json ou .husky"
+fi
+
+echo ""
+

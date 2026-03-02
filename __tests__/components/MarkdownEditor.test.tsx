@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MarkdownEditor } from '@/components/MarkdownEditor';
 import { useAppStore } from '@/lib/store';
@@ -11,7 +10,7 @@ describe('MarkdownEditor.tsx', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    (useAppStore as jest.Mock).mockReturnValue({
+    (useAppStore as unknown as jest.Mock).mockReturnValue({
       setTextoSelecionado: mockSetTextoSelecionado,
     });
   });

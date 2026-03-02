@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { TabsBar } from '@/components/TabsBar';
 import { useAppStore } from '@/lib/store';
@@ -33,7 +32,7 @@ describe('TabsBar.tsx', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    (useAppStore as jest.Mock).mockReturnValue(mockUseAppStore);
+    (useAppStore as unknown as jest.Mock).mockReturnValue(mockUseAppStore);
   });
 
   it('deve renderizar todas as abas', () => {
@@ -113,7 +112,7 @@ describe('TabsBar.tsx', () => {
   });
 
   it('deve mostrar ícone de "Salvo" quando salvoAoMemento está ativo', () => {
-    (useAppStore as jest.Mock).mockReturnValue({
+    (useAppStore as unknown as jest.Mock).mockReturnValue({
       ...mockUseAppStore,
       abas: [{ id: '1', nome: 'Aba 1', conteudo: 'Conteúdo 1', salvoAoMemento: '13:45:30' }],
     });
@@ -126,7 +125,7 @@ describe('TabsBar.tsx', () => {
   });
 
   it('deve desabilitar remover aba se houver apenas uma aba', () => {
-    (useAppStore as jest.Mock).mockReturnValue({
+    (useAppStore as unknown as jest.Mock).mockReturnValue({
       ...mockUseAppStore,
       abas: [{ id: '1', nome: 'Aba 1', conteudo: 'Conteúdo 1', salvoAoMemento: null }],
     });

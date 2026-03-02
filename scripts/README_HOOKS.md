@@ -18,6 +18,7 @@ npm run setup-hooks
 ```
 
 Este comando irá:
+
 - Instalar Husky
 - Inicializar os hooks
 - Configurar permissões
@@ -65,6 +66,7 @@ O hook `pre-commit` é executado automaticamente:
 ```
 
 Se alguma verificação falhar:
+
 - O commit é **cancelado**
 - Você vê qual verificação falhou
 - Mensagem de erro detalhada é mostrada
@@ -216,4 +218,3 @@ npx husky add .husky/commit-msg 'npm run validate:commit'
 ---
 
 Pronto! Seu repositório agora tem qualidade de código garantida antes de cada commit. 🎉
-

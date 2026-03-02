@@ -74,6 +74,7 @@ $ git commit -m "Adicionar novo componente"
 ```
 
 **O que fazer:**
+
 1. Commit é **cancelado** (ainda em staging)
 2. Corrigir os erros de linting
 3. Fazer commit novamente
@@ -109,6 +110,7 @@ FAIL  __tests__/lib/store.test.ts
 ```
 
 **O que fazer:**
+
 1. Commit é **cancelado**
 2. Verificar falha de teste: `npm run test`
 3. Corrigir código ou teste
@@ -225,14 +227,17 @@ fi
 ```
 
 **Quando é acionado:**
+
 - Após cada `git pull`
 - Se `package.json` ou `.husky` foram modificados
 
 **Benefício:**
+
 - Garante que hooks estão sempre sincronizados com o repositório
 - Evita problemas de hooks desatualizados
 
 **Exemplo:**
+
 ```bash
 $ git pull origin main
 
@@ -320,6 +325,7 @@ Se testes ficarem travados:
 ### "Formatação diferente entre hook e local"
 
 Garantir que:
+
 1. Prettier está instalado: `npm install`
 2. `.prettierrc.cjs` está correto
 3. Rodar `npm run format` localmente
@@ -329,13 +335,13 @@ Garantir que:
 
 Tempos aproximados de execução do hook (máquina típica):
 
-| Verificação | Tempo |
-|------------|-------|
-| ESLint | 2-5s |
-| Prettier | 1-2s |
-| Testes | 5-15s |
-| Build | 10-30s |
-| **Total** | **20-50s** |
+| Verificação | Tempo      |
+| ----------- | ---------- |
+| ESLint      | 2-5s       |
+| Prettier    | 1-2s       |
+| Testes      | 5-15s      |
+| Build       | 10-30s     |
+| **Total**   | **20-50s** |
 
 Para acelerar:
 
@@ -370,4 +376,3 @@ Para acelerar:
 ---
 
 Git hooks automáticos garantem qualidade de código consistente! 🎉
-

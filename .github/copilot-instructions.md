@@ -604,6 +604,7 @@ Git hooks pré-commit foram configurados para garantir qualidade antes de cada c
 **Arquivo:** `.husky/post-merge`
 
 Hook post-merge executa automaticamente após `git pull` se `package.json` ou `.husky` foram modificados:
+
 - Garante que hooks estão sempre sincronizados
 - Roda `npm run setup-hooks` automaticamente
 
@@ -854,7 +855,7 @@ Sincronizadas com `package.json`:
 - `prettier@3.8.1` — Code formatting
 - `typescript@5.3.0` — Tipagem estrita
 
-
 ## IMPORTANTE
+
 So criar um novo arquivo markdown para cada seção (ex: `ARCHITECTURE.md`, `REMARK_PLUGINS.md`, etc.) e linkar aqui. Manter este arquivo como um índice de instruções e padrões críticos, com links para documentação detalhada em `./docs/`.
 Nao criar novos. Só se solicitado em prompts futuros.

@@ -455,7 +455,6 @@ Se persistirem, verificar que `tsconfig.json` tem `"strict": true` e todos os ti
 
 A pasta `./docs` contém documentação técnica abrangente para desenvolvimentos, troubleshooting e onboarding de novos desenvolvedores. Esta seção é **crítica para manutenção futura** da aplicação.
 
-
 ### Estado e Persistência
 
 **Abas não salvam**

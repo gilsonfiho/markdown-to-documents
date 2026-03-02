@@ -57,10 +57,6 @@ export async function POST(req: NextRequest) {
     });
   } catch (erro) {
     console.error('Erro ao salvar no Google Drive:', erro);
-    return NextResponse.json(
-      { erro: 'Erro ao salvar no Google Drive', detalhes: String(erro) },
-      { status: 500 },
-    );
+    return NextResponse.json({ erro: 'Erro ao salvar no Google Drive', detalhes: String(erro) }, { status: 500 });
   }
 }
-

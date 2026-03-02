@@ -57,9 +57,7 @@ export async function salvarNoGoogleDrive(conteudo: string, nomeArquivo: string)
   }
 }
 
-export async function salvarTodasNoGoogleDrive(
-  abas: Array<{ id: string; nome: string; conteudo: string }>,
-): Promise<{ sucesso: number; falhas: number; erros: string[] }> {
+export async function salvarTodasNoGoogleDrive(abas: Array<{ id: string; nome: string; conteudo: string }>): Promise<{ sucesso: number; falhas: number; erros: string[] }> {
   const erros: string[] = [];
   let sucessos = 0;
   let falhas = 0;
@@ -78,4 +76,3 @@ export async function salvarTodasNoGoogleDrive(
 
   return { sucesso: sucessos, falhas, erros };
 }
-

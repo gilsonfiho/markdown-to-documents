@@ -10,9 +10,12 @@ export interface AbaData {
 interface AppStore {
   abas: AbaData[];
   abaAtiva: string;
+  mostrarPreview: boolean;
   textoSelecionado: string;
   setAbaAtiva: (id: string) => void;
   setTextoSelecionado: (texto: string) => void;
+  setMostrarPreview: (valor: boolean) => void;
+  toggleMostrarPreview: () => void;
   adicionarAba: () => void;
   removerAba: (id: string) => void;
   atualizarAba: (id: string, conteudo: string, nome?: string) => void;
@@ -25,6 +28,7 @@ interface AppStore {
 
 const CHAVE_STORAGE_ABAS = 'markdown-studio-abas';
 const CHAVE_STORAGE_ABA_ATIVA = 'markdown-studio-aba-ativa';
+const CHAVE_STORAGE_MOSTRAR_PREVIEW = 'markdown-studio-mostrar-preview';
 
 const MARKDOWN_PADRAO = `# Bem-vindo
 
@@ -52,9 +56,12 @@ const criarNovaAba = (nome: string = 'Novo documento'): AbaData => ({
 export const useAppStore = create<AppStore>((set, get) => ({
   abas: [criarNovaAba('Documento 1')],
   abaAtiva: '',
+  mostrarPreview: true,
   textoSelecionado: '',
   setAbaAtiva: (id: string) => set({ abaAtiva: id }),
   setTextoSelecionado: (texto: string) => set({ textoSelecionado: texto }),
+  setMostrarPreview: (valor: boolean) => set({ mostrarPreview: valor }),
+  toggleMostrarPreview: () => set({ mostrarPreview: !get().mostrarPreview }),
   adicionarAba: () => {
     const estado = get();
     const novaAba = criarNovaAba(`Documento ${estado.abas.length + 1}`);
@@ -112,6 +119,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
     if (typeof window !== 'undefined') {
       const abasSalvas = localStorage.getItem(CHAVE_STORAGE_ABAS);
       const abaAtivaId = localStorage.getItem(CHAVE_STORAGE_ABA_ATIVA);
+      const mostrarPreviewSalvo = localStorage.getItem(CHAVE_STORAGE_MOSTRAR_PREVIEW);
 
       if (abasSalvas) {
         const abas = JSON.parse(abasSalvas) as AbaData[];
@@ -119,6 +127,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
         set({
           abas,
           abaAtiva,
+          mostrarPreview: mostrarPreviewSalvo === null ? true : mostrarPreviewSalvo === 'true',
         });
       } else {
         const novaAba = criarNovaAba('Documento 1');
@@ -136,6 +145,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
 
       localStorage.setItem(CHAVE_STORAGE_ABAS, JSON.stringify(estado.abas));
       localStorage.setItem(CHAVE_STORAGE_ABA_ATIVA, estado.abaAtiva);
+      localStorage.setItem(CHAVE_STORAGE_MOSTRAR_PREVIEW, String(estado.mostrarPreview));
 
       const horario = new Date().toLocaleTimeString('pt-BR');
       get().setSalvoAoMemento(idAba, horario);
@@ -150,6 +160,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
       const estado = get();
       localStorage.setItem(CHAVE_STORAGE_ABAS, JSON.stringify(estado.abas));
       localStorage.setItem(CHAVE_STORAGE_ABA_ATIVA, estado.abaAtiva);
+      localStorage.setItem(CHAVE_STORAGE_MOSTRAR_PREVIEW, String(estado.mostrarPreview));
 
       const horario = new Date().toLocaleTimeString('pt-BR');
       estado.abas.forEach((aba) => {
@@ -169,6 +180,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
     if (typeof window !== 'undefined') {
       localStorage.removeItem('markdown-studio-abas');
       localStorage.removeItem('markdown-studio-aba-ativa');
+      localStorage.removeItem(CHAVE_STORAGE_MOSTRAR_PREVIEW);
     }
   },
 }));

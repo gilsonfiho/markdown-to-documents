@@ -821,3 +821,8 @@ Sincronizadas com `package.json`:
 - `@typescript-eslint@8.0.0` — TypeScript ESLint
 - `prettier@3.8.1` — Code formatting
 - `typescript@5.3.0` — Tipagem estrita
+
+
+## IMPORTANTE
+So criar um novo arquivo markdown para cada seção (ex: `ARCHITECTURE.md`, `REMARK_PLUGINS.md`, etc.) e linkar aqui. Manter este arquivo como um índice de instruções e padrões críticos, com links para documentação detalhada em `./docs/`.
+Nao criar novos. Só se solicitado em prompts futuros.

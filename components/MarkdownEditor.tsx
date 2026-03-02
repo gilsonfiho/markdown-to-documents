@@ -1,9 +1,12 @@
 'use client';
 
 import React, { useRef, useState } from 'react';
-import { CheckCircle2, ChevronDown, Clipboard } from 'lucide-react';
+import { CheckCircle2, Clipboard } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAppStore } from '@/lib/store';
+import { Button } from '@/components/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Textarea } from '@/components/ui/textarea';
 
 interface MarkdownEditorProps {
   value: string;
@@ -13,7 +16,6 @@ interface MarkdownEditorProps {
 export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({ value, onChange }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [colado, setColado] = useState(false);
-  const [dropdownAberto, setDropdownAberto] = useState(false);
   const { setTextoSelecionado } = useAppStore();
 
   const handleColar = async () => {
@@ -26,7 +28,6 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({ value, onChange 
         onChange(novoValor);
 
         setColado(true);
-        setDropdownAberto(false);
         setTimeout(() => setColado(false), 2000);
 
         setTimeout(() => {
@@ -36,8 +37,8 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({ value, onChange 
           }
         }, 0);
       }
-    } catch (error) {
-      console.error('Erro ao colar:', error);
+    } catch (erro) {
+      console.error('Erro ao colar:', erro);
     }
   };
 
@@ -47,7 +48,6 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({ value, onChange 
       onChange(texto);
 
       setColado(true);
-      setDropdownAberto(false);
       setTimeout(() => setColado(false), 2000);
 
       setTimeout(() => {
@@ -56,8 +56,8 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({ value, onChange 
           textareaRef.current.focus();
         }
       }, 0);
-    } catch (error) {
-      console.error('Erro ao colar:', error);
+    } catch (erro) {
+      console.error('Erro ao colar:', erro);
     }
   };
 
@@ -101,60 +101,42 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({ value, onChange 
 
   return (
     <div className="relative h-full flex flex-col">
-      <textarea
+      <Textarea
         ref={textareaRef}
         value={value}
         onChange={handleInput}
         onKeyDown={handleKeyDown}
         onMouseUp={handleMouseUp}
         onKeyUp={handleKeyUp}
-        className="flex-1 p-6 font-mono text-sm text-neutral-900 bg-white resize-none focus:outline-none border-r border-neutral-200"
+        className="flex-1 p-6 font-mono text-sm text-neutral-900 resize-none focus-visible:ring-0 border-r border-neutral-200 rounded-none"
         placeholder="Coloque seu markdown aqui..."
         spellCheck="false"
       />
       <div className="absolute top-4 right-4">
-        <motion.button
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => setDropdownAberto(!dropdownAberto)}
-          className="flex items-center gap-1 px-3 py-2 text-neutral-400 hover:text-purple-600 rounded-lg hover:bg-purple-100 transition-colors"
-          title="Colar opções"
-        >
-          {colado ? (
-            <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} transition={{ duration: 0.2 }}>
-              <CheckCircle2 size={18} className="text-green-600" />
-            </motion.div>
-          ) : (
-            <>
-              <Clipboard size={18} />
-              <ChevronDown size={14} />
-            </>
-          )}
-        </motion.button>
-
-        {dropdownAberto && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.15 }}
-            className="absolute top-full right-0 mt-2 bg-white border border-neutral-200 rounded-lg shadow-lg z-50 min-w-[180px]"
-          >
-            <motion.button whileHover={{ backgroundColor: '#f3f4f6' }} onClick={handleColar} className="w-full flex items-center gap-3 px-4 py-3 text-xs text-neutral-700 hover:bg-neutral-50 transition-colors text-left font-medium whitespace-nowrap">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button size="sm" variant="ghost" className="h-9 w-9 p-0 text-neutral-400 hover:text-purple-600" title="Colar opções">
+              {colado ? (
+                <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} transition={{ duration: 0.2 }}>
+                  <CheckCircle2 size={18} className="text-green-600" />
+                </motion.div>
+              ) : (
+                <Clipboard size={18} />
+              )}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-[180px]">
+            <DropdownMenuItem onClick={handleColar} className="flex gap-3 cursor-pointer">
               <Clipboard size={14} />
               <span>Colar</span>
-            </motion.button>
-            <div className="border-t border-neutral-200" />
-            <motion.button
-              whileHover={{ backgroundColor: '#f3f4f6' }}
-              onClick={handleLimparEColar}
-              className="w-full flex items-center gap-3 px-4 py-3 text-xs text-neutral-700 hover:bg-neutral-50 transition-colors text-left font-medium whitespace-nowrap"
-            >
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={handleLimparEColar} className="flex gap-3 cursor-pointer">
               <Clipboard size={14} />
               <span>Limpar e colar</span>
-            </motion.button>
-          </motion.div>
-        )}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   );

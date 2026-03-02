@@ -20,6 +20,7 @@ Você pode quebrar linhas naturalmente
 Este documento usa todos os plugins remark! :fire:
 
 Aqui estão alguns emojis populares:
+
 - :rocket: Foguete
 - :heart: Coração
 - :star: Estrela
@@ -79,13 +80,13 @@ Os slugs são gerados automaticamente a partir dos títulos das seções!
 
 ### Tabelas com Suporte Completo
 
-| Componente | Descrição | Status |
-|:-----------|:----------|:-------|
-| Editor | Textarea com suporte a Tab | ✅ Funcional |
-| Preview | Renderização em tempo real | ✅ Funcional |
-| Exportação DOCX | Converter para Word | ✅ Funcional |
-| Emojis | Suporte para emojis | :smile: Adicionado |
-| Equações | Renderização LaTeX | :fire: Adicionado |
+| Componente      | Descrição                  | Status             |
+| :-------------- | :------------------------- | :----------------- |
+| Editor          | Textarea com suporte a Tab | ✅ Funcional       |
+| Preview         | Renderização em tempo real | ✅ Funcional       |
+| Exportação DOCX | Converter para Word        | ✅ Funcional       |
+| Emojis          | Suporte para emojis        | :smile: Adicionado |
+| Equações        | Renderização LaTeX         | :fire: Adicionado  |
 
 ### Listas Ordenadas
 
@@ -116,6 +117,7 @@ i\hbar\frac{\partial}{\partial t}|\psi\rangle = \hat{H}|\psi\rangle
 $$
 
 Funcionalidades implementadas:
+
 1. Preview em tempo real :fast_forward:
 2. Suporte a múltiplas abas :memo:
 3. Exportação para DOCX :page_facing_up:
@@ -170,18 +172,19 @@ const plugins: PluginConfig[] = [
 
 ## 🎯 Casos de Uso
 
-| Tipo de Documento | Plugins Recomendados | Exemplo |
-|:----------------|:------------------|:-------|
-| **Documentação Técnica** | gfm, toc, math, slug | Guias, tutoriais :book: |
-| **Blogging** | breaks, emoji, toc, slug | Posts, artigos :pencil: |
-| **Pesquisa Científica** | math, toc, slug, gfm | Papers, teses :scientist: |
-| **Comunicação Geral** | breaks, emoji, gfm | Mensagens, anúncios :speech_bubble: |
+| Tipo de Documento        | Plugins Recomendados     | Exemplo                             |
+| :----------------------- | :----------------------- | :---------------------------------- |
+| **Documentação Técnica** | gfm, toc, math, slug     | Guias, tutoriais :book:             |
+| **Blogging**             | breaks, emoji, toc, slug | Posts, artigos :pencil:             |
+| **Pesquisa Científica**  | math, toc, slug, gfm     | Papers, teses :scientist:           |
+| **Comunicação Geral**    | breaks, emoji, gfm       | Mensagens, anúncios :speech_bubble: |
 
 ---
 
 ## 📊 Estatísticas Desta Página
 
 Informações sobre este documento:
+
 - **Emojis utilizados**: 25+ :tada:
 - **Equações matemáticas**: 4 principais $E=mc^2$
 - **Seções com links internos**: Navegáveis
@@ -195,6 +198,7 @@ Informações sobre este documento:
 ### Slug com Caracteres Especiais
 
 Qualquer caractere especial é automaticamente removido ou convertido:
+
 - `# Título com Acentuação` → `titulo-com-acentuacao`
 - `# CamelCase Automático` → `camelcase-automatico`
 - `# LETRAS MAIÚSCULAS` → `letras-maiusculas`
@@ -244,4 +248,3 @@ Use este documento como referência para suas próprias criações! :rocket: :sp
 **Criado em**: 27 de Fevereiro de 2026
 **Markdown Studio**: Versão 1.0.18+
 **Status**: 🟢 Todos os plugins funcionando perfeitamente!
-

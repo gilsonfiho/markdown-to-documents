@@ -1,11 +1,14 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
 import { type AbaData, useAppStore } from '@/lib/store';
-import { CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, Clipboard, Download, FileJson, FileText, Plus, Save, X } from 'lucide-react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { CheckCircle2, ChevronLeft, ChevronRight, Clipboard, Download, FileJson, FileText, Plus, Save, X } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { baixarHtmlDocumento, copiarParaAreaTransferencia, exportarParaPdf, markdownToDocx } from '@/lib/markdown-to-docx';
+import { Button } from '@/components/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
+import { toast } from 'sonner';
 
 export const TabsBar: React.FC = () => {
   const { abas, abaAtiva, setAbaAtiva, adicionarAba, removerAba, atualizarAba, salvarNoStorage, textoSelecionado } = useAppStore();
@@ -15,12 +18,7 @@ export const TabsBar: React.FC = () => {
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
   const [abaExportando, setAbaExportando] = useState<string | null>(null);
-  const [menuExportarId, setMenuExportarId] = useState<string | null>(null);
   const [abaCopiadaId, setAbaCopiadaId] = useState<string | null>(null);
-  const [posicaoMenuExportar, setPosicaoMenuExportar] = useState<{
-    top: number;
-    left: number;
-  } | null>(null);
 
   const handleAdicionarAba = () => {
     adicionarAba();
@@ -29,58 +27,60 @@ export const TabsBar: React.FC = () => {
   const handleSalvarAba = (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
     salvarNoStorage(id);
+    toast.success('Aba salva com sucesso!');
   };
 
   const handleExportarAba = async (e: React.MouseEvent, aba: AbaData) => {
     e.stopPropagation();
-    setMenuExportarId(null);
-    setPosicaoMenuExportar(null);
     setAbaExportando(aba.id);
     try {
       const conteudo = textoSelecionado || aba.conteudo;
       await markdownToDocx(conteudo, aba.nome);
-    } catch {
+      toast.success(`Documento "${aba.nome}" exportado com sucesso!`);
+    } catch (erro) {
+      toast.error('Erro ao exportar. Verifique o console.');
+      console.error('Erro ao exportar aba:', erro);
+    } finally {
       setAbaExportando(null);
-      return;
     }
-    setAbaExportando(null);
   };
 
   const handleCopiarAba = async (e: React.MouseEvent, aba: AbaData) => {
     e.stopPropagation();
-    setMenuExportarId(null);
-    setPosicaoMenuExportar(null);
     try {
       const conteudo = textoSelecionado || aba.conteudo;
       await copiarParaAreaTransferencia(conteudo);
       setAbaCopiadaId(aba.id);
+      toast.success('Conteúdo copiado para a área de transferência!');
       setTimeout(() => setAbaCopiadaId(null), 2000);
-    } catch {
+    } catch (erro) {
+      toast.error('Erro ao copiar.');
+      console.error('Erro ao copiar aba:', erro);
       setAbaCopiadaId(null);
     }
   };
 
   const handleBaixarHtml = async (e: React.MouseEvent, aba: AbaData) => {
     e.stopPropagation();
-    setMenuExportarId(null);
-    setPosicaoMenuExportar(null);
     try {
       const conteudo = textoSelecionado || aba.conteudo;
       await baixarHtmlDocumento(conteudo, aba.nome);
-    } catch {
-      // Erro silenciado
+      toast.success(`HTML "${aba.nome}" baixado com sucesso!`);
+    } catch (erro) {
+      toast.error('Erro ao baixar HTML.');
+      console.error('Erro ao baixar HTML:', erro);
     }
   };
 
   const handleExportarPdf = async (e: React.MouseEvent, aba: AbaData) => {
     e.stopPropagation();
-    setMenuExportarId(null);
-    setPosicaoMenuExportar(null);
     try {
       const conteudo = textoSelecionado || aba.conteudo;
       await exportarParaPdf(conteudo, aba.nome);
-    } catch {
-      // Erro silenciado
+      toast.success(`PDF "${aba.nome}" exportado com sucesso!`);
+    } catch (erro) {
+      toast.error('Erro ao exportar PDF.');
+      console.error('Erro ao exportar PDF:', erro);
     }
   };
 
@@ -125,15 +125,6 @@ export const TabsBar: React.FC = () => {
     }
   }, [abas]);
 
-  useEffect(() => {
-    const handleFecharMenu = () => {
-      setMenuExportarId(null);
-      setPosicaoMenuExportar(null);
-    };
-    window.addEventListener('click', handleFecharMenu);
-    return () => window.removeEventListener('click', handleFecharMenu);
-  }, []);
-
   const rolarEsquerda = () => {
     if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollBy({ left: -200, behavior: 'smooth' });
@@ -146,33 +137,14 @@ export const TabsBar: React.FC = () => {
     }
   };
 
-  const abaMenuAtivo = menuExportarId ? abas.find((aba) => aba.id === menuExportarId) : null;
-
-  const obterTextoExportacao = (tipo: 'docx' | 'copiar' | 'html' | 'pdf'): string => {
-    const sufixo = textoSelecionado ? 'Seleção' : 'Documento';
-    const textos: Record<string, string> = {
-      docx: `Exportar ${sufixo} (.docx)`,
-      copiar: `Copiar ${sufixo}`,
-      html: `Exportar ${sufixo} (.html)`,
-      pdf: `Exportar ${sufixo} (.pdf)`,
-    };
-    return textos[tipo] || '';
-  };
-
   return (
     <>
       <div className="flex items-center gap-0 px-1 py-1 bg-neutral-50 border-b border-neutral-200">
         {/* Botão scroll esquerda */}
         {canScrollLeft && (
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            onClick={rolarEsquerda}
-            className="flex items-center justify-center p-2 text-neutral-500 hover:text-neutral-700 hover:bg-neutral-200 rounded-lg transition-colors flex-shrink-0"
-            title="Rolar para esquerda"
-          >
+          <Button size="sm" variant="ghost" onClick={rolarEsquerda} className="h-9 w-9 p-0 text-neutral-500 hover:text-neutral-700" title="Rolar para esquerda">
             <ChevronLeft size={18} />
-          </motion.button>
+          </Button>
         )}
 
         {/* Container com scroll horizontal */}
@@ -197,7 +169,7 @@ export const TabsBar: React.FC = () => {
               onClick={() => setAbaAtiva(aba.id)}
             >
               {editandoId === aba.id ? (
-                <input
+                <Input
                   autoFocus
                   type="text"
                   value={novoNome}
@@ -210,7 +182,7 @@ export const TabsBar: React.FC = () => {
                       setNovoNome('');
                     }
                   }}
-                  className="px-2 py-1 text-sm bg-white border border-blue-500 rounded focus:outline-none max-w-[150px]"
+                  className="h-6 px-2 text-sm max-w-[150px]"
                   onClick={(e) => e.stopPropagation()}
                 />
               ) : (
@@ -223,62 +195,59 @@ export const TabsBar: React.FC = () => {
                       <CheckCircle2 size={13} className="text-green-600" />
                     </motion.div>
                   )}
-                  <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={(e) => handleSalvarAba(e, aba.id)}
-                    className="flex items-center justify-center text-neutral-400 hover:text-blue-600 p-1 rounded hover:bg-blue-100 transition-colors"
-                    title="Salvar aba"
-                  >
+                  <Button size="sm" variant="ghost" onClick={(e) => handleSalvarAba(e, aba.id)} className="h-6 w-6 p-0 text-neutral-400 hover:text-blue-600" title="Salvar aba">
                     <Save size={13} />
-                  </motion.button>
-                  <div className="relative">
-                    <motion.button
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (menuExportarId === aba.id) {
-                          setMenuExportarId(null);
-                          setPosicaoMenuExportar(null);
-                          return;
-                        }
-                        const rect = e.currentTarget.getBoundingClientRect();
-                        const larguraMenu = 192;
-                        const margem = 8;
-                        const esquerda = Math.min(Math.max(rect.right - larguraMenu, margem), window.innerWidth - larguraMenu - margem);
-                        const topo = rect.bottom + 6;
-                        setPosicaoMenuExportar({ top: topo, left: esquerda });
-                        setMenuExportarId(aba.id);
-                      }}
-                      className={`flex items-center gap-0.5 text-neutral-400 hover:text-purple-600 p-1 rounded hover:bg-purple-100 transition-colors ${menuExportarId === aba.id ? 'bg-purple-100 text-purple-600' : ''}`}
-                      title="Exportar aba"
-                    >
-                      {abaExportando === aba.id ? (
-                        <div className="animate-spin">
+                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button size="sm" variant="ghost" onClick={(e) => e.stopPropagation()} disabled={abaExportando === aba.id} className="h-6 w-6 p-0 text-neutral-400 hover:text-purple-600" title="Exportar aba">
+                        {abaExportando === aba.id ? (
+                          <div className="animate-spin">
+                            <Download size={13} />
+                          </div>
+                        ) : (
                           <Download size={13} />
-                        </div>
-                      ) : (
-                        <>
-                          <Download size={13} />
-                          <ChevronDown size={10} />
-                        </>
-                      )}
-                    </motion.button>
-                  </div>
+                        )}
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-64">
+                      <DropdownMenuItem onClick={(e) => handleExportarAba(e as any, aba)} className="flex gap-2 cursor-pointer">
+                        <Download size={12} className="text-purple-500 flex-shrink-0" />
+                        <span>Exportar Documento (.docx)</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={(e) => handleCopiarAba(e as any, aba)} className="flex gap-2 cursor-pointer">
+                        {abaCopiadaId === aba.id ? (
+                          <>
+                            <CheckCircle2 size={12} className="text-green-500 flex-shrink-0" />
+                            <span>Copiado!</span>
+                          </>
+                        ) : (
+                          <>
+                            <Clipboard size={12} className="text-purple-500 flex-shrink-0" />
+                            <span>Copiar para Área de Transf.</span>
+                          </>
+                        )}
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={(e) => handleBaixarHtml(e as any, aba)} className="flex gap-2 cursor-pointer">
+                        <FileText size={12} className="text-purple-500 flex-shrink-0" />
+                        <span>Baixar como HTML</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={(e) => handleExportarPdf(e as any, aba)} className="flex gap-2 cursor-pointer">
+                        <FileJson size={12} className="text-purple-500 flex-shrink-0" />
+                        <span>Exportar como PDF</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </>
               )}
 
               {abas.length > 1 && (
-                <motion.button
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={(e) => handleRemoverAba(e, aba.id)}
-                  className="flex items-center justify-center text-neutral-400 hover:text-neutral-600 p-1 rounded hover:bg-neutral-200"
-                  title="Fechar aba"
-                >
+                <Button size="sm" variant="ghost" onClick={(e) => handleRemoverAba(e, aba.id)} className="h-6 w-6 p-0 text-neutral-400 hover:text-neutral-600" title="Fechar aba">
                   <X size={16} />
-                </motion.button>
+                </Button>
               )}
             </motion.div>
           ))}
@@ -286,71 +255,17 @@ export const TabsBar: React.FC = () => {
 
         {/* Botão scroll direita */}
         {canScrollRight && (
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            onClick={rolarDireita}
-            className="flex items-center justify-center p-2 text-neutral-500 hover:text-neutral-700 hover:bg-neutral-200 rounded-lg transition-colors flex-shrink-0"
-            title="Rolar para direita"
-          >
+          <Button size="sm" variant="ghost" onClick={rolarDireita} className="h-9 w-9 p-0 text-neutral-500 hover:text-neutral-700" title="Rolar para direita">
             <ChevronRight size={18} />
-          </motion.button>
+          </Button>
         )}
 
         {/* Botão adicionar nova aba */}
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={handleAdicionarAba}
-          className="flex items-center justify-center gap-1 px-3 py-2 rounded-lg text-neutral-600 hover:bg-neutral-100 transition-colors border border-neutral-200 hover:border-neutral-300 flex-shrink-0"
-          title="Adicionar nova aba"
-        >
+        <Button size="sm" variant="outline" onClick={handleAdicionarAba} className="flex items-center gap-1 flex-shrink-0" title="Adicionar nova aba">
           <Plus size={16} />
           <span className="text-sm font-medium">Nova</span>
-        </motion.button>
+        </Button>
       </div>
-
-      {typeof document !== 'undefined' && abaMenuAtivo && posicaoMenuExportar
-        ? createPortal(
-            <AnimatePresence>
-              <motion.div
-                initial={{ opacity: 0, y: 5 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 5 }}
-                className="fixed w-64 bg-white border border-neutral-200 rounded-lg shadow-lg z-[9999] overflow-hidden"
-                style={{ top: posicaoMenuExportar.top, left: posicaoMenuExportar.left }}
-                onClick={(e) => e.stopPropagation()}
-              >
-                <button onClick={(e) => handleExportarAba(e, abaMenuAtivo)} className="w-full flex items-center gap-2 px-4 py-3 text-xs text-neutral-700 hover:bg-neutral-100 transition-colors text-left font-medium whitespace-nowrap">
-                  <Download size={12} className="text-purple-500 flex-shrink-0" />
-                  {obterTextoExportacao('docx')}
-                </button>
-                <button
-                  onClick={(e) => handleCopiarAba(e, abaMenuAtivo)}
-                  className="w-full flex items-center gap-2 px-4 py-3 text-xs text-neutral-700 hover:bg-neutral-100 transition-colors text-left font-medium border-t border-neutral-100 whitespace-nowrap"
-                >
-                  {abaCopiadaId === abaMenuAtivo.id ? <CheckCircle2 size={12} className="text-green-500 flex-shrink-0" /> : <Clipboard size={12} className="text-purple-500 flex-shrink-0" />}
-                  {obterTextoExportacao('copiar')}
-                </button>
-                <button
-                  onClick={(e) => handleBaixarHtml(e, abaMenuAtivo)}
-                  className="w-full flex items-center gap-2 px-4 py-3 text-xs text-neutral-700 hover:bg-neutral-100 transition-colors text-left font-medium border-t border-neutral-100 whitespace-nowrap"
-                >
-                  <FileText size={12} className="text-purple-500 flex-shrink-0" />
-                  {obterTextoExportacao('html')}
-                </button>
-                <button
-                  onClick={(e) => handleExportarPdf(e, abaMenuAtivo)}
-                  className="w-full flex items-center gap-2 px-4 py-3 text-xs text-neutral-700 hover:bg-neutral-100 transition-colors text-left font-medium border-t border-neutral-100 whitespace-nowrap"
-                >
-                  <FileJson size={12} className="text-purple-500 flex-shrink-0" />
-                  {obterTextoExportacao('pdf')}
-                </button>
-              </motion.div>
-            </AnimatePresence>,
-            document.body,
-          )
-        : null}
     </>
   );
 };

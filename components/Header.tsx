@@ -1,79 +1,79 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useSession, signIn, signOut } from 'next-auth/react';
 import { useAppStore } from '@/lib/store';
 import { markdownToDocx, copiarParaAreaTransferencia, baixarHtmlDocumento, exportarParaPdf } from '@/lib/markdown-to-docx';
 import { obterVersaoFormatada } from '@/lib/versao';
-import { LogOut, LogIn, Save, Package, X, Clipboard, ChevronDown, CheckCircle2, FileText, FileJson } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { LogOut, LogIn, Save, Package, X, Clipboard, CheckCircle2, FileText, FileJson } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Button } from '@/components/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { toast } from 'sonner';
 
 export const Header: React.FC = () => {
   const { data: session } = useSession();
   const { abas, salvarTodasAsAbas, fecharTodasAsAbas } = useAppStore();
   const [isExportingAll, setIsExportingAll] = useState(false);
-  const [menuExportarAberto, setMenuExportarAberto] = useState(false);
   const [tudoCopiado, setTudoCopiado] = useState(false);
 
   const handleExportarTodas = async () => {
-    setMenuExportarAberto(false);
     setIsExportingAll(true);
     try {
       for (const aba of abas) {
         await markdownToDocx(aba.conteudo, aba.nome);
         await new Promise((resolve) => setTimeout(resolve, 500));
       }
-    } catch (_error) {
-      console.error('Erro ao exportar todas:', _error);
+      toast.success('Todos os documentos foram exportados com sucesso!');
+    } catch (erro) {
+      toast.error('Erro ao exportar. Verifique o console.');
+      console.error('Erro ao exportar todas:', erro);
     } finally {
       setIsExportingAll(false);
     }
   };
 
   const handleCopiarTodas = async () => {
-    setMenuExportarAberto(false);
     try {
       const conteudos = abas.map((aba) => aba.conteudo).join('\n\n---\n\n');
       await copiarParaAreaTransferencia(conteudos);
+      toast.success('Todos os documentos copiados para a área de transferência!');
       setTudoCopiado(true);
       setTimeout(() => setTudoCopiado(false), 2000);
     } catch {
+      toast.error('Erro ao copiar. Tente novamente.');
       setTudoCopiado(false);
     }
   };
 
   const handleBaixarHtmlTodas = async () => {
-    setMenuExportarAberto(false);
     try {
       const conteudos = abas.map((aba) => aba.conteudo).join('\n\n---\n\n');
       await baixarHtmlDocumento(conteudos, 'documentos-completo');
+      toast.success('Arquivo HTML baixado com sucesso!');
     } catch {
-      // Erro silenciado
+      toast.error('Erro ao baixar HTML.');
     }
   };
 
   const handleExportarPdfTodas = async () => {
-    setMenuExportarAberto(false);
     try {
       const conteudos = abas.map((aba) => aba.conteudo).join('\n\n---\n\n');
       await exportarParaPdf(conteudos, 'documentos-completo');
+      toast.success('Arquivo PDF exportado com sucesso!');
     } catch {
-      // Erro silenciado
+      toast.error('Erro ao exportar PDF.');
     }
   };
 
-  useEffect(() => {
-    const handleFecharMenu = () => setMenuExportarAberto(false);
-    window.addEventListener('click', handleFecharMenu);
-    return () => window.removeEventListener('click', handleFecharMenu);
-  }, []);
-
   const handleSalvarTodas = () => {
     salvarTodasAsAbas();
+    toast.success('Todos os documentos foram salvos!');
   };
 
   const handleFecharTodas = () => {
     fecharTodasAsAbas();
+    toast.success('Área de trabalho limpa!');
   };
 
   return (
@@ -99,101 +99,67 @@ export const Header: React.FC = () => {
               <p className="text-xs text-neutral-500">{session.user.email}</p>
             </motion.div>
           )}
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={handleSalvarTodas}
-            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-neutral-400 disabled:cursor-not-allowed transition-colors"
-            title="Salvar todas as abas"
-          >
+          <Button onClick={handleSalvarTodas} className="bg-green-600 hover:bg-green-700 text-white gap-2" title="Salvar todas as abas">
             <Save size={18} />
             <span>Salvar tudo</span>
-          </motion.button>
+          </Button>
 
-          <div className="relative">
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={(e) => {
-                e.stopPropagation();
-                setMenuExportarAberto(!menuExportarAberto);
-              }}
-              disabled={isExportingAll || !session || abas.length === 0}
-              className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:bg-neutral-400 disabled:cursor-not-allowed transition-colors"
-              title="Opções de exportação para todas as abas"
-            >
-              {isExportingAll ? (
-                <>
-                  <div className="animate-spin">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button disabled={isExportingAll || !session || abas.length === 0} className="bg-purple-600 hover:bg-purple-700 text-white gap-2" title="Opções de exportação para todas as abas">
+                {isExportingAll ? (
+                  <>
+                    <div className="animate-spin">
+                      <Package size={18} />
+                    </div>
+                    <span>Exportando...</span>
+                  </>
+                ) : (
+                  <>
                     <Package size={18} />
-                  </div>
-                  <span>Exportando...</span>
-                </>
-              ) : (
-                <>
-                  <Package size={18} />
-                  <span>Exportar tudo</span>
-                  <ChevronDown size={14} />
-                </>
-              )}
-            </motion.button>
+                    <span>Exportar tudo</span>
+                  </>
+                )}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-72">
+              <DropdownMenuItem onClick={handleExportarTodas} className="flex gap-3 cursor-pointer">
+                <Package size={18} className="text-purple-600" />
+                <span>Baixar Todas (.docx)</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleCopiarTodas} className="flex gap-3 cursor-pointer">
+                {tudoCopiado ? (
+                  <>
+                    <CheckCircle2 size={18} className="text-green-600" />
+                    <span>Copiado!</span>
+                  </>
+                ) : (
+                  <>
+                    <Clipboard size={18} className="text-purple-600" />
+                    <span>Copiar Todas para Área de Transf.</span>
+                  </>
+                )}
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleBaixarHtmlTodas} className="flex gap-3 cursor-pointer">
+                <FileText size={18} className="text-purple-600" />
+                <span>Baixar Todas como HTML</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleExportarPdfTodas} className="flex gap-3 cursor-pointer">
+                <FileJson size={18} className="text-purple-600" />
+                <span>Exportar Todas como PDF</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
-            <AnimatePresence>
-              {menuExportarAberto && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 10 }}
-                  className="absolute right-0 mt-2 w-72 bg-white border border-neutral-200 rounded-lg shadow-xl z-50 overflow-hidden"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <button onClick={handleExportarTodas} className="w-full flex items-center gap-3 px-4 py-3 text-xs text-neutral-700 hover:bg-neutral-50 transition-colors text-left font-medium whitespace-nowrap">
-                    <Package size={18} className="text-purple-600" />
-                    Baixar Todas (.docx)
-                  </button>
-                  <button onClick={handleCopiarTodas} className="w-full flex items-center gap-3 px-4 py-3 text-xs text-neutral-700 hover:bg-neutral-50 transition-colors text-left font-medium border-t border-neutral-100 whitespace-nowrap">
-                    {tudoCopiado ? (
-                      <>
-                        <CheckCircle2 size={18} className="text-green-600" />
-                        Copiado!
-                      </>
-                    ) : (
-                      <>
-                        <Clipboard size={18} className="text-purple-600" />
-                        Copiar Todas para Área de Transf.
-                      </>
-                    )}
-                  </button>
-                  <button onClick={handleBaixarHtmlTodas} className="w-full flex items-center gap-3 px-4 py-3 text-xs text-neutral-700 hover:bg-neutral-50 transition-colors text-left font-medium border-t border-neutral-100 whitespace-nowrap">
-                    <FileText size={18} className="text-purple-600" />
-                    Baixar Todas como HTML
-                  </button>
-                  <button onClick={handleExportarPdfTodas} className="w-full flex items-center gap-3 px-4 py-3 text-xs text-neutral-700 hover:bg-neutral-50 transition-colors text-left font-medium border-t border-neutral-100 whitespace-nowrap">
-                    <FileJson size={18} className="text-purple-600" />
-                    Exportar Todas como PDF
-                  </button>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={handleFecharTodas}
-            className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:bg-neutral-400 disabled:cursor-not-allowed transition-colors"
-            title="Fechar todas as abas"
-          >
+          <Button onClick={handleFecharTodas} className="bg-red-600 hover:bg-red-700 text-white gap-2" title="Fechar todas as abas">
             <X size={18} />
             <span>Fechar tudo</span>
-          </motion.button>
+          </Button>
 
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => (session ? signOut() : signIn('google'))}
-            className="flex items-center gap-2 px-4 py-2 border border-neutral-300 text-neutral-700 rounded-lg hover:bg-neutral-50 transition-colors"
-          >
+          <Button onClick={() => (session ? signOut() : signIn('google'))} variant="outline" className="gap-2">
             {session ? (
               <>
                 <LogOut size={18} />
@@ -205,7 +171,7 @@ export const Header: React.FC = () => {
                 <span>Google</span>
               </>
             )}
-          </motion.button>
+          </Button>
         </div>
       </div>
     </header>

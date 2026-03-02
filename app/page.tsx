@@ -47,19 +47,10 @@ export default function Home() {
 
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }} className="flex flex-1 overflow-hidden gap-px">
         {/* Editor Panel */}
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.2, duration: 0.5 }}
-          className="flex-1 flex flex-col overflow-hidden bg-white border-r border-neutral-200"
-        >
+        <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2, duration: 0.5 }} className="flex-1 flex flex-col overflow-hidden bg-white border-r border-neutral-200">
           <div className="px-6 py-3 border-b border-neutral-200 bg-neutral-50 flex items-center justify-between">
             <h2 className="text-sm font-semibold text-neutral-900">Editor</h2>
-            <button
-              onClick={toggleMostrarPreview}
-              title={mostrarPreview ? 'Ocultar preview' : 'Mostrar preview'}
-              className="flex items-center gap-1 text-xs text-neutral-400 hover:text-neutral-700 transition-colors"
-            >
+            <button onClick={toggleMostrarPreview} title={mostrarPreview ? 'Ocultar preview' : 'Mostrar preview'} className="flex items-center gap-1 text-xs text-neutral-400 hover:text-neutral-700 transition-colors">
               {mostrarPreview ? <EyeOff size={13} /> : <Eye size={13} />}
               {mostrarPreview ? 'Ocultar preview' : 'Mostrar preview'}
             </button>
@@ -78,12 +69,7 @@ export default function Home() {
 
         {/* Preview Panel */}
         {mostrarPreview && (
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2, duration: 0.5 }}
-            className="flex-1 flex flex-col overflow-hidden bg-neutral-50"
-          >
+          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2, duration: 0.5 }} className="flex-1 flex flex-col overflow-hidden bg-neutral-50">
             <div className="px-6 py-3 border-b border-neutral-200 bg-white">
               <h2 className="text-sm font-semibold text-neutral-900">Preview</h2>
             </div>

@@ -1,4 +1,5 @@
 module.exports = {
+  ignorePatterns: ['__tests__/**/*', 'coverage/**/*', '.next/**/*'],
   env: {
     browser: true,
     es2021: true,

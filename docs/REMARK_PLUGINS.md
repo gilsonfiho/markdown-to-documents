@@ -5,9 +5,11 @@ Este documento descreve os plugins remark instalados e como utilizá-los no Mark
 ## Plugins Instalados
 
 ### 1. **remark-breaks**
+
 Converte quebras de linha simples em tags `<br>` HTML.
 
 **Como usar:**
+
 ```markdown
 Primeira linha
 Segunda linha será exibida abaixo
@@ -16,6 +18,7 @@ Segunda linha será exibida abaixo
 ```
 
 **Resultado em preview:**
+
 ```
 Primeira linha
 Segunda linha será exibida abaixo
@@ -24,9 +27,11 @@ Segunda linha será exibida abaixo
 ---
 
 ### 2. **remark-emoji**
+
 Converte códigos de emoji em emojis reais.
 
 **Como usar:**
+
 ```markdown
 :smile: Bem-vindo ao Markdown Studio! :rocket:
 :heart: Isso é incrível! :tada:
@@ -34,6 +39,7 @@ Converte códigos de emoji em emojis reais.
 ```
 
 **Emojis suportados:**
+
 - `:smile:` → 😄
 - `:rocket:` → 🚀
 - `:heart:` → ❤️
@@ -48,9 +54,11 @@ Converte códigos de emoji em emojis reais.
 ---
 
 ### 3. **remark-toc**
+
 Gera automaticamente um índice (tabela de conteúdos) a partir dos headings.
 
 **Como usar:**
+
 ```markdown
 # Meu Documento
 
@@ -75,6 +83,7 @@ Conteúdo da subseção...
 O índice será automaticamente preenchido com links para cada seção (H2, H3, etc.)
 
 **Marcadores válidos para o índice:**
+
 - `## Índice`
 - `## Table of Contents`
 - `## Tabela de Conteúdos`
@@ -83,16 +92,19 @@ O índice será automaticamente preenchido com links para cada seção (H2, H3, 
 ---
 
 ### 4. **remark-math**
+
 Adiciona suporte para equações matemáticas no formato LaTeX.
 
 **Como usar:**
 
 **Matemática inline:**
+
 ```markdown
 A fórmula do teorema de Pitágoras é $a^2 + b^2 = c^2$.
 ```
 
 **Bloco matemático:**
+
 ```markdown
 $$
 \int_{-\infty}^{+\infty} e^{-x^2} dx = \sqrt{\pi}
@@ -100,6 +112,7 @@ $$
 ```
 
 **Exemplos:**
+
 - Quadrado: `$x^2$`
 - Raiz quadrada: `$\sqrt{x}$`
 - Fração: `$\frac{a}{b}$`
@@ -108,6 +121,7 @@ $$
 - Integral: `$\int_a^b f(x) dx$`
 
 **Equações complexas:**
+
 ```markdown
 $$
 \begin{align}
@@ -120,6 +134,7 @@ $$
 ---
 
 ### 5. **rehype-katex**
+
 Plugin rehype que renderiza as equações matemáticas do remark-math usando KaTeX.
 
 **Instalado junto com remark-math** - Trabalham juntos!
@@ -159,11 +174,11 @@ Segunda linha de código
 
 ### Tabela de Derivadas Comuns
 
-| Função | Derivada |
-|--------|----------|
-| $x^n$ | $nx^{n-1}$ |
-| $e^x$ | $e^x$ |
-| $\sin(x)$ | $\cos(x)$ |
+| Função    | Derivada   |
+| --------- | ---------- |
+| $x^n$     | $nx^{n-1}$ |
+| $e^x$     | $e^x$      |
+| $\sin(x)$ | $\cos(x)$  |
 
 ## Exercícios :pencil:
 
@@ -182,13 +197,13 @@ Segunda linha de código
 
 ### Quando usar cada plugin
 
-| Plugin | Use quando... | Evite quando... |
-|--------|:-----:|:------:|
+| Plugin        |               Use quando...                |                 Evite quando...                  |
+| ------------- | :----------------------------------------: | :----------------------------------------------: |
 | remark-breaks | Precisa respeitar quebras de linha simples | Quer o comportamento padrão markdown (2 espaços) |
-| remark-emoji | Quer documentos mais amigáveis e visuais | Cria documentos formais (relatórios, PDFs) |
-| remark-toc | Documento tem mais de 5 seções | Documento é muito curto (<1 página) |
-| remark-math | Contém equações matemáticas/científicas | Documentos puramente textuais |
-| remark-slug | Quer navegação interna e índices clicáveis | Documentos sem links internos |
+| remark-emoji  |  Quer documentos mais amigáveis e visuais  |    Cria documentos formais (relatórios, PDFs)    |
+| remark-toc    |       Documento tem mais de 5 seções       |       Documento é muito curto (<1 página)        |
+| remark-math   |  Contém equações matemáticas/científicas   |          Documentos puramente textuais           |
+| remark-slug   | Quer navegação interna e índices clicáveis |          Documentos sem links internos           |
 
 ---
 
@@ -208,6 +223,7 @@ Segunda linha de código
 ## Dicas e Truques
 
 ### 1. **Combinar Múltiplos Recursos**
+
 ```markdown
 # Projeto :rocket:
 
@@ -225,13 +241,17 @@ Segunda linha
 ```
 
 ### 2. **Emojis em Headings**
+
 ```markdown
 # 📚 Documentação
+
 ## ✨ Features
+
 ### 🎯 Objetivos
 ```
 
 ### 3. **Equações em Listas**
+
 ```markdown
 1. Primeira equação: $x = \frac{-b \pm \sqrt{b^2-4ac}}{2a}$
 2. Segunda equação: $y = mx + b$
@@ -239,6 +259,7 @@ Segunda linha
 ```
 
 ### 4. **Navegação com Slugs**
+
 ```markdown
 # Capítulo 1
 
@@ -279,4 +300,3 @@ Para dúvidas ou problemas com os plugins:
 1. Verifique a documentação oficial do plugin
 2. Abra uma issue no repositório
 3. Consulte os exemplos neste documento
-

@@ -13,7 +13,7 @@ Uma aplicação web moderna e minimalista que permite converter markdown para do
 - ✅ **Suporte Markdown Completo**: Headings (H1-H6), listas ordenadas/desordenadas, código com syntax highlight, blocos de citação, links, tabelas, linhas horizontais
 - ✅ **Diagramas Mermaid**: Renderização em tempo real de diagramas (flow, sequence, state, gantt, etc.) com suporte completo
 - ✅ **Estruturas de Árvore e Diagramas ASCII**: Detecta e renderiza automaticamente diagramas com caracteres `├──`, `└──`, `│`, etc.
-- ✅ **Plugins Remark Avançados**: 
+- ✅ **Plugins Remark Avançados**:
   - 📝 **remark-breaks** - Quebras de linha simples em `<br>` tags
   - 😄 **remark-emoji** - Suporte para emojis (`:smile:` → 😄)
   - 📚 **remark-toc** - Tabela de conteúdos automática
@@ -156,11 +156,11 @@ Para conhecer em detalhes como usar os plugins remark instalados (emojis, equaç
 👉 **[docs/REMARK_PLUGINS.md](docs/REMARK_PLUGINS.md)**
 
 Nele você encontrará:
+
 - Como usar cada plugin
 - Exemplos práticos
 - Limitações na exportação DOCX
 - Dicas e truques para combinar múltiplos recursos
-
 
 - `npm run format:check` — Prettier --check
 

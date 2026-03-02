@@ -145,9 +145,9 @@ Toast: "Salvo em: https://drive.google.com/..."
 
 ```typescript
 interface AbaData {
-  id: string;                   // ID único gerado
-  nome: string;                 // Nome renomeável
-  conteudo: string;            // Markdown editável
+  id: string; // ID único gerado
+  nome: string; // Nome renomeável
+  conteudo: string; // Markdown editável
   salvoAoMemento: string | null; // Timestamp "Salvo às HH:MM:SS"
 }
 
@@ -186,6 +186,7 @@ interface AppStore {
 ### Header.tsx
 
 **Responsabilidades:**
+
 - Exibir versão da aplicação
 - Botão "Exportar Todas" (loop com 500ms delay)
 - Botão "Salvar Todas" (timestamp em todas as abas)
@@ -193,6 +194,7 @@ interface AppStore {
 - Botões auth (login/logout)
 
 **Padrão de Animação:**
+
 ```typescript
 {aba.salvoAoMemento ? (
   <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}>
@@ -206,6 +208,7 @@ interface AppStore {
 ### TabsBar.tsx
 
 **Responsabilidades:**
+
 - Renderizar array de abas com scroll horizontal
 - Adicionar/remover/renomear abas
 - Salvar/exportar aba individual
@@ -213,6 +216,7 @@ interface AppStore {
 - Navegar entre abas (left/right em viewports pequenos)
 
 **Estrutura:**
+
 ```
 [← botão scroll] [aba1] [aba2] [aba3] [+ botão] [botão scroll →]
 ```
@@ -220,12 +224,14 @@ interface AppStore {
 ### MarkdownEditor.tsx
 
 **Responsabilidades:**
+
 - Textarea com suporte a Tab (insere `\t`)
 - Dropdown inteligente: Colar / Limpar e Colar
 - Feedback visual (CheckCircle2 por 2s após colar)
 - Sincronizar com store em tempo real
 
 **Padrão Tab:**
+
 ```typescript
 if (e.key === 'Tab') {
   e.preventDefault();
@@ -241,12 +247,14 @@ if (e.key === 'Tab') {
 ### MarkdownPreview.tsx
 
 **Responsabilidades:**
+
 - Renderizar markdown via ReactMarkdown
 - Detectar e renderizar diagramas Mermaid
 - Aplicar plugins remark (GFM, emojis, TOC, math)
 - Handlers customizados para cada elemento HTML
 
 **Plugins Remark (Ordem Importa!):**
+
 1. `remarkGfm` — GitHub Flavored Markdown
 2. `remarkBreaks` — Quebras de linha simples
 3. `remarkEmoji` — Emojis (`:smile:` → 😄)
@@ -254,11 +262,13 @@ if (e.key === 'Tab') {
 5. `remarkMath` — Equações matemáticas
 
 **Plugins Rehype:**
+
 - `rehypeKatex` — Renderização KaTeX (requer CSS)
 
 ### MermaidDiagram.tsx
 
 **Responsabilidades:**
+
 - Renderizar blocos ` ```mermaid ` como SVG
 - Inicializar mermaid com tema e segurança
 - Tratamento de erros (div vermelho se inválido)
@@ -269,6 +279,7 @@ if (e.key === 'Tab') {
 ### Arquivo: lib/markdown-to-docx.ts
 
 **Fluxo:**
+
 1. **Parsing**: Tokenizar markdown linha-por-linha
 2. **Tipos**: `heading|paragraph|list|code|table|hr|mermaid`
 3. **Processamento**: Formatação inline (`**bold**`, `_italic_`, `` `código` ``)
@@ -277,15 +288,15 @@ if (e.key === 'Tab') {
 
 **Tipos Suportados:**
 
-| Tipo | Exemplo | Renderização DOCX |
-|------|---------|------------------|
-| `heading` | `# Título` | `HeadingLevel` 1-6 |
-| `paragraph` | Texto simples | `Paragraph` |
-| `list` | `- Item` ou `1. Item` | `Paragraph` com marcadores |
-| `code` | ` ```js ... ` | `Paragraph` monospace |
-| `table` | `\| col \|` | `Table` |
-| `hr` | `---` | `Paragraph` com border |
-| `mermaid` | ` ```mermaid ` | `Paragraph` com código (SVG não suportado) |
+| Tipo        | Exemplo               | Renderização DOCX                          |
+| ----------- | --------------------- | ------------------------------------------ |
+| `heading`   | `# Título`            | `HeadingLevel` 1-6                         |
+| `paragraph` | Texto simples         | `Paragraph`                                |
+| `list`      | `- Item` ou `1. Item` | `Paragraph` com marcadores                 |
+| `code`      | ` ```js ... `         | `Paragraph` monospace                      |
+| `table`     | `\| col \|`           | `Table`                                    |
+| `hr`        | `---`                 | `Paragraph` com border                     |
+| `mermaid`   | ` ```mermaid `        | `Paragraph` com código (SVG não suportado) |
 
 ### ⚠️ Limitações Importantes
 
@@ -299,9 +310,11 @@ if (e.key === 'Tab') {
 ### NextAuth Configuration (app/api/auth/[...nextauth].ts)
 
 **Providers:**
+
 - Google OAuth com escopo `https://www.googleapis.com/auth/drive.file`
 
 **Callbacks:**
+
 ```typescript
 jwt({ token, account }) {
   // Armazenar accessToken no JWT
@@ -321,6 +334,7 @@ session({ session, token }) {
 ```
 
 **Fluxo:**
+
 1. User clica "Entrar com Google"
 2. Google OAuth autentica
 3. NextAuth cria JWT com accessToken
@@ -332,6 +346,7 @@ session({ session, token }) {
 ### POST /api/auth/[...nextauth]
 
 Handled by NextAuth. Endpoints automáticos:
+
 - `GET /api/auth/signin` — Redirects to login
 - `GET /api/auth/callback/google` — OAuth callback
 - `GET /api/auth/signout` — Logout
@@ -342,32 +357,36 @@ Handled by NextAuth. Endpoints automáticos:
 **Propósito:** Salvar documento DOCX no Google Drive
 
 **Request:**
+
 ```typescript
 {
-  conteudo: string;     // Markdown a converter
-  nomeArquivo: string;  // Nome do arquivo
+  conteudo: string; // Markdown a converter
+  nomeArquivo: string; // Nome do arquivo
 }
 ```
 
 **Response (Sucesso):**
+
 ```typescript
 {
   sucesso: true;
   mensagem: string;
   idArquivo: string;
-  urlArquivo: string;   // Link público do arquivo
+  urlArquivo: string; // Link público do arquivo
 }
 ```
 
 **Response (Erro):**
+
 ```typescript
 {
   sucesso: false;
-  mensagem: string;     // Descrição do erro
+  mensagem: string; // Descrição do erro
 }
 ```
 
 **Validações:**
+
 - Session autenticada obrigatória
 - accessToken deve estar disponível
 - MIME type: `application/vnd.openxmlformats-officedocument.wordprocessingml.document`
@@ -422,6 +441,7 @@ Google Drive
 ## 🧪 Teste e Build
 
 **Comandos:**
+
 ```bash
 npm run dev              # Dev server
 npm run build            # Build otimizado
@@ -433,6 +453,7 @@ npm run format           # Prettier
 ```
 
 **Jest Configuration:**
+
 - Test Environment: `jsdom`
 - Path Mapping: `@/` → raiz
 - Setup: `jest.setup.js`
@@ -440,26 +461,26 @@ npm run format           # Prettier
 
 ## 🎯 Stack Tecnológico
 
-| Layer | Biblioteca | Versão |
-|-------|-----------|--------|
-| Framework | Next.js | 16.1.6 |
-| React | React + React DOM | 19.0.0 |
-| State | Zustand | 4.4.0 |
-| UI Framework | Tailwind CSS | 3.3 |
-| Components | shadcn/ui | latest |
-| Ícones | lucide-react | 0.575.0 |
-| Animações | Framer Motion | 11.0.0 |
-| Markdown | react-markdown | 9.0.0 |
-| Plugins Remark | remark-gfm, remark-breaks, remark-emoji, remark-toc, remark-math | 4.0.0+ |
-| Plugins Rehype | rehype-katex | 7.0.1 |
-| Diagramas | Mermaid | 11.12.3 |
-| DOCX Export | docx | 8.5.0 |
-| Autenticação | NextAuth.js | 4.24.0 |
-| Google APIs | googleapis | 171.4.0 |
-| Tipagem | TypeScript | 5.3 |
-| Linting | ESLint | 8.57 |
-| Formatação | Prettier | 3.8 |
-| Testes | Jest + RTL | latest |
+| Layer          | Biblioteca                                                       | Versão  |
+| -------------- | ---------------------------------------------------------------- | ------- |
+| Framework      | Next.js                                                          | 16.1.6  |
+| React          | React + React DOM                                                | 19.0.0  |
+| State          | Zustand                                                          | 4.4.0   |
+| UI Framework   | Tailwind CSS                                                     | 3.3     |
+| Components     | shadcn/ui                                                        | latest  |
+| Ícones         | lucide-react                                                     | 0.575.0 |
+| Animações      | Framer Motion                                                    | 11.0.0  |
+| Markdown       | react-markdown                                                   | 9.0.0   |
+| Plugins Remark | remark-gfm, remark-breaks, remark-emoji, remark-toc, remark-math | 4.0.0+  |
+| Plugins Rehype | rehype-katex                                                     | 7.0.1   |
+| Diagramas      | Mermaid                                                          | 11.12.3 |
+| DOCX Export    | docx                                                             | 8.5.0   |
+| Autenticação   | NextAuth.js                                                      | 4.24.0  |
+| Google APIs    | googleapis                                                       | 171.4.0 |
+| Tipagem        | TypeScript                                                       | 5.3     |
+| Linting        | ESLint                                                           | 8.57    |
+| Formatação     | Prettier                                                         | 3.8     |
+| Testes         | Jest + RTL                                                       | latest  |
 
 ## 🔑 Variáveis de Ambiente
 
@@ -476,8 +497,8 @@ GOOGLE_CLIENT_SECRET=seu-google-client-secret
 ## ✅ Checklist de Desenvolvimento
 
 Antes de fazer commit:
+
 1. `npm run lint:fix` — Corrigir linting
 2. `npm run format` — Formatar com Prettier
 3. `npm run test` — Todos os testes passam
 4. `npm run build` — Build sem erros TypeScript
-

@@ -32,6 +32,7 @@ echo ""
 echo "🧪 Executando testes..."
 npm run test -- --passWithNoTests
 
+# shellcheck disable=SC2181
 if [ $? -ne 0 ]; then
   echo "❌ Testes falharam"
   exit 1
@@ -44,6 +45,7 @@ echo ""
 echo "🔨 Verificando build..."
 npm run build
 
+# shellcheck disable=SC2181
 if [ $? -ne 0 ]; then
   echo "❌ Build falhou"
   exit 1

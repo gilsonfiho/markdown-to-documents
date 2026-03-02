@@ -6,11 +6,11 @@ Os plugins remark são usados em `components/MarkdownPreview.tsx` para estender 
 
 ```typescript
 const remarkPlugins = [
-  remarkGfm,       // 1. GitHub Flavored Markdown
-  remarkBreaks,    // 2. Quebras de linha simples
-  remarkEmoji,     // 3. Suporte a emojis
-  remarkToc,       // 4. Tabela de conteúdos
-  remarkMath,      // 5. Equações matemáticas
+  remarkGfm, // 1. GitHub Flavored Markdown
+  remarkBreaks, // 2. Quebras de linha simples
+  remarkEmoji, // 3. Suporte a emojis
+  remarkToc, // 4. Tabela de conteúdos
+  remarkMath, // 5. Equações matemáticas
 ];
 
 const rehypePlugins = [
@@ -23,6 +23,7 @@ const rehypePlugins = [
 **Propósito:** Suporte para GitHub Flavored Markdown
 
 **Funcionalidades:**
+
 - Tabelas
 - Strikethrough (`~~texto~~`)
 - Task lists (`- [x] Tarefa completa`)
@@ -32,19 +33,22 @@ const rehypePlugins = [
 ### Exemplos
 
 **Tabelas:**
+
 ```markdown
 | Coluna 1 | Coluna 2 |
-|----------|----------|
+| -------- | -------- |
 | Célula 1 | Célula 2 |
 | Célula 3 | Célula 4 |
 ```
 
 **Strikethrough:**
+
 ```markdown
 ~~Texto riscado~~
 ```
 
 **Task Lists:**
+
 ```markdown
 - [x] Tarefa completa
 - [ ] Tarefa pendente
@@ -85,31 +89,36 @@ const rehypePlugins = [
 **Propósito:** Converter quebras de linha simples (`\n`) em tags `<br/>`
 
 **Por que é importante:**
+
 - Markdown padrão ignora quebras de linha simples
 - `remarkBreaks` permite quebras de linha sem precisar de duplos espaços ou `<br/>`
 
 ### Exemplos
 
 **Sem remarkBreaks:**
+
 ```markdown
 Linha 1
 Linha 2
 ```
 
 Renderiza como:
+
 ```html
 <p>Linha 1 Linha 2</p>
 ```
 
 **Com remarkBreaks:**
+
 ```markdown
 Linha 1
 Linha 2
 ```
 
 Renderiza como:
+
 ```html
-<p>Linha 1<br/>Linha 2</p>
+<p>Linha 1<br />Linha 2</p>
 ```
 
 ### Casos de Uso
@@ -126,13 +135,13 @@ Renderiza como:
 
 ### Exemplos
 
-| Código | Resultado | Código | Resultado |
-|--------|-----------|--------|-----------|
-| `:smile:` | 😄 | `:heart:` | ❤️ |
-| `:rocket:` | 🚀 | `:star:` | ⭐ |
-| `:thumbsup:` | 👍 | `:tada:` | 🎉 |
-| `:bug:` | 🐛 | `:fire:` | 🔥 |
-| `:warning:` | ⚠️ | `:check:` | ✅ |
+| Código       | Resultado | Código    | Resultado |
+| ------------ | --------- | --------- | --------- |
+| `:smile:`    | 😄        | `:heart:` | ❤️        |
+| `:rocket:`   | 🚀        | `:star:`  | ⭐        |
+| `:thumbsup:` | 👍        | `:tada:`  | 🎉        |
+| `:bug:`      | 🐛        | `:fire:`  | 🔥        |
+| `:warning:`  | ⚠️        | `:check:` | ✅        |
 
 ### Markdown Completo
 
@@ -171,6 +180,7 @@ Este projeto é :rocket: e :star: demais!
 ### Exemplos
 
 **Markdown:**
+
 ```markdown
 # Meu Documento
 
@@ -188,19 +198,23 @@ Este projeto é :rocket: e :star: demais!
 ```
 
 **Saída HTML Gerada:**
+
 ```html
 <h1>Meu Documento</h1>
 
 <h2>Table of Contents</h2>
 <ul>
-  <li><a href="#seção-1">Seção 1</a>
+  <li>
+    <a href="#seção-1">Seção 1</a>
     <ul>
       <li><a href="#subseção-11">Subseção 1.1</a></li>
     </ul>
   </li>
-  <li><a href="#seção-2">Seção 2</a>
+  <li>
+    <a href="#seção-2">Seção 2</a>
     <ul>
-      <li><a href="#subseção-21">Subseção 2.1</a>
+      <li>
+        <a href="#subseção-21">Subseção 2.1</a>
         <ul>
           <li><a href="#subsubseção-211">Subsubseção 2.1.1</a></li>
         </ul>
@@ -230,24 +244,27 @@ Este projeto é :rocket: e :star: demais!
 
 **Delimitadores:**
 
-| Tipo | Exemplo | Saída |
-|------|---------|-------|
-| Inline | `$a + b = c$` | Fórmula inline |
+| Tipo    | Exemplo               | Saída            |
+| ------- | --------------------- | ---------------- |
+| Inline  | `$a + b = c$`         | Fórmula inline   |
 | Display | `$$a^2 + b^2 = c^2$$` | Fórmula centrada |
 
 ### Exemplos
 
 **Inline Math:**
+
 ```markdown
 A fórmula de Pitágoras é $a^2 + b^2 = c^2$, onde...
 ```
 
 Renderiza como:
+
 ```
 A fórmula de Pitágoras é [fórmula renderizada], onde...
 ```
 
 **Display Math:**
+
 ```markdown
 A integral de $f(x)$ é:
 
@@ -299,6 +316,7 @@ c & d
 ### ⚠️ Importação CSS Obrigatória
 
 **Em `app/layout.tsx` ou `components/MarkdownPreview.tsx`:**
+
 ```typescript
 import 'katex/dist/katex.min.css';
 ```
@@ -353,6 +371,7 @@ HTML Final
 ```
 
 **⚠️ Se mudar a ordem:**
+
 - `remarkGfm` **deve ser primeiro** (baseline para GFM)
 - `remarkMath` **deve ser último** nos remark plugins (prepara para rehype)
 - `rehypeKatex` **deve ser depois** de toda a cadeia remark
@@ -362,11 +381,13 @@ HTML Final
 ### Exemplo: Adicionar `remark-slug` (para gerar IDs automáticos em headings)
 
 **1. Instalar:**
+
 ```bash
 npm install remark-slug
 ```
 
 **2. Importar em `MarkdownPreview.tsx`:**
+
 ```typescript
 import remarkSlug from 'remark-slug';
 
@@ -374,17 +395,19 @@ const remarkPlugins = [
   remarkGfm,
   remarkBreaks,
   remarkEmoji,
-  [remarkSlug, {}],  // Novo plugin aqui
-  remarkToc,         // Após remarkSlug (porque TOC usa slugs)
+  [remarkSlug, {}], // Novo plugin aqui
+  remarkToc, // Após remarkSlug (porque TOC usa slugs)
   remarkMath,
 ];
 ```
 
 **3. Testar:**
+
 ```markdown
 # Meu Heading
 
 Renderiza como:
+
 <h1 id="meu-heading">Meu Heading</h1>
 ```
 
@@ -393,6 +416,7 @@ Renderiza como:
 ### Problema: "Plugin não funciona"
 
 **Checklist:**
+
 - ✅ Plugin está instalado (`npm list remark-xxx`)
 - ✅ Importado corretamente em `MarkdownPreview.tsx`
 - ✅ Adicionado no array `remarkPlugins`
@@ -404,6 +428,7 @@ Renderiza como:
 **Causa:** Falta `import 'katex/dist/katex.min.css'`
 
 **Solução:**
+
 ```typescript
 // Em MarkdownPreview.tsx
 import 'katex/dist/katex.min.css';
@@ -415,12 +440,14 @@ import { renderToString } from 'react-markdown';
 **Causa:** Não tem `## Table of Contents` no markdown
 
 **Solução:** Adicionar linha ao markdown:
+
 ```markdown
 # Meu Documento
 
 ## Table of Contents
 
 ## Seção 1
+
 ...
 ```
 
@@ -429,9 +456,10 @@ import { renderToString } from 'react-markdown';
 **Causa:** `remarkGfm` não é o primeiro plugin
 
 **Solução:** Colocar `remarkGfm` **sempre primeiro**:
+
 ```typescript
 const remarkPlugins = [
-  remarkGfm,        // SEMPRE PRIMEIRO
+  remarkGfm, // SEMPRE PRIMEIRO
   outroPlugin,
 ];
 ```
@@ -441,27 +469,29 @@ const remarkPlugins = [
 **Nota:** Mermaid é renderizado separadamente em `MermaidDiagram.tsx`, não via plugins remark.
 
 Plugins remark são para markdown. Mermaid tem:
+
 - Detecção: ` ```mermaid ` code blocks
 - Renderização: Component `<MermaidDiagram>`
 - Limpeza: Função `limparDiagramaMermaid()` em `lib/mermaid-cleaner.ts`
 
 ## 📊 Matriz de Compatibilidade
 
-| Plugin | Versão | React 19 | Next.js 16 | DOCX | Observação |
-|--------|--------|----------|-----------|------|-----------|
-| remarkGfm | 4.0.0 | ✅ | ✅ | ⚠️ | Deve ser primeiro |
-| remarkBreaks | 4.0.0 | ✅ | ✅ | ✅ | Preserva quebras |
-| remarkEmoji | 5.0.2 | ✅ | ✅ | ✅ | Compatível |
-| remarkToc | 9.0.0 | ✅ | ✅ | ⚠️ | Links não funcionam em DOCX |
-| remarkMath | 6.0.0 | ✅ | ✅ | ❌ | Não exporta para DOCX |
-| rehypeKatex | 7.0.1 | ✅ | ✅ | ❌ | Requer CSS obrigatório |
+| Plugin       | Versão | React 19 | Next.js 16 | DOCX | Observação                  |
+| ------------ | ------ | -------- | ---------- | ---- | --------------------------- |
+| remarkGfm    | 4.0.0  | ✅       | ✅         | ⚠️   | Deve ser primeiro           |
+| remarkBreaks | 4.0.0  | ✅       | ✅         | ✅   | Preserva quebras            |
+| remarkEmoji  | 5.0.2  | ✅       | ✅         | ✅   | Compatível                  |
+| remarkToc    | 9.0.0  | ✅       | ✅         | ⚠️   | Links não funcionam em DOCX |
+| remarkMath   | 6.0.0  | ✅       | ✅         | ❌   | Não exporta para DOCX       |
+| rehypeKatex  | 7.0.1  | ✅       | ✅         | ❌   | Requer CSS obrigatório      |
 
 ## 📝 Referências de Sintaxe Rápida
 
 **GFM:**
+
 ```markdown
 | Col 1 | Col 2 |
-|-------|-------|
+| ----- | ----- |
 | Dado  | Dado  |
 
 ~~Riscado~~
@@ -471,26 +501,29 @@ Plugins remark são para markdown. Mermaid tem:
 ```
 
 **Emojis:**
+
 ```markdown
 :smile: :rocket: :tada: :heart: :thumbsup:
 ```
 
 **Quebras de Linha:**
+
 ```markdown
 Linha 1
 Linha 2
 ```
 
 **Table of Contents:**
+
 ```markdown
 ## Table of Contents
 ```
 
 **Math:**
+
 ```markdown
 Inline: $a + b = c$
 
 Display:
 $$\int_0^{\infty} e^{-x^2} dx = \frac{\sqrt{\pi}}{2}$$
 ```
-

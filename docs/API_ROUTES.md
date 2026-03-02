@@ -12,14 +12,14 @@ As rotas de API são implementadas em Next.js 16 usando App Router em `app/api/`
 
 NextAuth gera endpoints automáticos em `app/api/auth/[...nextauth]/route.ts`:
 
-| Método | Endpoint | Descrição |
-|--------|----------|-----------|
-| GET | `/api/auth/signin` | Redireciona para tela de login Google |
-| GET | `/api/auth/callback/google` | OAuth callback (automático) |
-| GET | `/api/auth/signout` | Logout e limpa sessão |
-| GET | `/api/auth/session` | Retorna sessão atual (para cliente) |
-| GET | `/api/auth/providers` | Lista providers configurados |
-| GET | `/api/auth/csrf` | CSRF token para formulários |
+| Método | Endpoint                    | Descrição                             |
+| ------ | --------------------------- | ------------------------------------- |
+| GET    | `/api/auth/signin`          | Redireciona para tela de login Google |
+| GET    | `/api/auth/callback/google` | OAuth callback (automático)           |
+| GET    | `/api/auth/signout`         | Logout e limpa sessão                 |
+| GET    | `/api/auth/session`         | Retorna sessão atual (para cliente)   |
+| GET    | `/api/auth/providers`       | Lista providers configurados          |
+| GET    | `/api/auth/csrf`            | CSRF token para formulários           |
 
 ### Configuração
 
@@ -108,6 +108,7 @@ export const MeuComponente = () => {
 **Autenticação:** Obrigatória (NextAuth session)
 
 **Body:**
+
 ```json
 {
   "conteudo": "# Título\n\nParágrafo...",
@@ -117,10 +118,10 @@ export const MeuComponente = () => {
 
 **Parâmetros:**
 
-| Nome | Tipo | Obrigatório | Descrição |
-|------|------|-------------|-----------|
-| `conteudo` | string | Sim | Conteúdo markdown a converter |
-| `nomeArquivo` | string | Sim | Nome do arquivo (sem extensão) |
+| Nome          | Tipo   | Obrigatório | Descrição                      |
+| ------------- | ------ | ----------- | ------------------------------ |
+| `conteudo`    | string | Sim         | Conteúdo markdown a converter  |
+| `nomeArquivo` | string | Sim         | Nome do arquivo (sem extensão) |
 
 ### Response (Sucesso - 200)
 
@@ -135,12 +136,12 @@ export const MeuComponente = () => {
 
 **Campos:**
 
-| Nome | Tipo | Descrição |
-|------|------|-----------|
-| `sucesso` | boolean | Indica sucesso da operação |
-| `mensagem` | string | Mensagem descritiva |
-| `idArquivo` | string | ID do arquivo no Google Drive |
-| `urlArquivo` | string | Link público para acessar arquivo |
+| Nome         | Tipo    | Descrição                         |
+| ------------ | ------- | --------------------------------- |
+| `sucesso`    | boolean | Indica sucesso da operação        |
+| `mensagem`   | string  | Mensagem descritiva               |
+| `idArquivo`  | string  | ID do arquivo no Google Drive     |
+| `urlArquivo` | string  | Link público para acessar arquivo |
 
 ### Response (Erro - 401)
 
@@ -154,6 +155,7 @@ export const MeuComponente = () => {
 **Status Code:** 401 Unauthorized
 
 **Causas:**
+
 - User não fez login
 - Sessão expirou
 - `NEXTAUTH_SECRET` não configurado
@@ -170,6 +172,7 @@ export const MeuComponente = () => {
 **Status Code:** 400 Bad Request
 
 **Causas:**
+
 - `conteudo` ou `nomeArquivo` vazio
 - JSON inválido no body
 
@@ -185,6 +188,7 @@ export const MeuComponente = () => {
 **Status Code:** 500 Internal Server Error
 
 **Causas:**
+
 - Google Drive quota excedida
 - AccessToken expirado
 - API erro do Google
@@ -258,29 +262,20 @@ export async function POST(req: NextRequest) {
     // 1. Validar autenticação
     const session = await getServerSession(authOptions);
     if (!session?.user) {
-      return NextResponse.json(
-        { sucesso: false, mensagem: 'Não autenticado' },
-        { status: 401 }
-      );
+      return NextResponse.json({ sucesso: false, mensagem: 'Não autenticado' }, { status: 401 });
     }
 
     // 2. Extrair token de acesso
     const accessToken = (session.user as any).accessToken;
     if (!accessToken) {
-      return NextResponse.json(
-        { sucesso: false, mensagem: 'AccessToken não disponível' },
-        { status: 401 }
-      );
+      return NextResponse.json({ sucesso: false, mensagem: 'AccessToken não disponível' }, { status: 401 });
     }
 
     // 3. Parse request
     const { conteudo, nomeArquivo } = await req.json();
 
     if (!conteudo || !nomeArquivo) {
-      return NextResponse.json(
-        { sucesso: false, mensagem: 'Conteúdo ou nome ausente' },
-        { status: 400 }
-      );
+      return NextResponse.json({ sucesso: false, mensagem: 'Conteúdo ou nome ausente' }, { status: 400 });
     }
 
     // 4. Converter markdown para DOCX
@@ -316,23 +311,16 @@ export async function POST(req: NextRequest) {
       idArquivo: response.data.id,
       urlArquivo: response.data.webViewLink,
     });
-
   } catch (erro) {
     console.error('Erro ao salvar no Drive:', erro);
 
     // Tratamento de erros específicos
     if ((erro as any).code === 'UNAUTHENTICATED') {
-      return NextResponse.json(
-        { sucesso: false, mensagem: 'Token expirado. Faça login novamente.' },
-        { status: 401 }
-      );
+      return NextResponse.json({ sucesso: false, mensagem: 'Token expirado. Faça login novamente.' }, { status: 401 });
     }
 
     if ((erro as any).message?.includes('quota')) {
-      return NextResponse.json(
-        { sucesso: false, mensagem: 'Quota do Google Drive excedida' },
-        { status: 429 }
-      );
+      return NextResponse.json({ sucesso: false, mensagem: 'Quota do Google Drive excedida' }, { status: 429 });
     }
 
     return NextResponse.json(
@@ -340,7 +328,7 @@ export async function POST(req: NextRequest) {
         sucesso: false,
         mensagem: `Erro: ${(erro as Error).message}`,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -379,28 +367,19 @@ export async function POST(req: NextRequest) {
   try {
     // 1. Validar método HTTP
     if (req.method !== 'POST') {
-      return NextResponse.json(
-        { erro: 'Método não permitido' },
-        { status: 405 }
-      );
+      return NextResponse.json({ erro: 'Método não permitido' }, { status: 405 });
     }
 
     // 2. Validar autenticação (se necessário)
     const session = await getServerSession(authOptions);
     if (!session?.user) {
-      return NextResponse.json(
-        { erro: 'Não autenticado' },
-        { status: 401 }
-      );
+      return NextResponse.json({ erro: 'Não autenticado' }, { status: 401 });
     }
 
     // 3. Parse e validar request
     const dados = await req.json();
     if (!dados.campo_obrigatorio) {
-      return NextResponse.json(
-        { erro: 'Campo obrigatório faltando' },
-        { status: 400 }
-      );
+      return NextResponse.json({ erro: 'Campo obrigatório faltando' }, { status: 400 });
     }
 
     // 4. Lógica principal
@@ -411,13 +390,9 @@ export async function POST(req: NextRequest) {
       sucesso: true,
       dados: resultado,
     });
-
   } catch (erro) {
     console.error('Erro na API:', erro);
-    return NextResponse.json(
-      { erro: (erro as Error).message },
-      { status: 500 }
-    );
+    return NextResponse.json({ erro: (erro as Error).message }, { status: 500 });
   }
 }
 
@@ -503,12 +478,14 @@ Cliente (Browser)
 ### Exemplo: POST /api/validar-markdown
 
 1. **Criar arquivo:**
+
 ```bash
 touch app/api/validar-markdown/route.ts
 ```
 
 2. **Implementar:**
-```typescript
+
+````typescript
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
@@ -516,10 +493,7 @@ export async function POST(req: NextRequest) {
     const { conteudo } = await req.json();
 
     if (!conteudo) {
-      return NextResponse.json(
-        { erro: 'Conteúdo vazio' },
-        { status: 400 }
-      );
+      return NextResponse.json({ erro: 'Conteúdo vazio' }, { status: 400 });
     }
 
     // Validar markdown
@@ -533,7 +507,7 @@ export async function POST(req: NextRequest) {
 
     // Check: links quebrados
     const links = conteudo.match(/\[([^\]]+)\]\(([^)]+)\)/g) || [];
-    links.forEach(link => {
+    links.forEach((link) => {
       if (!link.includes('(http')) {
         erros.push(`Link relativo: ${link}`);
       }
@@ -544,17 +518,14 @@ export async function POST(req: NextRequest) {
       erros,
       avisos: [],
     });
-
   } catch (erro) {
-    return NextResponse.json(
-      { erro: (erro as Error).message },
-      { status: 500 }
-    );
+    return NextResponse.json({ erro: (erro as Error).message }, { status: 500 });
   }
 }
-```
+````
 
 3. **Usar no cliente:**
+
 ```typescript
 const response = await fetch('/api/validar-markdown', {
   method: 'POST',
@@ -590,4 +561,3 @@ Antes de publicar nova rota:
 - **NextAuth.js:** https://next-auth.js.org
 - **Google Drive API:** https://developers.google.com/drive/api/v3/about-sdk
 - **HTTP Status Codes:** https://httpwg.org/specs/rfc9110.html
-

@@ -5,6 +5,7 @@
 ### "Session is null" ou "Not authenticated"
 
 **Sintomas:**
+
 - Redirecionamento contínuo para `/auth/signin`
 - `useSession()` retorna `status: 'unauthenticated'`
 - Botão "Entrar" não funciona
@@ -12,11 +13,13 @@
 **Diagnóstico:**
 
 1. **Verificar variáveis de ambiente:**
+
 ```bash
 cat .env.local | grep -E "NEXTAUTH|GOOGLE"
 ```
 
 Deve retornar:
+
 ```
 NEXTAUTH_SECRET=seu-secret
 NEXTAUTH_URL=http://localhost:3000
@@ -25,6 +28,7 @@ GOOGLE_CLIENT_SECRET=seu-secret
 ```
 
 2. **Se houver campos vazios:**
+
 ```bash
 # Gerar novo NEXTAUTH_SECRET
 openssl rand -base64 32
@@ -34,17 +38,20 @@ nano .env.local
 ```
 
 3. **Limpar cookies e cache:**
+
 - Abrir DevTools (F12)
 - Ir para "Application" → "Storage"
 - Clicar "Clear Site Data"
 - Fechar e reabrir navegador
 
 4. **Reiniciar servidor:**
+
 ```bash
 npm run dev
 ```
 
 **Solução Permanente:**
+
 ```env
 # .env.local deve ter:
 NEXTAUTH_SECRET=<resultado de openssl rand -base64 32>
@@ -58,6 +65,7 @@ GOOGLE_CLIENT_SECRET=seu-google-client-secret
 ### "Google authentication failed" ou erro 401 em OAuth
 
 **Sintomas:**
+
 - Erro na tela de login do Google
 - Callback falha silenciosamente
 - Redirecionamento para `/auth/signin?error=...`
@@ -72,6 +80,7 @@ GOOGLE_CLIENT_SECRET=seu-google-client-secret
    - Authorized redirect URIs: `http://localhost:3000/api/auth/callback/google`
 
 2. **Verificar `.env.local`:**
+
 ```bash
 # IDs devem ser exatos (copiar/colar do Cloud Console)
 GOOGLE_CLIENT_ID=seu-id-exato.apps.googleusercontent.com
@@ -79,13 +88,15 @@ GOOGLE_CLIENT_SECRET=seu-secret-exato
 ```
 
 3. **Validar escopo OAuth:**
+
 ```typescript
 // Em app/api/auth/[...nextauth].ts
 // Verificar que scopes incluem:
-scope: 'openid profile email https://www.googleapis.com/auth/drive.file'
+scope: 'openid profile email https://www.googleapis.com/auth/drive.file';
 ```
 
 **Solução:**
+
 ```bash
 # Regenerar Google OAuth credentials:
 # 1. Deletar credenciais antigas no Cloud Console
@@ -102,6 +113,7 @@ npm run dev
 ### "Abas não salvam" ou "localStorage vazio"
 
 **Sintomas:**
+
 - Editar markdown, desconectar e reconectar perde conteúdo
 - localStorage vazio em DevTools
 - Novas abas criadas sempre com conteúdo padrão
@@ -109,6 +121,7 @@ npm run dev
 **Diagnóstico:**
 
 1. **Verificar localStorage em DevTools:**
+
 ```bash
 # F12 > Application > Storage > Local Storage
 # Deve ter:
@@ -130,12 +143,13 @@ const handleChange = (conteudo: string) => {
 ```
 
 3. **Verificar se localStorage está corrompido:**
+
 ```javascript
 // No console do navegador (F12):
-localStorage.getItem('markdown-studio-abas')
+localStorage.getItem('markdown-studio-abas');
 // Se retorna algo inválido ou null:
-localStorage.clear()
-location.reload()
+localStorage.clear();
+location.reload();
 ```
 
 4. **Verificar se `carregarDoStorage()` é chamado ao iniciar:**
@@ -155,10 +169,10 @@ useEffect(() => {
 
 carregarDoStorage: () => {
   if (typeof window === 'undefined') return;
-  
+
   const storedAbas = localStorage.getItem('markdown-studio-abas');
   const storedAbaAtiva = localStorage.getItem('markdown-studio-aba-ativa');
-  
+
   if (storedAbas) {
     set({ abas: JSON.parse(storedAbas) });
   }
@@ -169,17 +183,17 @@ carregarDoStorage: () => {
 
 salvarNoStorage: (abaId?: string) => {
   if (typeof window === 'undefined') return;
-  
+
   const state = get();
   localStorage.setItem('markdown-studio-abas', JSON.stringify(state.abas));
   localStorage.setItem('markdown-studio-aba-ativa', state.abaAtiva);
-  
+
   // Timestamp visual
   if (abaId) {
     const now = new Date();
     const hora = now.toLocaleTimeString('pt-BR');
     set(state => ({
-      abas: state.abas.map(aba => 
+      abas: state.abas.map(aba =>
         aba.id === abaId ? { ...aba, salvoAoMemento: `Salvo às ${hora}` } : aba
       )
     }));
@@ -192,6 +206,7 @@ salvarNoStorage: (abaId?: string) => {
 ### "Aba não renderiza preview" ou "Preview em branco"
 
 **Sintomas:**
+
 - Editor mostra markdown, preview vazio
 - Trocar de abas e preview desaparece
 - Sem erros no console
@@ -199,6 +214,7 @@ salvarNoStorage: (abaId?: string) => {
 **Diagnóstico:**
 
 1. **Verificar se `abaAtiva` está definida:**
+
 ```typescript
 // Em app/page.tsx, adicionar log:
 const { abaAtiva, abas } = useAppStore();
@@ -209,23 +225,27 @@ console.log('Abas:', abas);
 Deve ter ID válido em `abaAtiva`.
 
 2. **Verificar se aba contém conteúdo:**
+
 ```typescript
 // Console:
 const store = useAppStore.getState();
-const abaAtual = store.abas.find(a => a.id === store.abaAtiva);
+const abaAtual = store.abas.find((a) => a.id === store.abaAtiva);
 console.log('Aba atual:', abaAtual);
 console.log('Conteúdo:', abaAtual?.conteudo);
 ```
 
 3. **Testar com markdown simples:**
+
 ```markdown
 # Título
+
 Parágrafo simples
 ```
 
 Se preview ainda está vazio, problema é em `MarkdownPreview.tsx`.
 
 4. **Verificar console para erros de React Markdown:**
+
 - F12 → Console
 - Procurar por erros vermelhos
 - Se houver erro em plugin remark, será mostrado aqui
@@ -270,6 +290,7 @@ export const MarkdownPreview: React.FC = () => {
 ### "Export não funciona" ou "Download não inicia"
 
 **Sintomas:**
+
 - Clicar em "Exportar" não faz nada
 - Sem erro, sem download
 - Console está limpo
@@ -277,6 +298,7 @@ export const MarkdownPreview: React.FC = () => {
 **Diagnóstico:**
 
 1. **Verificar se `markdownToDocx()` executa:**
+
 ```typescript
 // Adicionar log em Header.tsx
 const handleExportarTodas = async () => {
@@ -284,24 +306,28 @@ const handleExportarTodas = async () => {
   for (const aba of abas) {
     console.log(`Exportando aba: ${aba.nome}`);
     await markdownToDocx(aba.conteudo, aba.nome);
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 500));
   }
   console.log('Exportação completa');
 };
 ```
 
 2. **Verificar tamanho do arquivo:**
+
 - Markdown muito grande pode falhar
 - Se > 10MB, quebrar em múltiplos documentos
 
 3. **Verificar permissões de download:**
+
 - Navegador bloqueou downloads?
 - F12 → Application → Permissions
 - Permitir downloads do localhost
 
 4. **Testar com markdown simples:**
+
 ```markdown
 # Título
+
 Parágrafo
 ```
 
@@ -314,26 +340,28 @@ Se funciona com simples, problema está no markdown complexo.
 export const markdownToDocx = async (conteudo: string, nomeArquivo: string) => {
   try {
     console.log('Iniciando conversão:', { nomeArquivo, tamanho: conteudo.length });
-    
+
     const parsedContent = parseMarkdown(conteudo);
     console.log('Markdown parseado:', parsedContent);
-    
+
     const document = new Document({
-      sections: [{
-        children: parsedContent.map(converterParaParagraph),
-      }],
+      sections: [
+        {
+          children: parsedContent.map(converterParaParagraph),
+        },
+      ],
     });
 
     const blob = await Packer.toBlob(document);
     console.log('Blob criado:', { tamanho: blob.size });
-    
+
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
     a.download = `${nomeArquivo}.docx`;
     a.click();
     URL.revokeObjectURL(url);
-    
+
     console.log('Download iniciado');
   } catch (erro) {
     console.error('Erro ao exportar:', erro);
@@ -346,6 +374,7 @@ export const markdownToDocx = async (conteudo: string, nomeArquivo: string) => {
 ### "DOCX vazio" ou "Conteúdo perdido na exportação"
 
 **Sintomas:**
+
 - Arquivo baixa, mas está vazio
 - Apenas alguns parágrafos aparecem
 - Tabelas ou listas não aparecem
@@ -353,12 +382,13 @@ export const markdownToDocx = async (conteudo: string, nomeArquivo: string) => {
 **Diagnóstico:**
 
 1. **Verificar parsing de markdown:**
+
 ```typescript
 // Adicionar log em markdown-to-docx.ts
 const parseMarkdown = (conteudo: string) => {
   const lines = conteudo.split('\n');
   console.log(`Parseando ${lines.length} linhas...`);
-  
+
   const parsed = [];
   // ... parsing logic ...
   console.log('Resultado parseado:', parsed);
@@ -367,6 +397,7 @@ const parseMarkdown = (conteudo: string) => {
 ```
 
 2. **Verificar tipos suportados:**
+
 - `heading` ✅
 - `paragraph` ✅
 - `list` (renderizado como Paragraph com marcadores)
@@ -376,6 +407,7 @@ const parseMarkdown = (conteudo: string) => {
 - Imagens ❌ (não suportadas)
 
 3. **Testar conversão individual:**
+
 ```bash
 # Criar arquivo test.md com markdown simples
 npm run dev
@@ -438,6 +470,7 @@ const converterParaParagraph = (element: ParsedMarkdown): Paragraph | Table => {
 ### "Diagrama Mermaid não renderiza" ou "Erro vermelho"
 
 **Sintomas:**
+
 - Bloco ` ```mermaid ` aparece como código em vez de diagrama
 - Div vermelho com mensagem de erro
 - Sintaxe válida no mermaid.live mas não funciona aqui
@@ -449,6 +482,7 @@ const converterParaParagraph = (element: ParsedMarkdown): Paragraph | Table => {
    - Se erro lá, é problema de sintaxe Mermaid
 
 2. **Verificar console para erro específico:**
+
 ```bash
 F12 → Console
 # Procurar por:
@@ -461,9 +495,7 @@ F12 → Console
 // lib/mermaid-cleaner.ts
 export const limparDiagramaMermaid = (conteudo: string): string => {
   // Remove tags <br/>, <br>, </br> que quebram Mermaid
-  return conteudo
-    .replace(/<br\s*\/?>/gi, '')
-    .replace(/<\/br>/gi, '');
+  return conteudo.replace(/<br\s*\/?>/gi, '').replace(/<\/br>/gi, '');
 };
 ```
 
@@ -482,16 +514,12 @@ useEffect(() => {
 
   const renderDiagram = async () => {
     try {
-      const { svg, bindFunctions } = await mermaid.render(
-        `diagram-${Date.now()}`,
-        conteudoLimpo,
-      );
+      const { svg, bindFunctions } = await mermaid.render(`diagram-${Date.now()}`, conteudoLimpo);
       diagramRef.current!.innerHTML = svg;
       bindFunctions?.(diagramRef.current);
     } catch (erro) {
       console.error('Erro ao renderizar Mermaid:', erro);
-      diagramRef.current!.innerHTML = 
-        `<div style="color: red;">Erro: ${(erro as Error).message}</div>`;
+      diagramRef.current!.innerHTML = `<div style="color: red;">Erro: ${(erro as Error).message}</div>`;
     }
   };
 
@@ -502,6 +530,7 @@ useEffect(() => {
 **Solução:**
 
 1. **Validar sintaxe:**
+
 ```mermaid
 graph TD
     A[Início] --> B[Processo]
@@ -509,21 +538,26 @@ graph TD
 ```
 
 2. **Remover quebras de linha dentro do diagrama:**
-```markdown
+
+````markdown
 # ❌ Errado
+
 ```mermaid
 graph TD
-    A[Início] 
+    A[Início]
     --> B[Processo]
     --> C[Fim]
 ```
+````
 
 # ✅ Correto
+
 ```mermaid
 graph TD
     A[Início] --> B[Processo] --> C[Fim]
 ```
-```
+
+````
 
 3. **Verificar quotes e caracteres especiais:**
 ```markdown
@@ -532,13 +566,14 @@ A["Texto com 'aspas' dentro"]
 
 # ✅ Melhor usar escape
 A["Texto com caracteres especiais"]
-```
+````
 
 ---
 
 ### "Diagrama não exporta para DOCX"
 
 **Sintomas:**
+
 - Preview mostra diagrama corretamente
 - DOCX baixa mas diagrama não aparece
 - Vê bloco de código em vez de diagrama
@@ -564,6 +599,7 @@ case 'mermaid':
 ### "Salvar no Google Drive falha" ou "500 error"
 
 **Sintomas:**
+
 - Clica "Salvar no Drive", nada acontece
 - Error 500 no console
 - Toast com mensagem de erro
@@ -571,6 +607,7 @@ case 'mermaid':
 **Diagnóstico:**
 
 1. **Verificar se sessão tem accessToken:**
+
 ```typescript
 // No componente que chama salvarNoGoogleDrive:
 const { data: session } = useSession();
@@ -609,6 +646,7 @@ O escopo **deve incluir** `https://www.googleapis.com/auth/drive.file`.
    - Tester users adicionados
 
 4. **Testar endpoint manualmente:**
+
 ```bash
 # Terminal
 curl -X POST http://localhost:3000/api/salvar-no-drive \
@@ -619,6 +657,7 @@ curl -X POST http://localhost:3000/api/salvar-no-drive \
 ```
 
 5. **Verificar logs do servidor:**
+
 ```bash
 # Terminal onde npm run dev está rodando
 # Procurar por erros em POST /api/salvar-no-drive
@@ -711,6 +750,7 @@ export async POST(req: NextRequest) {
 ### "Type errors ao fazer build"
 
 **Sintomas:**
+
 - `npm run build` falha com erros de tipo
 - Código funciona em dev mas falha em build
 
@@ -728,7 +768,8 @@ npm run lint
 
 ```typescript
 // ❌ Erro: `any` implícito
-const handleChange = (props) => {  // props é `any`
+const handleChange = (props) => {
+  // props é `any`
   return props.value;
 };
 
@@ -747,6 +788,7 @@ const handleChange = (props: ChangeProps) => {
 ### "ESLint/Prettier errors impede build"
 
 **Sintomas:**
+
 - `npm run build` falha mesmo sem type errors
 - Mensagem: "ESLint found X warnings"
 
@@ -776,6 +818,7 @@ npm run lint
 ### "Editor lento" ou "Preview travando"
 
 **Sintomas:**
+
 - Digitação com lag
 - Scroll lento
 - Memória crescendo
@@ -783,6 +826,7 @@ npm run lint
 **Diagnóstico:**
 
 1. **Verificar tamanho do markdown:**
+
 ```typescript
 const { abaAtual } = useAppStore();
 console.log('Tamanho do markdown:', abaAtual.conteudo.length, 'caracteres');
@@ -792,6 +836,7 @@ console.log('Tamanho do markdown:', abaAtual.conteudo.length, 'caracteres');
 ```
 
 2. **Verificar re-renders desnecessários:**
+
 ```bash
 # Usar React DevTools Profiler (F12 → Profiler)
 # Gravar interação
@@ -799,6 +844,7 @@ console.log('Tamanho do markdown:', abaAtual.conteudo.length, 'caracteres');
 ```
 
 3. **Verificar plugins remark:**
+
 - `remarkToc` é lento em documentos grandes
 - `remarkMath` pode ser lento com muitas equações
 
@@ -826,6 +872,7 @@ const handleChange = (conteudo: string) => {
 ### "Port 3000 already in use"
 
 **Solução:**
+
 ```bash
 # macOS/Linux
 kill -9 $(lsof -t -i :3000)
@@ -839,6 +886,7 @@ PORT=3001 npm run dev
 ### "npm install falha com dependências conflitantes"
 
 **Solução:**
+
 ```bash
 rm -rf node_modules package-lock.json
 npm install
@@ -850,6 +898,7 @@ npm run dev
 ### "localStorage não limpa entre testes"
 
 **Solução em testes:**
+
 ```typescript
 beforeEach(() => {
   localStorage.clear();
@@ -883,4 +932,3 @@ Quando algo não funciona:
 - **NextAuth.js Docs:** https://next-auth.js.org
 - **Google Drive API:** https://developers.google.com/drive
 - **Next.js 16 Docs:** https://nextjs.org
-

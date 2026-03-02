@@ -32,6 +32,7 @@ nano .env.local
 ```
 
 **Variáveis obrigatórias:**
+
 ```env
 NEXTAUTH_SECRET=<openssl rand -base64 32>
 NEXTAUTH_URL=http://localhost:3000
@@ -122,12 +123,20 @@ Conforme instruções globais, usar português para nomes de funções e variáv
 
 ```typescript
 // ✅ Correto (português)
-const obterAbas = (): AbaData[] => { /* ... */ };
-const renderizarEditor = () => { /* ... */ };
+const obterAbas = (): AbaData[] => {
+  /* ... */
+};
+const renderizarEditor = () => {
+  /* ... */
+};
 
 // ❌ Evitar (inglês)
-const getAbas = (): AbaData[] => { /* ... */ };
-const renderEditor = () => { /* ... */ };
+const getAbas = (): AbaData[] => {
+  /* ... */
+};
+const renderEditor = () => {
+  /* ... */
+};
 ```
 
 ### 5. Comentários e Documentação
@@ -278,11 +287,13 @@ describe('MeuComponente', () => {
 **Exemplo: Adicionar `remark-slug`**
 
 1. **Instalar:**
+
 ```bash
 npm install remark-slug
 ```
 
 2. **Importar em `MarkdownPreview.tsx`:**
+
 ```typescript
 import remarkSlug from 'remark-slug';
 
@@ -290,17 +301,19 @@ const remarkPlugins = [
   remarkGfm,
   remarkBreaks,
   remarkEmoji,
-  [remarkSlug, {}],  // ← Novo plugin
+  [remarkSlug, {}], // ← Novo plugin
   remarkToc,
   remarkMath,
 ];
 ```
 
 3. **Testar:**
+
 ```markdown
 # Meu Heading
 
 Renderiza como:
+
 <h1 id="meu-heading">Meu Heading</h1>
 ```
 
@@ -309,28 +322,31 @@ Renderiza como:
 **Exemplo: Adicionar campo `tags` a cada aba**
 
 1. **Atualizar interface em `lib/store.ts`:**
+
 ```typescript
 interface AbaData {
   id: string;
   nome: string;
   conteudo: string;
   salvoAoMemento: string | null;
-  tags: string[];  // ← Novo campo
+  tags: string[]; // ← Novo campo
 }
 ```
 
 2. **Atualizar inicialização:**
+
 ```typescript
 const MARKDOWN_PADRAO: AbaData = {
   id: gerarIdUnico(),
   nome: 'Documento 1',
   conteudo: '',
   salvoAoMemento: null,
-  tags: [],  // ← Inicializar
+  tags: [], // ← Inicializar
 };
 ```
 
 3. **Adicionar ação no store:**
+
 ```typescript
 adicionarTag: (abaId: string, tag: string) => {
   set(state => ({
@@ -344,9 +360,10 @@ adicionarTag: (abaId: string, tag: string) => {
 ```
 
 4. **Usar em componente:**
+
 ```typescript
 const { abas, adicionarTag } = useAppStore();
-const aba = abas.find(a => a.id === abaAtiva);
+const aba = abas.find((a) => a.id === abaAtiva);
 
 const handleAddTag = (tag: string) => {
   adicionarTag(abaAtiva, tag);
@@ -359,7 +376,8 @@ const handleAddTag = (tag: string) => {
 **Exemplo: Endpoint para validar markdown**
 
 1. **Criar `app/api/validar-markdown/route.ts`:**
-```typescript
+
+````typescript
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
@@ -367,10 +385,7 @@ export async function POST(req: NextRequest) {
     const { conteudo } = await req.json();
 
     if (!conteudo) {
-      return NextResponse.json(
-        { valido: false, erro: 'Conteúdo vazio' },
-        { status: 400 }
-      );
+      return NextResponse.json({ valido: false, erro: 'Conteúdo vazio' }, { status: 400 });
     }
 
     // Validar markdown
@@ -381,10 +396,7 @@ export async function POST(req: NextRequest) {
       erros,
     });
   } catch (erro) {
-    return NextResponse.json(
-      { valido: false, erro: (erro as Error).message },
-      { status: 500 }
-    );
+    return NextResponse.json({ valido: false, erro: (erro as Error).message }, { status: 500 });
   }
 }
 
@@ -398,9 +410,10 @@ function validarMarkdown(conteudo: string): string[] {
 
   return erros;
 }
-```
+````
 
 2. **Usar em componente:**
+
 ```typescript
 const handleValidar = async () => {
   const resposta = await fetch('/api/validar-markdown', {
@@ -496,6 +509,7 @@ git push origin feature/nome-descritivo
 ```
 
 **Descrição de PR deve incluir:**
+
 - O que foi alterado
 - Por que foi alterado
 - Como testar
@@ -508,12 +522,14 @@ git push origin feature/nome-descritivo
 ### Boas Práticas
 
 1. **Nunca commitar `.env.local`:**
+
 ```bash
 # Já ignorado em .gitignore
 echo ".env.local" >> .gitignore
 ```
 
 2. **Validar inputs em API routes:**
+
 ```typescript
 // ✅ Validar
 const { conteudo } = await req.json();
@@ -523,6 +539,7 @@ if (!conteudo || typeof conteudo !== 'string') {
 ```
 
 3. **Usar NextAuth para proteção:**
+
 ```typescript
 // ✅ Validar sessão em API route
 const session = await getServerSession(authOptions);
@@ -532,6 +549,7 @@ if (!session?.user) {
 ```
 
 4. **Sanitizar inputs user-facing:**
+
 ```typescript
 // Markdown é escapado por ReactMarkdown
 // Evitar dangerouslySetInnerHTML
@@ -542,6 +560,7 @@ if (!session?.user) {
 ## 📚 Referências de Arquitetura
 
 Antes de começar, ler:
+
 - `docs/ARCHITECTURE.md` — Fluxo de dados
 - `docs/REMARK_PLUGINS.md` — Plugins de markdown
 - `.github/copilot-instructions.md` — Padrões do projeto
@@ -611,4 +630,3 @@ Antes de começar, ler:
 ---
 
 Obrigado por contribuir! 🎉
-

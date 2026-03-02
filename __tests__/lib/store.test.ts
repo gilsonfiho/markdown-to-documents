@@ -129,7 +129,7 @@ describe('useAppStore', () => {
   });
 
   it('deve gerar IDs únicos para diferentes abas', () => {
-    const { adicionarAba, abas: abasAntes } = useAppStore.getState();
+    const { adicionarAba } = useAppStore.getState();
 
     adicionarAba();
     adicionarAba();

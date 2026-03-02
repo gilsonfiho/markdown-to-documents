@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useSession, signIn, signOut } from 'next-auth/react';
 import { useAppStore } from '@/lib/store';
 import { markdownToDocx, copiarParaAreaTransferencia, baixarHtmlDocumento, exportarParaPdf } from '@/lib/markdown-to-docx';
+import { salvarNoGoogleDrive, salvarTodasNoGoogleDrive } from '@/lib/google-drive';
 import { obterVersaoFormatada } from '@/lib/versao';
-import { LogOut, LogIn, Save, Package, X, Clipboard, CheckCircle2, FileText, FileJson } from 'lucide-react';
+import { LogOut, LogIn, Save, Package, X, Clipboard, CheckCircle2, FileText, FileJson, Cloud } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -15,6 +16,7 @@ export const Header: React.FC = () => {
   const { data: session } = useSession();
   const { abas, salvarTodasAsAbas, fecharTodasAsAbas } = useAppStore();
   const [isExportingAll, setIsExportingAll] = useState(false);
+  const [isSavingToDrive, setIsSavingToDrive] = useState(false);
   const [tudoCopiado, setTudoCopiado] = useState(false);
 
   const handleExportarTodas = async () => {
@@ -32,6 +34,48 @@ export const Header: React.FC = () => {
       setIsExportingAll(false);
     }
   };
+
+  const handleSalvarNoGoogleDrive = async (abaUnica?: string) => {
+    if (!session) {
+      toast.error('Você precisa estar logado para salvar no Google Drive');
+      return;
+    }
+
+    setIsSavingToDrive(true);
+    try {
+      if (abaUnica) {
+        // Salvar uma aba específica
+        const aba = abas.find((a) => a.id === abaUnica);
+        if (!aba) {
+          toast.error('Aba não encontrada');
+          return;
+        }
+
+        const resultado = await salvarNoGoogleDrive(aba.conteudo, aba.nome);
+        if (resultado.sucesso) {
+          toast.success(`"${resultado.nomeArquivo}" salvo no Google Drive com sucesso!`);
+        } else {
+          toast.error(resultado.erro || resultado.mensagem);
+        }
+      } else {
+        // Salvar todas as abas
+        const resultado = await salvarTodasNoGoogleDrive(abas);
+        if (resultado.sucesso > 0) {
+          toast.success(`${resultado.sucesso} documento(s) salvo(s) no Google Drive com sucesso!`);
+        }
+        if (resultado.falhas > 0) {
+          toast.error(`${resultado.falhas} documento(s) falharam ao salvar`);
+        }
+      }
+    } catch (erro) {
+      toast.error('Erro ao salvar no Google Drive');
+      console.error('Erro:', erro);
+    } finally {
+      setIsSavingToDrive(false);
+    }
+  };
+
+  // ...existing code...
 
   const handleCopiarTodas = async () => {
     try {
@@ -126,6 +170,22 @@ export const Header: React.FC = () => {
               <DropdownMenuItem onClick={handleExportarTodas} className="flex gap-3 cursor-pointer">
                 <Package size={18} className="text-purple-600" />
                 <span>Baixar Todas (.docx)</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => handleSalvarNoGoogleDrive()} disabled={isSavingToDrive} className="flex gap-3 cursor-pointer">
+                {isSavingToDrive ? (
+                  <>
+                    <div className="animate-spin">
+                      <Cloud size={18} />
+                    </div>
+                    <span>Salvando no Drive...</span>
+                  </>
+                ) : (
+                  <>
+                    <Cloud size={18} className="text-blue-600" />
+                    <span>Salvar Todas no Google Drive</span>
+                  </>
+                )}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleCopiarTodas} className="flex gap-3 cursor-pointer">

@@ -1,16 +1,19 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { type AbaData, useAppStore } from '@/lib/store';
-import { CheckCircle2, ChevronLeft, ChevronRight, Clipboard, Download, FileJson, FileText, Plus, Save, X } from 'lucide-react';
+import { CheckCircle2, ChevronLeft, ChevronRight, Clipboard, Download, FileJson, FileText, Plus, Save, X, Cloud } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { baixarHtmlDocumento, copiarParaAreaTransferencia, exportarParaPdf, markdownToDocx } from '@/lib/markdown-to-docx';
+import { salvarNoGoogleDrive } from '@/lib/google-drive';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
+import { useSession } from 'next-auth/react';
 
 export const TabsBar: React.FC = () => {
+  const { data: session } = useSession();
   const { abas, abaAtiva, setAbaAtiva, adicionarAba, removerAba, atualizarAba, salvarNoStorage, textoSelecionado } = useAppStore();
   const [editandoId, setEditandoId] = useState<string | null>(null);
   const [novoNome, setNovoNome] = useState('');
@@ -19,6 +22,7 @@ export const TabsBar: React.FC = () => {
   const [canScrollRight, setCanScrollRight] = useState(false);
   const [abaExportando, setAbaExportando] = useState<string | null>(null);
   const [abaCopiadaId, setAbaCopiadaId] = useState<string | null>(null);
+  const [abaSalvandoNoDrive, setAbaSalvandoNoDrive] = useState<string | null>(null);
 
   const handleAdicionarAba = () => {
     adicionarAba();
@@ -83,6 +87,34 @@ export const TabsBar: React.FC = () => {
       console.error('Erro ao exportar PDF:', erro);
     }
   };
+
+  const handleSalvarNoGoogleDrive = async (e: React.MouseEvent, aba: AbaData) => {
+    e.stopPropagation();
+
+    if (!session) {
+      toast.error('Você precisa estar logado para salvar no Google Drive');
+      return;
+    }
+
+    setAbaSalvandoNoDrive(aba.id);
+    try {
+      const conteudo = textoSelecionado || aba.conteudo;
+      const resultado = await salvarNoGoogleDrive(conteudo, aba.nome);
+
+      if (resultado.sucesso) {
+        toast.success(`"${resultado.nomeArquivo}" salvo no Google Drive com sucesso!`);
+      } else {
+        toast.error(resultado.erro || resultado.mensagem);
+      }
+    } catch (erro) {
+      toast.error('Erro ao salvar no Google Drive');
+      console.error('Erro:', erro);
+    } finally {
+      setAbaSalvandoNoDrive(null);
+    }
+  };
+
+  // ...existing code...
 
   const handleRemoverAba = (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
@@ -214,6 +246,22 @@ export const TabsBar: React.FC = () => {
                       <DropdownMenuItem onClick={(e) => handleExportarAba(e as any, aba)} className="flex gap-2 cursor-pointer">
                         <Download size={12} className="text-purple-500 flex-shrink-0" />
                         <span>Exportar Documento (.docx)</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={(e) => handleSalvarNoGoogleDrive(e, aba)} disabled={abaSalvandoNoDrive === aba.id} className="flex gap-2 cursor-pointer">
+                        {abaSalvandoNoDrive === aba.id ? (
+                          <>
+                            <div className="animate-spin">
+                              <Cloud size={12} />
+                            </div>
+                            <span>Salvando no Drive...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Cloud size={12} className="text-blue-500 flex-shrink-0" />
+                            <span>Salvar no Google Drive</span>
+                          </>
+                        )}
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem onClick={(e) => handleCopiarAba(e as any, aba)} className="flex gap-2 cursor-pointer">

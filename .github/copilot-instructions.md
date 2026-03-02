@@ -84,9 +84,14 @@ interface AppStore {
   // Dados
   abas: AbaData[]; // Array de todas as abas
   abaAtiva: string; // ID da aba ativa
+  mostrarPreview: boolean; // Controlar visibilidade do preview (mobile)
+  textoSelecionado: string; // Rastreamento de texto selecionado
 
   // Setters simples
   setAbaAtiva: (id: string) => void; // Muda aba ativa
+  setTextoSelecionado: (texto: string) => void; // Atualiza texto selecionado
+  setMostrarPreview: (valor: boolean) => void; // Define visibilidade preview
+  toggleMostrarPreview: () => void; // Alterna visibilidade preview
 
   // Operações em abas
   adicionarAba: () => void; // Cria nova aba com MARKDOWN_PADRAO
@@ -168,13 +173,28 @@ new Paragraph({
 });
 ```
 
-### 2.5. **Renderização de Diagramas Mermaid** (`components/MermaidDiagram.tsx`, `lib/mermaid-cleaner.ts`)
+### 2.5. **Renderização de Diagramas Mermaid e Plugins Remark** (`components/MarkdownPreview.tsx`, `lib/mermaid-cleaner.ts`)
 
-- **Preview**: `MarkdownPreview.tsx` detecta blocos ` ```mermaid ` e renderiza via `<MermaidDiagram>` component
-- **Inicialização**: `mermaid.initialize()` com `theme: 'default'` e `securityLevel: 'loose'`
-- **Erro Handling**: Renderiza div vermelho com mensagem de erro se diagrama falhar (ex: sintaxe inválida)
-- **Limpeza**: `limparDiagramaMermaid()` remove tags `<br/>`, `<br>`, `</br>` que quebram parseamento Mermaid
-- **Limitação DOCX**: Diagramas Mermaid não são exportados para DOCX — renderizados como bloco de código
+**Plugins Remark Configurados**:
+
+- **`remarkGfm`** (4.0.0) — GitHub Flavored Markdown (tabelas, strikethrough, task lists)
+- **`remarkBreaks`** (4.0.0) — Quebras de linha simples em tags `<br>`
+- **`remarkEmoji`** (5.0.2) — Suporte para emojis (`:smile:` → 😄)
+- **`remarkToc`** (9.0.0) — Tabela de conteúdos automática `## Table of Contents`
+- **`remarkMath`** (6.0.0) — Equações matemáticas com delimitadores `$$..$$` ou `$...$`
+- **`rehypeKatex`** (7.0.1) — Renderização KaTeX (requer import CSS: `import 'katex/dist/katex.min.css'`)
+
+**Preview**: `MarkdownPreview.tsx` detecta blocos ` ```mermaid ` e renderiza via `<MermaidDiagram>` component
+
+**Inicialização Mermaid**: `mermaid.initialize()` com `theme: 'default'` e `securityLevel: 'loose'`
+
+**Erro Handling**: Renderiza div vermelho com mensagem de erro se diagrama falhar (ex: sintaxe inválida)
+
+**Limpeza**: `limparDiagramaMermaid()` remove tags `<br/>`, `<br>`, `</br>` que quebram parseamento Mermaid
+
+**Limitação DOCX**: Diagramas Mermaid não são exportados para DOCX — renderizados como bloco de código
+
+**Ordem dos plugins importa**: `[remarkGfm, remarkBreaks, remarkEmoji, remarkToc, remarkMath]` e `[rehypeKatex]`
 
 ---
 
@@ -196,7 +216,7 @@ interface ComponentProps {
 export const MyComponent: React.FC<ComponentProps> = ({ content }) => {
   // Hooks
   const { data: session } = useSession();
-  const { markdown, setMarkdown } = useAppStore();
+  const { abas, abaAtiva, salvarNoStorage } = useAppStore(); // ✅ Padrão para acessar store
   const [localState, setLocalState] = useState(false);
   const ref = useRef<HTMLElement>(null);
 
@@ -207,6 +227,28 @@ export const MyComponent: React.FC<ComponentProps> = ({ content }) => {
     </div>
   );
 };
+```
+
+### **Renderização Condicional com Preview Toggle**
+
+O store oferece `mostrarPreview` e `toggleMostrarPreview()` para permitir esconder/mostrar o preview em mobile:
+
+```typescript
+const { mostrarPreview, toggleMostrarPreview } = useAppStore();
+
+return (
+  <div className="flex flex-1 overflow-hidden gap-px">
+    {/* Editor sempre visível */}
+    <MarkdownEditor />
+    
+    {/* Preview toggle em mobile */}
+    {mostrarPreview && <MarkdownPreview />}
+    
+    <button onClick={toggleMostrarPreview}>
+      {mostrarPreview ? <Eye /> : <EyeOff />}
+    </button>
+  </div>
+);
 ```
 
 ### **Animações com Framer Motion**
@@ -282,18 +324,115 @@ import typography from '@tailwindcss/typography';
 
 **`.prettierrc.cjs`** (configs importantes):
 
-- `printWidth: 100` — Limite de 100 caracteres por linha
+- `printWidth: 250` — Limite de 250 caracteres por linha
 - `singleQuote: true` — Aspas simples em JS/TS
 - **Overrides**: TSX usa `jsxSingleQuote: false` (aspas duplas em JSX)
 - HTML usa `htmlWhitespaceSensitivity: 'css'`
-- Markdown e MDX com parser `markdown`
+- Markdown com parser `markdown`
 
 **`.eslintrc.cjs`** (regras críticas):
 
 - `@typescript-eslint/no-explicit-any: ['off']` — Necessário para props em `react-markdown`
-- `@typescript-eslint/no-unused-vars: ['warn', { argsIgnorePattern: '^_' }]` — Permite underscore para variáveis não utilizadas
+- `@typescript-eslint/no-unused-vars: ['warn', { argsIgnorePattern: '^_|^node$' }]` — Permite underscore para variáveis não utilizadas
 - `react/react-in-jsx-scope: 'off'` — React 19 não requer import
 - `prettier/prettier` integrado diretamente
+
+---
+
+## 🧪 Padrões de Testes (Jest + React Testing Library)
+
+### **Configuração Jest** (`jest.config.js`)
+
+- **Test Environment**: `jest-environment-jsdom` (para componentes React)
+- **Path Mapping**: `@/` mapeia para raiz do projeto
+- **Setup File**: `jest.setup.js` (configuração global)
+- **Padrão de testes**: `**/__tests__/**/*.[jt]s?(x)` ou `**/?(*.)+(spec|test).[jt]s?(x)`
+- **Coverage**: Coleta de `app/`, `components/`, `lib/` (exclui `.d.ts`, `node_modules`, `.next`, `coverage`)
+
+⚠️ **Nota crítica**: `jest.config.js` usa ES modules com `import nextJest from 'next/jest.js'`. O último `module.exports` é necessário para compatibilidade com Jest.
+
+### **Estrutura de Testes para Store Zustand** (`__tests__/lib/store.test.ts`)
+
+Padrão usando `useAppStore.getState()` para acessar estado sem componentes:
+
+```typescript
+import { useAppStore } from '@/lib/store';
+
+describe('useAppStore', () => {
+  beforeEach(() => {
+    const { fecharTodasAsAbas } = useAppStore.getState();
+    fecharTodasAsAbas();  // Reset state antes de cada teste
+  });
+
+  it('deve adicionar uma nova aba', () => {
+    const { adicionarAba, abas } = useAppStore.getState();
+    const abasAntes = abas.length;
+
+    adicionarAba();
+
+    const { abas: abasDepois } = useAppStore.getState();
+    expect(abasDepois.length).toBe(abasAntes + 1);
+  });
+
+  it('deve atualizar conteúdo de uma aba', () => {
+    const { abas, atualizarAba } = useAppStore.getState();
+    const idAba = abas[0].id;
+    const novoConteudo = '# Novo Título';
+
+    atualizarAba(idAba, novoConteudo);
+
+    const { abas: abasAtualizado } = useAppStore.getState();
+    const abaAtualizada = abasAtualizado.find((a) => a.id === idAba);
+    expect(abaAtualizada?.conteudo).toBe(novoConteudo);
+  });
+
+  it('deve manter sempre pelo menos 1 aba', () => {
+    const { removerAba, abas } = useAppStore.getState();
+    const idAbaUnica = abas[0].id;
+
+    removerAba(idAbaUnica);
+
+    const { abas: abasAposTentarRemover } = useAppStore.getState();
+    expect(abasAposTentarRemover.length).toBeGreaterThanOrEqual(1);
+  });
+});
+```
+
+### **Estrutura de Testes para Componentes** (`__tests__/components/*.test.tsx`)
+
+Padrão com `render()` do React Testing Library e `useAppStore` em mocks:
+
+```typescript
+import { render, screen } from '@testing-library/react';
+import { SessionProvider } from 'next-auth/react';
+import { MyComponent } from '@/components/MyComponent';
+
+// Mock da sessão
+const mockSession = {
+  user: { name: 'Test User', email: 'test@example.com' },
+  expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+};
+
+describe('MyComponent', () => {
+  it('deve renderizar conteúdo corretamente', () => {
+    render(
+      <SessionProvider session={mockSession}>
+        <MyComponent content="Test content" />
+      </SessionProvider>,
+    );
+
+    expect(screen.getByText('Test content')).toBeInTheDocument();
+  });
+});
+```
+
+### **Scripts de Teste**
+
+```bash
+npm run test                # Rodar testes uma vez
+npm run test:watch         # Modo watch (re-roda ao salvar)
+npm run test:coverage      # Coverage report (exclui .d.ts, node_modules, .next)
+```
 
 ---
 
@@ -368,6 +507,12 @@ const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
 
 ---
 
+### Documemtação de Desenvolvimento e Debug
+
+Usar a pasta ./docs para documentação de desenvolvimento, debug e armadilhas comuns. Esta seção é crítica para manutenção futura e onboarding de novos desenvolvedores.
+Todos os detalhes técnicos, padrões de código, armadilhas comuns e soluções de debug devem ser documentados aqui para referência rápida.
+O padrao é markdown com seções claras, exemplos de código e explicações detalhadas.
+
 ### Build e Desenvolvimento
 
 ```bash
@@ -382,14 +527,18 @@ npm run format                # Formatar código com Prettier
 
 ### Debug Comum
 
-- **"Abas não salvam"**: Verificar `salvarNoStorage()` e localStorage em DevTools
-- **"Aba não renderiza preview"**: Verificar `abaAtual` em `page.tsx` (deve ser não-nulo)
+- **"Abas não salvam"**: Verificar `salvarNoStorage()` e localStorage em DevTools → localStorage
+- **"Aba não renderiza preview"**: Verificar `abaAtual` em `page.tsx` (deve ser não-nulo) → pode estar undefined
 - **"Export não funciona"**: Verificar console — `markdownToDocx()` deve não lançar erro
 - **"Type errors"**: Rodar `npx tsc --noEmit` para verificar tipos
-- **"NEXTAUTH_SECRET missing"**: Adicionar variável de ambiente aleatória (mínimo 32 bytes)
-- **"Session null"**: Verificar `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `NEXTAUTH_SECRET`
-- **"Mermaid não renderiza"**: Verificar sintaxe em [mermaid.live](https://mermaid.live)
-- **"Zustand state não atualiza"**: Verificar que componente está marcado com `'use client'`
+- **"NEXTAUTH_SECRET missing"**: Adicionar variável de ambiente aleatória (mínimo 32 bytes) → `openssl rand -base64 32`
+- **"Session null"**: Verificar `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `NEXTAUTH_SECRET` em `.env.local`
+- **"Mermaid não renderiza"**: Verificar sintaxe em [mermaid.live](https://mermaid.live) → provavelmente erro na sintaxe do diagrama
+- **"Zustand state não atualiza"**: Verificar que componente está marcado com `'use client'` → necessário para hooks
+- **"Jest test fails com 'module is not defined'"**: `jest.config.js` está em ES module mas precisa `module.exports` no final — regra ESLint `@typescript-eslint/no-require-imports` desativada para este arquivo
+- **"ReferenceError: localStorage is not defined"**: Sempre usar `typeof window !== 'undefined'` antes de acessar `localStorage` (SSR safety)
+- **"Plugins remark não funcionam"**: Verificar ordem em `remarkPlugins={[remarkGfm, remarkBreaks, remarkEmoji, remarkToc, remarkMath]}` — ordem importa!
+- **"KaTeX não renderiza"**: Incluir `import 'katex/dist/katex.min.css'` antes de usar `rehypeKatex`
 
 ---
 

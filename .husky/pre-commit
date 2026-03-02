@@ -4,36 +4,43 @@
 echo "🔍 Executando verificações pre-commit..."
 echo ""
 
+PRECISA_RETRY=0
+
 # 1. ESLint + Prettier
 echo "📝 Executando ESLint..."
-npm run lint:fix
-
-if [ $? -ne 0 ]; then
-  echo "❌ ESLint falhou"
-  exit 1
+if ! npm run lint:fix; then
+  echo "❌ ESLint encontrou problemas"
+  PRECISA_RETRY=1
 fi
 
-echo "✅ ESLint passou"
+echo "✅ ESLint corrigido"
 echo ""
 
 # 2. Prettier
 echo "🎨 Formatando com Prettier..."
-npm run format
+if ! npm run format; then
+  echo "❌ Prettier encontrou problemas"
+  PRECISA_RETRY=1
+fi
 
-if [ $? -ne 0 ]; then
-  echo "❌ Prettier falhou"
+echo "✅ Prettier aplicado"
+echo ""
+
+# Se ESLint ou Prettier tiveram problemas, pedir para committar novamente
+if [ $PRECISA_RETRY -eq 1 ]; then
+  echo ""
+  echo "⚠️  Prettier ou ESLint fizeram alterações"
+  echo ""
+  echo "Execute novamente:"
+  echo "   git add ."
+  echo "   git commit -m \"<sua mensagem>\""
+  echo ""
   exit 1
 fi
 
-echo "✅ Prettier passou"
-echo ""
-
 # 3. Testes
 echo "🧪 Executando testes..."
-npm run test -- --passWithNoTests
-
-# shellcheck disable=SC2181
-if [ $? -ne 0 ]; then
+if ! npm run test -- --passWithNoTests; then
   echo "❌ Testes falharam"
   exit 1
 fi
@@ -43,10 +50,7 @@ echo ""
 
 # 4. Build TypeScript
 echo "🔨 Verificando build..."
-npm run build
-
-# shellcheck disable=SC2181
-if [ $? -ne 0 ]; then
+if ! npm run build; then
   echo "❌ Build falhou"
   exit 1
 fi
